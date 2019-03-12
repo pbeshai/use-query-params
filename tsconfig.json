@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "jsx": "react",
+    "declaration": true,
+    "pretty": true,
+    "rootDir": "src",
+    "sourceMap": false,
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true,
+    "outDir": "lib",
+    "lib": ["es2018", "dom"]
+  },
+  "exclude": [
+    "node_modules",
+    "lib",
+    "*.test.ts",
+    "*.test.tsx",
+    "examples",
+    "docs"
+  ]
+}

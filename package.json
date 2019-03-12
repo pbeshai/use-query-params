@@ -1,0 +1,42 @@
+{
+  "name": "use-query-params",
+  "version": "0.0.1",
+  "description": "React hook for serializing and deserializing URL query parameters",
+  "main": "lib/index.js",
+  "files": [
+    "lib/"
+  ],
+  "types": "lib/index.d.ts",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "NODE_ENV=development tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/pbeshai/use-query-params"
+  },
+  "keywords": [
+    "react",
+    "url",
+    "query",
+    "parameters",
+    "hook"
+  ],
+  "author": "Peter Beshai <peter.beshai@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/react": "^16.8.7",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
+    "typescript": "^3.3.3333"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0"
+  },
+  "dependencies": {
+    "query-string": "^6.3.0"
+  }
+}
