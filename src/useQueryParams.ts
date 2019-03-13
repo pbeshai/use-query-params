@@ -1,6 +1,9 @@
 import * as React from 'react';
-import { parse as parseQueryString } from 'query-string';
+import { parse as parseQueryString, ParsedQuery } from 'query-string';
 import { useQueryParam, QueryParamConfig } from './useQueryParam';
+import updateUrlQuery from './updateUrlQuery';
+import { QueryParamContext } from './QueryParamProvider';
+import { UrlUpdateType } from './types';
 
 interface QueryParamConfigMap {
   [paramName: string]: QueryParamConfig<any>;
@@ -12,39 +15,38 @@ type DecodedValueMap<QPCMap extends QueryParamConfigMap> = {
 
 type SetQuery<QPCMap extends QueryParamConfigMap> = (
   changes: Partial<DecodedValueMap<QPCMap>>,
-  updateType?: string
+  updateType?: UrlUpdateType
 ) => void;
 
 export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
-  const rawQuery = parseQueryString(window.location.search) || {};
+  const { history, location } = React.useContext(QueryParamContext);
+
+  // read in the raw query
+  const rawQuery =
+    (location.query as ParsedQuery) || parseQueryString(location.search) || {};
 
   // parse each parameter
 
   const paramNames = Object.keys(paramConfigMap);
   const decodedValues: Partial<DecodedValueMap<QPCMap>> = {};
-  const changeValues: any = {};
   for (const paramName of paramNames) {
-    const [decodedValue, changeValue] = useQueryParam(
+    decodedValues[paramName] = useQueryParam(
       paramName,
       paramConfigMap[paramName],
       rawQuery
-    );
-    decodedValues[paramName] = decodedValue;
-    changeValues[paramName] = changeValue;
+    )[0];
   }
 
-  console.log('decoded values xxx', decodedValues);
-  const setQuery = (
-    changes: Partial<DecodedValueMap<QPCMap>>,
-    updateType?: string
-  ) => {
-    console.log('in theory this bulk changes', changes, updateType);
-  };
+  const setQuery = React.useCallback(
+    (changes: Partial<DecodedValueMap<QPCMap>>, updateType?: UrlUpdateType) => {
+      updateUrlQuery(changes, location, history, updateType);
+    },
+    [location]
+  );
 
   return [decodedValues as DecodedValueMap<QPCMap>, setQuery];
-  // return useQueryParam('zz''zzz'), rawQuery);
 };
 
 export default useQueryParams;

@@ -19,17 +19,31 @@ export const useQueryParam = <T>(
 
   // read in the raw query
   if (!rawQuery) {
-    rawQuery = parseQueryString(window.location.search) || {};
+    rawQuery =
+      (location.query as ParsedQuery) ||
+      parseQueryString(location.search) ||
+      {};
   }
 
   const encodedValue = rawQuery[name] as string;
-  const decodedValue = paramConfig.decode(encodedValue);
 
-  const changeValue = (newValue: T, updateType?: UrlUpdateType) => {
-    const newEncodedValue = paramConfig.encode(newValue);
+  const decodedValue = React.useMemo(() => paramConfig.decode(encodedValue), [
+    encodedValue,
+  ]);
 
-    updateUrlQuery({ [name]: newEncodedValue }, location, history, updateType);
-  };
+  const changeValue = React.useCallback(
+    (newValue: T, updateType?: UrlUpdateType) => {
+      const newEncodedValue = paramConfig.encode(newValue);
+
+      updateUrlQuery(
+        { [name]: newEncodedValue },
+        location,
+        history,
+        updateType
+      );
+    },
+    [location]
+  );
 
   return [decodedValue, changeValue];
 };

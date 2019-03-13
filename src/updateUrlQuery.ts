@@ -1,5 +1,5 @@
 import { stringify, parse as parseQueryString } from 'query-string';
-import { UrlUpdateType } from './types';
+import { PushReplaceHistory, UrlUpdateType } from './types';
 
 interface EncodedQuery {
   [key: string]: string;
@@ -7,11 +7,6 @@ interface EncodedQuery {
 
 interface EncodedQueryWithNulls {
   [key: string]: string | null | undefined;
-}
-
-interface WrappedHistory {
-  push: (location: Location) => void;
-  replace: (location: Location) => void;
 }
 
 function mergeLocationQueryOrSearch(
@@ -36,10 +31,8 @@ function mergeLocationQueryOrSearch(
     };
   }
 
-  // remove react router key
-  // if (newLocation.key) {
-  // delete newLocation.key;
-  // }
+  // update react router key
+  (newLocation as any).key = `${Date.now()}`;
 
   return newLocation;
 }
@@ -91,7 +84,7 @@ function updateInLocation(
 export function updateUrlQuery(
   queryReplacements: EncodedQueryWithNulls,
   location: Location,
-  history: WrappedHistory,
+  history: PushReplaceHistory,
   updateType: UrlUpdateType = 'replaceIn'
 ): void {
   switch (updateType) {
