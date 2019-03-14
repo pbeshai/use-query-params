@@ -106,12 +106,12 @@ A few basic [examples](https://github.com/pbeshai/use-query-params/tree/master/e
 
 ### API
 
-- [UrlUpdateType](#)
-- [Param Types](#)
-- [useQueryParam](#)
-- [useQueryParams](#)
-- [encodeQueryParams](#)
-- [QueryParamProvider](#)
+- [UrlUpdateType](#urlupdatetype)
+- [Param Types](#param-types)
+- [useQueryParam](#usequeryparam)
+- [useQueryParams](#usequeryparams-1)
+- [encodeQueryParams](#encodequeryparams)
+- [QueryParamProvider](#queryparamprovider)
 - [Type Definitions](https://github.com/pbeshai/use-query-params/blob/master/src/types.ts)
 - [Serialization Utility Functions](https://github.com/pbeshai/use-query-params/blob/master/src/serialize.ts)
 
