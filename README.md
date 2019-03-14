@@ -16,7 +16,7 @@ Using npm:
 $ npm install --save use-query-params
 ```
 
-Link your routing system (e.g. [React Router example](#), [Reach Router example](#)):
+Link your routing system (e.g., [React Router example](#), [Reach Router example](#)):
 ```js
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -40,21 +40,20 @@ ReactDOM.render(
 Add the hook to your component. There are two options: `useQueryParam`:
 ```js
 import * as React from 'react';
-import {
-  useQueryParam,
-  NumberParam,
-} from 'use-query-params';
+import { useQueryParam, NumberParam } from 'use-query-params';
 
 const UseQueryParamExample = () => {
   const [num, setNum] = useQueryParam('x', NumberParam);
-  
+
   return (
     <div>
       <h1>num is {num}</h1>
       <button onClick={() => setNum(Math.random())}>Change</button>
     </div>
   );
-}
+};
+
+export default UseQueryParamExample;
 ```
 
 Or `useQueryParams`:
@@ -67,28 +66,43 @@ import {
   ArrayParam,
 } from 'use-query-params';
 
-const UseQueryParamExample = () => {
-  const [query, setQuery] = useQueryParams({ x: NumberParam, q: StringParam, filters: ArrayParam });
+const UseQueryParamsExample = () => {
+  const [query, setQuery] = useQueryParams({
+    x: NumberParam,
+    q: StringParam,
+    filters: ArrayParam,
+  });
   const { x: num, q: searchQuery, filters = [] } = query;
-  
+
   return (
     <div>
       <h1>num is {num}</h1>
       <button onClick={() => setQuery({ x: Math.random() })}>Change</button>
       <h1>searchQuery is {searchQuery}</h1>
       <h1>There are {filters.length} filters active.</h1>
-      <button onClick={() => setQuery({ x: Math.random(), filters: [...filters, 'foo'] })}>Change Two</button>
+      <button
+        onClick={() =>
+          setQuery(
+            { x: Math.random(), filters: [...filters, 'foo'], q: 'bar' },
+            'push'
+          )
+        }
+      >
+        Change All
+      </button>
     </div>
   );
-}
+};
+
+export default UseQueryParamsExample;
 ```
 
 ### Examples
 
-A few basic examples have been put together to demonstrate how `useQueryParams` works with different routing systems.
+A few basic [examples](https://github.com/pbeshai/use-query-params/tree/master/examples) have been put together to demonstrate how `useQueryParams` works with different routing systems.
 
-- [React Router Example](#TODO)
-- [Reach Router Example](#TODO)
+- [React Router Example](https://github.com/pbeshai/use-query-params/tree/master/examples/react-router)
+- [Reach Router Example](https://github.com/pbeshai/use-query-params/tree/master/examples/reach-router)
 
 ### API
 
