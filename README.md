@@ -106,10 +106,58 @@ A few basic [examples](https://github.com/pbeshai/use-query-params/tree/master/e
 
 ### API
 
+- [UrlUpdateType](#)
+- [Param Types](#)
+- [useQueryParam](#)
+- [useQueryParams](#)
+- [encodeQueryParams](#)
+- [QueryParamProvider](#)
+- [Type Definitions](https://github.com/pbeshai/use-query-params/blob/master/src/types.ts)
+- [Serialization Utility Functions](https://github.com/pbeshai/use-query-params/blob/master/src/serialize.ts)
+
+#### UrlUpdateType
+
+The `UrlUpdateType` is a string type definings the different methods for updating the URL:
+
+ - `'replaceIn'`: Replace just a single parameter, leaving the rest as is
+ - `'replace'`: Replace all parameters with just those specified
+ - `'pushIn'`: Push just a single parameter, leaving the rest as is (back button works)
+ - `'push'`: Push all parameters with just those specified (back button works)
+
+
+#### Param Types
+See [all param definitions here](https://github.com/pbeshai/use-query-params/blob/master/src/params.ts). You can define your own parameter types by creating an object with an `encode` and a `decode` function. See the existing definitions for examples.
+
+Note that all nully values will encode and decode as `undefined`.
+
+| Param | Type | Example Decoded | Example Encoded |
+| --- | --- | --- | --- |
+| StringParam | string | `'foo'` | `'foo'` |
+| NumberParam | number | `123` | `'123'` |
+| ObjectParam | { key: string } | `{ foo: 'bar', baz: 'zzz' }` | `'foo-bar_baz-zzz'` |
+| ArrayParam | string[] | `['a','b','c']` | `'a_b_c'` |
+| JsonParam | any | `{ foo: 'bar' }` | `'{"foo":"bar"}'` |
+| DateParam | Date | `Date(2019, 2, 1)` | `'2019-03-01'` |
+| BooleanParam | boolean | `true` | `'1'` |
+| NumericObjectParam | { key: number } | `{ foo: 1, bar: 2 }` | `'foo-1_bar-2'` |
+| NumericArrayParam | number[] | `[1, 2, 3]` | `'1_2_3'` |
+
+**Example**
+```js
+import { ArrayParam, useQueryParam, useQueryParams } from 'use-query-params';
+
+// typically used with the hooks:
+const [foo, setFoo] = useQueryParam('foo', ArrayParam);
+// - OR -
+const [query, setQuery] = useQueryParams({ foo: ArrayParam });
+```
+<br/>
+
+
 #### useQueryParam
 
 ```js
-useQueryParam<T>(name: string, paramConfig: QueryParamConfig<T>, rawQuery?: ParsedQuery): 
+useQueryParam<T>(name: string, paramConfig: QueryParamConfig<T>, rawQuery?: ParsedQuery):
   [T | undefined, (newValue: T, updateType?: UrlUpdateType) => void]
 ```
 
@@ -122,9 +170,11 @@ is one of `'replace' | 'replaceIn' | 'push' | 'pushIn'`, defaulting to
 
 You may optionally pass in a rawQuery object, otherwise the query is derived
 from the location available in the QueryParamContext.
-  
+
 **Example**
 ```js
+import { useQueryParam, NumberParam } from 'use-query-params';
+
 // reads query parameter `foo` from the URL and stores its decoded numeric value
 const [foo, setFoo] = useQueryParam('foo', NumberParam);
 setFoo(500);
@@ -136,8 +186,8 @@ setFoo(123, 'push');
 #### useQueryParams
 
 ```js
-useQueryParams<QPCMap extends QueryParamConfigMap>(paramConfigMap: QPCMap): 
-  [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] 
+useQueryParams<QPCMap extends QueryParamConfigMap>(paramConfigMap: QPCMap):
+  [DecodedValueMap<QPCMap>, SetQuery<QPCMap>]
 ```
 
 Given a query parameter configuration (mapping query param name to `{ encode, decode }`),
@@ -146,9 +196,11 @@ return an object with the decoded values and a setter for updating them.
 The setter takes two arguments `(newQuery, updateType)` where updateType
 is one of `'replace' | 'replaceIn' | 'push' | 'pushIn'`, defaulting to
 `'replaceIn'`.
-  
+
 **Example**
 ```js
+import { useQueryParams, StringParam, NumberParam } from 'use-query-params';
+
 // reads query parameters `foo` and `bar` from the URL and stores their decoded values
 const [query, setQuery] = useQueryParams({ foo: NumberParam, bar: StringParam });
 setQuery({ foo: 500 })
@@ -157,7 +209,94 @@ setQuery({ foo: 123, bar: 'zzz' }, 'push');
 
 <br/>
 
+**Example with Custom Parameter Type**
+Parameter types are just objects with `{ encode, decode }` functions. You can
+provide your own if the provided ones don't work for your use case.
 
+```js
+import { useQueryParams } from 'use-query-params';
+
+const MyParam = {
+  encode(value) {
+    return `${value * 10000}`;
+  }
+
+  decode(strValue) {
+    return parseFloat(strValue) / 10000;
+  }
+}
+
+// ?foo=10000 -> query = { foo: 1 }
+const [query, setQuery] = useQueryParams({ foo: MyParam });
+
+// goes to ?foo=99000
+setQuery({ foo: 99 })
+```
+<br/>
+
+#### encodeQueryParams
+
+```js
+encodeQueryParams<QPCMap extends QueryParamConfigMap>(
+  paramConfigMap: QPCMap,
+  query: Partial<DecodedValueMap<QPCMap>>
+): EncodedQueryWithNulls
+```
+
+Convert the values in query to strings via the encode functions configured
+in paramConfigMap. This can be useful for constructing links using decoded
+query parameters.
+
+**Example**
+```js
+import { stringify } from 'query-string';
+import { encodeQueryParams, NumberParam } from 'use-query-params';
+
+// encode each parameter according to the configuration
+const encodedQuery = encodeQueryParams({ foo: NumberParam }, { foo });
+const link = `/?${stringify(encodedQuery)}`;
+```
+
+<br/>
+
+#### QueryParamProvider
+```js
+// Use one of these:
+<QueryParamProvider ReactRouterRoute={Route}><App /></QueryParamProvider>
+
+<QueryParamProvider reachHistory={globalHisory}><App /></QueryParamProvider>
+
+<QueryParamProvider history={myCustomHistory}><App /></QueryParamProvider>
+```
+
+The **QueryParamProvider** component links your routing library's history to
+the **useQueryParams** hook. It is needed for the hook to be able to update
+the URL and have the rest of your app know about it.
+
+See the tests or these examples for how to use it:
+
+- [React Router Example](https://github.com/pbeshai/use-query-params/tree/master/examples/react-router)
+- [Reach Router Example](https://github.com/pbeshai/use-query-params/tree/master/examples/reach-router)
+
+
+**Example (Reach Router)**
+```js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { globalHistory, Router } from '@reach/router';
+import { QueryParamProvider } from 'use-query-params';
+import App from './App';
+
+ReactDOM.render(
+  <QueryParamProvider reachHistory={globalHistory}>
+    <Router>
+      <App default />
+    </Router>
+  </QueryParamProvider>,
+  document.getElementById('root')
+);
+```
+<br/>
 
 ### Development
 
