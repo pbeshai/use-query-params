@@ -16,7 +16,7 @@ Using npm:
 $ npm install --save use-query-params
 ```
 
-Link your routing system (e.g., [React Router example](#), [Reach Router example](#)):
+Link your routing system (e.g., [React Router example](https://github.com/pbeshai/use-query-params/blob/master/examples/react-router/src/index.tsx), [Reach Router example](https://github.com/pbeshai/use-query-params/blob/master/examples/reach-router/src/index.tsx)):
 ```js
 import React from 'react';
 import ReactDOM from 'react-dom';
