@@ -1,6 +1,10 @@
 import * as React from 'react';
 import { PushReplaceHistory, ExtendedLocation } from './types';
 
+/**
+ * Subset of a @reach/router history object. We only
+ * care about the navigate function.
+ */
 interface ReachHistory {
   navigate: (
     to: string,
@@ -11,11 +15,21 @@ interface ReachHistory {
   ) => void;
 }
 
+/**
+ * Shape of the QueryParamContext, needed to update the URL
+ * and know its current state.
+ */
 export interface QueryParamContextValue {
   history: PushReplaceHistory;
   location: ExtendedLocation;
 }
 
+/**
+ * Adapts standard DOM window history to work with our
+ * { replace, push } interface.
+ *
+ * @param history Standard history provided by DOM
+ */
 function adaptWindowHistory(history: History): PushReplaceHistory {
   return {
     replace(location: Location) {
@@ -39,6 +53,12 @@ function adaptWindowHistory(history: History): PushReplaceHistory {
   };
 }
 
+/**
+ * Adapts @reach/router history to work with our
+ * { replace, push } interface.
+ *
+ * @param history globalHistory from @reach/router
+ */
 function adaptReachHistory(history: ReachHistory): PushReplaceHistory {
   return {
     replace(location: Location) {
@@ -60,28 +80,54 @@ function adaptReachHistory(history: ReachHistory): PushReplaceHistory {
   };
 }
 
-function getContextValue(overrides: any = {}): QueryParamContextValue {
+/**
+ * Helper to produce the context value falling back to
+ * window history and location if not provided.
+ */
+function getContextValue(
+  contextValue: Partial<QueryParamContextValue> = {}
+): QueryParamContextValue {
+  const value = { ...contextValue };
+
   const hasWindow = typeof window !== 'undefined';
+  if (hasWindow) {
+    if (!value.history) {
+      value.history = adaptWindowHistory(window.history);
+    }
+    if (!value.location) {
+      value.location = window.location;
+    }
+  }
 
-  const value = {
-    history: hasWindow ? adaptWindowHistory(window.history) : null,
-    location: hasWindow ? window.location : null,
-    ...overrides,
-  };
-
-  return value;
+  return value as QueryParamContextValue;
 }
 
 export const QueryParamContext = React.createContext(getContextValue());
 
+/**
+ * Props for the Provider component, used to hook the active routing
+ * system into our controls.
+ */
 interface Props {
+  /** Main app goes here */
   children: React.ReactNode;
-  ReactRouterRoute?: React.ComponentClass; // react-router <Route> component
+  /** `Route` from react-router */
+  ReactRouterRoute?: React.ComponentClass;
+  /** `globalHistory` from @reach/router */
   reachHistory?: ReachHistory;
+  /** Manually provided history that meets the { replace, push } interface */
   history?: PushReplaceHistory;
+  /**
+   * Override location object, otherwise window.location or the
+   * location provided by the active routing system is used.
+   */
   location?: ExtendedLocation;
 }
 
+/**
+ * Context provider for query params to have access to the
+ * active routing system, enabling updates to the URL.
+ */
 export function QueryParamProvider({
   children,
   ReactRouterRoute,
@@ -104,6 +150,7 @@ export function QueryParamProvider({
     );
   }
 
+  // if we are using reach router, use its history
   if (reachHistory) {
     return (
       <QueryParamContext.Provider
@@ -117,16 +164,9 @@ export function QueryParamProvider({
     );
   }
 
-  const overrides: any = {};
-  if (history) {
-    overrides.history = history;
-  }
-  if (location) {
-    overrides.location = location;
-  }
-
+  // neither reach nor react-router, so allow manual overrides
   return (
-    <QueryParamContext.Provider value={getContextValue(overrides)}>
+    <QueryParamContext.Provider value={getContextValue({ history, location })}>
       {children}
     </QueryParamContext.Provider>
   );
