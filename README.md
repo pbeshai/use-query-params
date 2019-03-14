@@ -3,8 +3,16 @@
   <p>A <a href="https://reactjs.org/docs/hooks-intro.html">React Hook</a> for managing state in URL query parameters with easy serialization.
   </p>
   <p>Works with <a href="https://reacttraining.com/react-router/">React Router</a> and <a href="https://reach.tech/router">Reach Router</a> out of the box. TypeScript supported.</p>
-</div>
+
 <hr />
+
+<a href="#installation">Installation</a> | 
+<a href="#usage">Usage</a> | 
+<a href="#examples">Examples</a> | 
+<a href="#api">API</a>
+
+</div>
+<hr/>
 
 When creating apps with easily shareable URLs, you often want to encode state as query parameters, but all query parameters must be encoded as strings. `useQueryParams` allows you to easily encode and decode data of any type as query parameters with smart memoization to prevent creating unnecessary duplicate objects.
 
