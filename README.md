@@ -6,6 +6,94 @@
 </div>
 <hr />
 
+When creating apps with easily shareable URLs, you often want to encode state as query parameters, but all query parameters must be encoded as strings. `useQueryParams` allows you to easily encode and decode data of any type as query parameters with smart memoization to prevent creating unnecessary duplicate objects.
+
+### Installation
+
+Using npm:
+
+```
+$ npm install --save use-query-params
+```
+
+Link your routing system (e.g. [React Router example](#), [Reach Router example](#)):
+```js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { QueryParamProvider } from 'use-query-params';
+import App from './App';
+
+ReactDOM.render(
+  <Router>
+    <QueryParamProvider ReactRouterRoute={Route}>
+      <App />
+    </QueryParamProvider>
+  </Router>,
+  document.getElementById('root')
+);
+```
+
+
+### Usage
+
+Add the hook to your component. There are two options: `useQueryParam`:
+```js
+import * as React from 'react';
+import {
+  useQueryParam,
+  NumberParam,
+} from 'use-query-params';
+
+const UseQueryParamExample = () => {
+  const [num, setNum] = useQueryParam('x', NumberParam);
+  
+  return (
+    <div>
+      <h1>num is {num}</h1>
+      <button onClick={() => setNum(Math.random())}>Change</button>
+    </div>
+  );
+}
+```
+
+Or `useQueryParams`:
+```js
+import * as React from 'react';
+import {
+  useQueryParams,
+  StringParam,
+  NumberParam,
+  ArrayParam,
+} from 'use-query-params';
+
+const UseQueryParamExample = () => {
+  const [query, setQuery] = useQueryParams({ x: NumberParam, q: StringParam, filters: ArrayParam });
+  const { x: num, q: searchQuery, filters = [] } = query;
+  
+  return (
+    <div>
+      <h1>num is {num}</h1>
+      <button onClick={() => setQuery({ x: Math.random() })}>Change</button>
+      <h1>searchQuery is {searchQuery}</h1>
+      <h1>There are {filters.length} filters active.</h1>
+      <button onClick={() => setQuery({ x: Math.random(), filters: [...filters, 'foo'] })}>Change Two</button>
+    </div>
+  );
+}
+```
+
+### Examples
+
+A few basic examples have been put together to demonstrate how `useQueryParams` works with different routing systems.
+
+- [React Router Example](#TODO)
+- [Reach Router Example](#TODO)
+
+### API
+
+TODO
+
 ### Development
 
 Run the typescript compiler in watch mode:
