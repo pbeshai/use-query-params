@@ -30,9 +30,7 @@ export const ObjectParam: QueryParamConfig<{
 /**
  * For flat arrays of strings
  */
-export const ArrayParam: QueryParamConfig<
-  (string | undefined)[] | (number | undefined)[]
-> = {
+export const ArrayParam: QueryParamConfig<(string | undefined)[]> = {
   encode: Serialize.encodeArray,
   decode: Serialize.decodeArray,
 };

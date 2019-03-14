@@ -203,7 +203,7 @@ export function decodeJson(
  * @return {String} The JSON string representation of array
  */
 export function encodeArray(
-  array: (string | undefined)[] | (number | undefined)[] | null | undefined,
+  array: (string | undefined)[] | null | undefined,
   entrySeparator = '_'
 ): string | undefined {
   if (!array) {
@@ -238,7 +238,10 @@ export function decodeArray(
  * @param {Array} array The array to be encoded
  * @return {String} The JSON string representation of array
  */
-export const encodeNumericArray = encodeArray;
+export const encodeNumericArray = encodeArray as (
+  array: (number | undefined)[] | null | undefined,
+  entrySeparator?: string
+) => string | undefined;
 
 /**
  * Decodes a JSON string into javascript array where all entries are numbers
