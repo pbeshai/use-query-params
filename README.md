@@ -51,6 +51,7 @@ import * as React from 'react';
 import { useQueryParam, NumberParam } from 'use-query-params';
 
 const UseQueryParamExample = () => {
+  // something like: ?x=123 in the URL
   const [num, setNum] = useQueryParam('x', NumberParam);
 
   return (
@@ -75,6 +76,7 @@ import {
 } from 'use-query-params';
 
 const UseQueryParamsExample = () => {
+  // something like: ?x=123&q=foo&filters=a_b_c in the URL
   const [query, setQuery] = useQueryParams({
     x: NumberParam,
     q: StringParam,
