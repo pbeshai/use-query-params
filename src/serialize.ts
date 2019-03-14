@@ -114,7 +114,7 @@ export function encodeNumber(
 export function decodeNumber(
   numStr: string | null | undefined
 ): number | undefined {
-  if (numStr == null) {
+  if (numStr == null || numStr === '') {
     return undefined;
   }
 
