@@ -2,7 +2,7 @@
   <h1>useQueryParams</h1>
   <p>A <a href="https://reactjs.org/docs/hooks-intro.html">React Hook</a> for managing state in URL query parameters with easy serialization.
   </p>
-  <p>Works with <a href="https://reacttraining.com/react-router/">React Router</a> and <a href="https://reach.tech/router">Reach Router</a> out of the box.</p>
+  <p>Works with <a href="https://reacttraining.com/react-router/">React Router</a> and <a href="https://reach.tech/router">Reach Router</a> out of the box. TypeScript supported.</p>
 </div>
 <hr />
 
@@ -106,7 +106,58 @@ A few basic [examples](https://github.com/pbeshai/use-query-params/tree/master/e
 
 ### API
 
-TODO
+#### useQueryParam
+
+```js
+useQueryParam<T>(name: string, paramConfig: QueryParamConfig<T>, rawQuery?: ParsedQuery): 
+  [T | undefined, (newValue: T, updateType?: UrlUpdateType) => void]
+```
+
+Given a query param name and query parameter configuration `{ encode, decode }`
+return the decoded value and a setter for updating it.
+
+The setter takes two arguments `(newValue, updateType)` where updateType
+is one of `'replace' | 'replaceIn' | 'push' | 'pushIn'`, defaulting to
+`'replaceIn'`.
+
+You may optionally pass in a rawQuery object, otherwise the query is derived
+from the location available in the QueryParamContext.
+  
+**Example**
+```js
+// reads query parameter `foo` from the URL and stores its decoded numeric value
+const [foo, setFoo] = useQueryParam('foo', NumberParam);
+setFoo(500);
+setFoo(123, 'push');
+```
+
+<br/>
+
+#### useQueryParams
+
+```js
+useQueryParams<QPCMap extends QueryParamConfigMap>(paramConfigMap: QPCMap): 
+  [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] 
+```
+
+Given a query parameter configuration (mapping query param name to `{ encode, decode }`),
+return an object with the decoded values and a setter for updating them.
+
+The setter takes two arguments `(newQuery, updateType)` where updateType
+is one of `'replace' | 'replaceIn' | 'push' | 'pushIn'`, defaulting to
+`'replaceIn'`.
+  
+**Example**
+```js
+// reads query parameters `foo` and `bar` from the URL and stores their decoded values
+const [query, setQuery] = useQueryParams({ foo: NumberParam, bar: StringParam });
+setQuery({ foo: 500 })
+setQuery({ foo: 123, bar: 'zzz' }, 'push');
+```
+
+<br/>
+
+
 
 ### Development
 
