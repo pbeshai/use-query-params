@@ -1,26 +1,27 @@
 import { stringify, parse as parseQueryString } from 'query-string';
-import { PushReplaceHistory, UrlUpdateType } from './types';
+import {
+  PushReplaceHistory,
+  UrlUpdateType,
+  EncodedQuery,
+  EncodedQueryWithNulls,
+} from './types';
 
-export interface EncodedQuery {
-  [key: string]: string;
-}
-
-export interface EncodedQueryWithNulls {
-  [key: string]: string | null | undefined;
-}
-
+/**
+ * Mutates a location object to use the query parameters passed in
+ */
 function mergeLocationQueryOrSearch(
   location: Location,
   newQuery: EncodedQuery
 ): Location {
-  // if location.query exists, update the query in location. otherwise update the search string
-  // replace location.query
   let newLocation: Location;
+
+  // if location.query exists, update the query in location.
+  // otherwise update the search string
   if ((location as any).query) {
     newLocation = {
       ...location,
       query: newQuery,
-      search: '', // this is necessary at least for React Router v4
+      search: '', // this was necessary at least for React Router v4
     } as any;
   } else {
     // replace location.search
@@ -38,12 +39,17 @@ function mergeLocationQueryOrSearch(
   return newLocation;
 }
 
-// remove query params that are nully or an empty strings.
-// note: these values are assumed to be already encoded as strings.
+/**
+ * remove query params that are nully or an empty strings.
+ * note: these values are assumed to be already encoded as strings.
+ */
 function filterNully(query: EncodedQueryWithNulls): EncodedQuery {
   const filteredQuery: EncodedQuery = Object.keys(query).reduce(
     (queryAccumulator: any, queryParam: string) => {
+      // get encoded value for this param
       const encodedValue = query[queryParam];
+
+      // if it isn't null or empty string, add it to the accumulated obj
       if (encodedValue != null && encodedValue !== '') {
         queryAccumulator[queryParam] = encodedValue;
       }
@@ -56,12 +62,15 @@ function filterNully(query: EncodedQueryWithNulls): EncodedQuery {
   return filteredQuery;
 }
 
+/**
+ * Update a location, wiping out parameters not included in newQuery
+ */
 function updateLocation(newQuery: EncodedQueryWithNulls, location: Location) {
   return mergeLocationQueryOrSearch(location, filterNully(newQuery));
 }
 
 /**
- * Update multiple parts of the location at once
+ * Update a location while retaining existing parameters
  */
 function updateInLocation(
   queryReplacements: EncodedQueryWithNulls,
@@ -80,7 +89,10 @@ function updateInLocation(
 }
 
 /**
- * Updates a multiple values in a query based on the type
+ * Updates the URL to match the specified query changes.
+ * If replaceIn or pushIn are used as the updateType, then parameters
+ * not specified in queryReplacements are retained. If replace or push
+ * are used, only the values in queryReplacements will be available.
  */
 export function updateUrlQuery(
   queryReplacements: EncodedQueryWithNulls,

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { PushReplaceHistory } from './types';
+import { PushReplaceHistory, ExtendedLocation } from './types';
 
 interface ReachHistory {
   navigate: (
@@ -11,19 +11,7 @@ interface ReachHistory {
   ) => void;
 }
 
-interface Props {
-  children: React.ReactNode;
-  ReactRouterRoute?: React.ComponentClass; // react-router <Route> component
-  reachHistory?: ReachHistory;
-  history?: PushReplaceHistory;
-  location?: ExtendedLocation;
-}
-
-interface ExtendedLocation extends Location {
-  query?: { [param: string]: string };
-}
-
-interface QueryParamContextValue {
+export interface QueryParamContextValue {
   history: PushReplaceHistory;
   location: ExtendedLocation;
 }
@@ -85,6 +73,14 @@ function getContextValue(overrides: any = {}): QueryParamContextValue {
 }
 
 export const QueryParamContext = React.createContext(getContextValue());
+
+interface Props {
+  children: React.ReactNode;
+  ReactRouterRoute?: React.ComponentClass; // react-router <Route> component
+  reachHistory?: ReachHistory;
+  history?: PushReplaceHistory;
+  location?: ExtendedLocation;
+}
 
 export function QueryParamProvider({
   children,

@@ -3,13 +3,19 @@ import { parse as parseQueryString, ParsedQuery } from 'query-string';
 import { QueryParamContext } from './QueryParamProvider';
 import { StringParam } from './params';
 import { updateUrlQuery } from './updateUrlQuery';
-import { UrlUpdateType } from './types';
+import { UrlUpdateType, QueryParamConfig } from './types';
 
-export interface QueryParamConfig<T> {
-  encode: (value: T | null | undefined) => string | undefined;
-  decode: (value: string) => T | undefined;
-}
-
+/**
+ * Given a query param name and query parameter configuration ({ encode, decode })
+ * return the decoded value and a setter for updating it.
+ *
+ * The setter takes two arguments (newValue, updateType) where updateType
+ * is one of 'replace' | 'replaceIn' | 'push' | 'pushIn', defaulting to
+ * 'replaceIn'.
+ *
+ * You may optionally pass in a rawQuery object, otherwise the query is derived
+ * from the location available in the QueryParamContext.
+ */
 export const useQueryParam = <T>(
   name: string,
   paramConfig: QueryParamConfig<T> = StringParam as QueryParamConfig<any>,
@@ -25,13 +31,16 @@ export const useQueryParam = <T>(
       {};
   }
 
+  // read in the encoded string value
   const encodedValue = rawQuery[name] as string;
 
+  // decode if the encoded value has changed, otherwise re-use memoized value
   const decodedValue = React.useMemo(() => paramConfig.decode(encodedValue), [
     encodedValue,
   ]);
 
-  const changeValue = React.useCallback(
+  // create the setter, memoizing via useCallback
+  const setValue = React.useCallback(
     (newValue: T, updateType?: UrlUpdateType) => {
       const newEncodedValue = paramConfig.encode(newValue);
 
@@ -45,5 +54,5 @@ export const useQueryParam = <T>(
     [location]
   );
 
-  return [decodedValue, changeValue];
+  return [decodedValue, setValue];
 };

@@ -1,23 +1,49 @@
 import * as React from 'react';
 import { parse as parseQueryString, ParsedQuery } from 'query-string';
-import { useQueryParam, QueryParamConfig } from './useQueryParam';
-import updateUrlQuery, { EncodedQueryWithNulls } from './updateUrlQuery';
+import { useQueryParam } from './useQueryParam';
+import updateUrlQuery from './updateUrlQuery';
 import { QueryParamContext } from './QueryParamProvider';
-import { UrlUpdateType } from './types';
+import {
+  UrlUpdateType,
+  EncodedQueryWithNulls,
+  DecodedValueMap,
+  SetQuery,
+  QueryParamConfigMap,
+} from './types';
 
-interface QueryParamConfigMap {
-  [paramName: string]: QueryParamConfig<any>;
+/**
+ * Convert the values in query to strings via the encode functions configured
+ * in paramConfigMap
+ *
+ * @param paramConfigMap Map from query name to { encode, decode } config
+ * @param query Query updates mapping param name to decoded value
+ */
+export function encodeQueryParams<QPCMap extends QueryParamConfigMap>(
+  paramConfigMap: QPCMap,
+  query: Partial<DecodedValueMap<QPCMap>>
+): EncodedQueryWithNulls {
+  const encodedChanges: EncodedQueryWithNulls = {};
+  const changingParamNames = Object.keys(query);
+  for (const paramName of changingParamNames) {
+    if (!paramConfigMap[paramName]) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(
+          `Skipping encoding parameter ${paramName} since it was not configured.`
+        );
+      }
+      continue;
+    }
+    encodedChanges[paramName] = paramConfigMap[paramName].encode(
+      query[paramName]
+    );
+  }
+  return encodedChanges;
 }
 
-type DecodedValueMap<QPCMap extends QueryParamConfigMap> = {
-  [P in keyof QPCMap]: ReturnType<QPCMap[P]['decode']>
-};
-
-type SetQuery<QPCMap extends QueryParamConfigMap> = (
-  changes: Partial<DecodedValueMap<QPCMap>>,
-  updateType?: UrlUpdateType
-) => void;
-
+/**
+ * Given a query parameter configuration (mapping query param name to { encode, decode }),
+ * return an object with the decoded values and a setter for updating them.
+ */
 export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
@@ -27,8 +53,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   const rawQuery =
     (location.query as ParsedQuery) || parseQueryString(location.search) || {};
 
-  // parse each parameter
-
+  // parse each parameter via usQueryParam
   const paramNames = Object.keys(paramConfigMap);
   const decodedValues: Partial<DecodedValueMap<QPCMap>> = {};
   for (const paramName of paramNames) {
@@ -39,24 +64,14 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     )[0];
   }
 
+  // create a setter for updating multiple query params at once
   const setQuery = React.useCallback(
     (changes: Partial<DecodedValueMap<QPCMap>>, updateType?: UrlUpdateType) => {
       // encode as strings for the URL
-      const encodedChanges: EncodedQueryWithNulls = {};
-      const changingParamNames = Object.keys(changes);
-      for (const paramName of changingParamNames) {
-        if (!paramConfigMap[paramName]) {
-          if (process.env.NODE_ENV === 'development') {
-            console.warn(
-              `Skipping encoding parameter ${paramName} since it was not configured.`
-            );
-          }
-          continue;
-        }
-        encodedChanges[paramName] = paramConfigMap[paramName].encode(
-          changes[paramName]
-        );
-      }
+      const encodedChanges: EncodedQueryWithNulls = encodeQueryParams(
+        paramConfigMap,
+        changes
+      );
 
       // update the URL
       updateUrlQuery(encodedChanges, location, history, updateType);
@@ -64,6 +79,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     [location]
   );
 
+  // no longer Partial
   return [decodedValues as DecodedValueMap<QPCMap>, setQuery];
 };
 
