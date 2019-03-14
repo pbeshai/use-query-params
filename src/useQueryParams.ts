@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { parse as parseQueryString, ParsedQuery } from 'query-string';
 import { useQueryParam, QueryParamConfig } from './useQueryParam';
-import updateUrlQuery from './updateUrlQuery';
+import updateUrlQuery, { EncodedQueryWithNulls } from './updateUrlQuery';
 import { QueryParamContext } from './QueryParamProvider';
 import { UrlUpdateType } from './types';
 
@@ -41,7 +41,25 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
 
   const setQuery = React.useCallback(
     (changes: Partial<DecodedValueMap<QPCMap>>, updateType?: UrlUpdateType) => {
-      updateUrlQuery(changes, location, history, updateType);
+      // encode as strings for the URL
+      const encodedChanges: EncodedQueryWithNulls = {};
+      const changingParamNames = Object.keys(changes);
+      for (const paramName of changingParamNames) {
+        if (!paramConfigMap[paramName]) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(
+              `Skipping encoding parameter ${paramName} since it was not configured.`
+            );
+          }
+          continue;
+        }
+        encodedChanges[paramName] = paramConfigMap[paramName].encode(
+          changes[paramName]
+        );
+      }
+
+      // update the URL
+      updateUrlQuery(encodedChanges, location, history, updateType);
     },
     [location]
   );

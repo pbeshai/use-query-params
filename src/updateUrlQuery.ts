@@ -1,11 +1,11 @@
 import { stringify, parse as parseQueryString } from 'query-string';
 import { PushReplaceHistory, UrlUpdateType } from './types';
 
-interface EncodedQuery {
+export interface EncodedQuery {
   [key: string]: string;
 }
 
-interface EncodedQueryWithNulls {
+export interface EncodedQueryWithNulls {
   [key: string]: string | null | undefined;
 }
 

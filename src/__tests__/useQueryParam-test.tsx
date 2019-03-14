@@ -69,5 +69,10 @@ describe('useQueryParam', () => {
     const [decodedValue3, setter3] = result.current;
     expect(decodedValue).not.toBe(decodedValue3);
     expect(decodedValue3).toEqual(['d', 'e', 'f']);
+
+    setter3(['d', 'e', 'f'], 'push');
+    rerender();
+    const [decodedValue4, setter4] = result.current;
+    expect(decodedValue3).toBe(decodedValue4);
   });
 });
