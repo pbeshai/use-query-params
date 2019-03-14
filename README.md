@@ -1,4 +1,8 @@
-# use-query-params
+<div align="center">
+  <h1>useQueryParams</h1>
+  <p>A <a href="https://reactjs.org/docs/hooks-intro.html">React Hook</a> for managing state in the URL with easy serialization. Works with [React Router](https://reacttraining.com/react-router/) and [Reach Router](https://reach.tech/router) out of the box.</p>
+</div>
+<hr />
 
 ### Development
 

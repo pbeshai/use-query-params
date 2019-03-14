@@ -1,6 +1,6 @@
 {
   "name": "use-query-params",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "React hook for serializing and deserializing URL query parameters",
   "main": "lib/index.js",
   "files": [
