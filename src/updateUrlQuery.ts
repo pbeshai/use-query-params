@@ -25,9 +25,10 @@ function mergeLocationQueryOrSearch(
   } else {
     // replace location.search
     const queryStr = stringify(newQuery);
+    const search = queryStr.length ? `?${queryStr}` : '';
     newLocation = {
       ...location,
-      search: queryStr.length ? `?${queryStr}` : '',
+      search,
     };
   }
 

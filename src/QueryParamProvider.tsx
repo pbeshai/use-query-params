@@ -15,6 +15,8 @@ interface Props {
   children: React.ReactNode;
   ReactRouterRoute?: React.ComponentClass; // react-router <Route> component
   reachHistory?: ReachHistory;
+  history?: PushReplaceHistory;
+  location?: ExtendedLocation;
 }
 
 interface ExtendedLocation extends Location {
@@ -88,6 +90,8 @@ export function QueryParamProvider({
   children,
   ReactRouterRoute,
   reachHistory,
+  history,
+  location,
 }: Props) {
   // if we have React Router, use it to get the context value
   if (ReactRouterRoute) {
@@ -107,16 +111,26 @@ export function QueryParamProvider({
   if (reachHistory) {
     return (
       <QueryParamContext.Provider
-        value={getContextValue({ history: adaptReachHistory(reachHistory) })}
+        value={getContextValue({
+          history: adaptReachHistory(reachHistory),
+          location,
+        })}
       >
         {children}
       </QueryParamContext.Provider>
     );
   }
 
-  // use
+  const overrides: any = {};
+  if (history) {
+    overrides.history = history;
+  }
+  if (location) {
+    overrides.location = location;
+  }
+
   return (
-    <QueryParamContext.Provider value={getContextValue()}>
+    <QueryParamContext.Provider value={getContextValue(overrides)}>
       {children}
     </QueryParamContext.Provider>
   );

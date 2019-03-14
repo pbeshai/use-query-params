@@ -39,6 +39,8 @@
     "jest": "^24.5.0",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
+    "react-hooks-testing-library": "^0.3.7",
+    "react-testing-library": "^6.0.0",
     "typescript": "^3.3.3333"
   },
   "peerDependencies": {
