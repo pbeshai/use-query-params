@@ -24,7 +24,10 @@
     "url",
     "query",
     "parameters",
-    "hook"
+    "hook",
+    "hooks",
+    "query param",
+    "react use"
   ],
   "author": "Peter Beshai <peter.beshai@gmail.com>",
   "license": "ISC",
