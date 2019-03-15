@@ -12,7 +12,8 @@
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-scripts": "2.1.8",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.3.3333",
+    "use-query-params": "file:../.."
   },
   "scripts": {
     "start": "react-scripts start",

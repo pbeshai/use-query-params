@@ -166,14 +166,14 @@ describe('serialize', () => {
       expect(decodeArray('')).not.toBeDefined();
     });
 
-    it('handles empty values', () => {
-      expect(decodeArray('__')).toEqual([undefined, undefined, undefined]);
+    it('filters empty values', () => {
+      expect(decodeArray('__')).toEqual([]);
     });
   });
 
   describe('encodeObject', () => {
     it('produces the correct value', () => {
-      const input = { test: 'bar', foo: 94 };
+      const input = { test: 'bar', foo: '94' };
       const expectedOutput = 'test-bar_foo-94';
       expect(encodeObject(input, '-', '_')).toBe(expectedOutput);
       expect(encodeObject(undefined)).not.toBeDefined();
@@ -223,12 +223,8 @@ describe('serialize', () => {
       expect(decodeNumericArray('')).not.toBeDefined();
     });
 
-    it('handles empty values', () => {
-      expect(decodeNumericArray('__')).toEqual([
-        undefined,
-        undefined,
-        undefined,
-      ]);
+    it('filters empty values', () => {
+      expect(decodeNumericArray('__')).toEqual([]);
     });
   });
 

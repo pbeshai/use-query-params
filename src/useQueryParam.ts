@@ -15,12 +15,15 @@ import { UrlUpdateType, QueryParamConfig } from './types';
  *
  * You may optionally pass in a rawQuery object, otherwise the query is derived
  * from the location available in the QueryParamContext.
+ *
+ * D = decoded type
+ * D2 = return value from decode (typically same as D)
  */
-export const useQueryParam = <T>(
+export const useQueryParam = <D, D2 = D>(
   name: string,
-  paramConfig: QueryParamConfig<T> = StringParam as QueryParamConfig<any>,
+  paramConfig: QueryParamConfig<D, D2> = StringParam as QueryParamConfig<any>,
   rawQuery?: ParsedQuery
-): [T | undefined, (newValue: T, updateType?: UrlUpdateType) => void] => {
+): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
   const { history, location } = React.useContext(QueryParamContext);
 
   // read in the raw query
@@ -41,7 +44,7 @@ export const useQueryParam = <T>(
 
   // create the setter, memoizing via useCallback
   const setValue = React.useCallback(
-    (newValue: T, updateType?: UrlUpdateType) => {
+    (newValue: D, updateType?: UrlUpdateType) => {
       const newEncodedValue = paramConfig.encode(newValue);
 
       updateUrlQuery(

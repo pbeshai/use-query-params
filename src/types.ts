@@ -42,20 +42,23 @@ export interface EncodedQueryWithNulls {
  * Configuration for a query param specifying how to encode it
  * (convert it to a string) and decode it (convert it from a string
  * back to its native type)
+ *
+ * D = type to be encoded
+ * D2 = type from decode (typically = D)
  */
-export interface QueryParamConfig<T> {
+export interface QueryParamConfig<D, D2 = D> {
   /** Convert the query param value to a string */
-  encode: (value: T | null | undefined) => string | undefined;
+  encode: (value: D) => string | undefined;
 
   /** Convert the query param string value to its native type */
-  decode: (value: string) => T | undefined;
+  decode: (value: string) => D2;
 }
 
 /**
  * Mapping from a query parameter name to a { encode, decode } config
  */
 export interface QueryParamConfigMap {
-  [paramName: string]: QueryParamConfig<any>;
+  [paramName: string]: QueryParamConfig<any, any>;
 }
 
 /**

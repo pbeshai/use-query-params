@@ -203,7 +203,7 @@ export function decodeJson(
  * @return {String} The JSON string representation of array
  */
 export function encodeArray(
-  array: (string | undefined)[] | null | undefined,
+  array: string[] | null | undefined,
   entrySeparator = '_'
 ): string | undefined {
   if (!array) {
@@ -222,14 +222,15 @@ export function encodeArray(
 export function decodeArray(
   arrayStr: string | null | undefined,
   entrySeparator = '_'
-): (string | undefined)[] | undefined {
+): string[] | undefined {
   if (!arrayStr) {
     return undefined;
   }
 
   return arrayStr
     .split(entrySeparator)
-    .map(item => (item === '' ? undefined : item));
+    .map(item => (item === '' ? undefined : item))
+    .filter(item => item !== undefined) as string[];
 }
 
 /**
@@ -239,7 +240,7 @@ export function decodeArray(
  * @return {String} The JSON string representation of array
  */
 export const encodeNumericArray = encodeArray as (
-  array: (number | undefined)[] | null | undefined,
+  array: number[] | null | undefined,
   entrySeparator?: string
 ) => string | undefined;
 
@@ -252,14 +253,16 @@ export const encodeNumericArray = encodeArray as (
 export function decodeNumericArray(
   arrayStr: string | null | undefined,
   entrySeparator = '_'
-): (number | undefined)[] | undefined {
+): number[] | undefined {
   const decoded = decodeArray(arrayStr, entrySeparator);
 
   if (!decoded) {
     return undefined;
   }
 
-  return decoded.map(d => (d == null ? undefined : +d));
+  return decoded
+    .map(d => (d == null ? undefined : +d))
+    .filter(d => d !== undefined) as number[];
 }
 
 /**
@@ -274,7 +277,7 @@ export function decodeNumericArray(
  * @return {String} The encoded object
  */
 export function encodeObject(
-  obj: { [key: string]: string | number | undefined } | null | undefined,
+  obj: { [key: string]: string | undefined } | null | undefined,
   keyValSeparator = '-',
   entrySeparator = '_'
 ): string | undefined {
@@ -326,7 +329,11 @@ export function decodeObject(
  * @param {String} entrySeparator="_" The separator between entries
  * @return {String} The encoded object
  */
-export const encodeNumericObject = encodeObject;
+export const encodeNumericObject = encodeObject as (
+  obj: { [key: string]: number | undefined } | null | undefined,
+  keyValSeparator?: string,
+  entrySeparator?: string
+) => string | undefined;
 
 /**
  * Decodes a simple object to javascript where all values are numbers.

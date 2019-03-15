@@ -84,7 +84,15 @@ const UseQueryParamExample = () => {
             </tr>
             <tr>
               <td>arr</td>
-              <td>{arr}</td>
+              <td>
+                {arr
+                  ? arr.map((d: string, i: number) => (
+                      <div key={i}>
+                        arr[{i}] = {d}
+                      </div>
+                    ))
+                  : arr}
+              </td>
               <td>{typeof arr}</td>
               <td>
                 <button

@@ -6,9 +6,16 @@ import {
   ArrayParam,
 } from 'use-query-params';
 
+const MyParam = {
+  encode: (val: number) => `MY_${val}`,
+  decode: (str: string | undefined) =>
+    str == null ? undefined : +str.split('_')[1],
+};
+
 const UseQueryParamExample = () => {
   const [count, setCount] = React.useState(0);
   const [zzz, setZzz] = useQueryParam('zzz', NumberParam);
+  const [custom, setCustom] = useQueryParam('custom', MyParam);
   const [test, setTest] = useQueryParam('test', StringParam);
   const [anyp, setAnyP] = useQueryParam('anyp');
   const [arr, setArr] = useQueryParam('arr', ArrayParam);
@@ -42,6 +49,18 @@ const UseQueryParamExample = () => {
               <td>
                 <button
                   onClick={() => setZzz(Math.floor(Math.random() * 10000))}
+                >
+                  Change
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>custom</td>
+              <td>{custom}</td>
+              <td>{typeof custom}</td>
+              <td>
+                <button
+                  onClick={() => setCustom(Math.floor(Math.random() * 10000))}
                 >
                   Change
                 </button>
@@ -84,7 +103,15 @@ const UseQueryParamExample = () => {
             </tr>
             <tr>
               <td>arr</td>
-              <td>{arr}</td>
+              <td>
+                {arr
+                  ? arr.map((d: string, i: number) => (
+                      <div key={i}>
+                        arr[{i}] = {d}
+                      </div>
+                    ))
+                  : arr}
+              </td>
               <td>{typeof arr}</td>
               <td>
                 <button
