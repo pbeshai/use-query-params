@@ -35,6 +35,9 @@ export function calledPushQuery(
 export function makeMockLocation(query: ParsedQuery): Location {
   const queryStr = stringify(query);
   return {
+    protocol: 'http:',
+    host: 'localhost',
+    pathname: '/',
     search: queryStr.length ? `?${queryStr}` : '',
   } as Location;
 }

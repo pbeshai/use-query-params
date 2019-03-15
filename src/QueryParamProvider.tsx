@@ -112,7 +112,7 @@ interface Props {
   /** Main app goes here */
   children: React.ReactNode;
   /** `Route` from react-router */
-  ReactRouterRoute?: React.ComponentClass;
+  ReactRouterRoute?: React.ComponentClass | React.FunctionComponent;
   /** `globalHistory` from @reach/router */
   reachHistory?: ReachHistory;
   /** Manually provided history that meets the { replace, push } interface */
