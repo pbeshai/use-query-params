@@ -1,4 +1,4 @@
-Demo of useQueryParams with React Router
+# Demo of useQueryParams with Reach Router
 
 To run, you'll need to link url-query-params by running:
 

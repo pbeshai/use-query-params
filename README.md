@@ -16,6 +16,8 @@
 
 When creating apps with easily shareable URLs, you often want to encode state as query parameters, but all query parameters must be encoded as strings. `useQueryParams` allows you to easily encode and decode data of any type as query parameters with smart memoization to prevent creating unnecessary duplicate objects.
 
+**Not ready for hooks?** Check out [react-url-query](https://github.com/pbeshai/react-url-query) for a higher-order component (HOC) approach.
+
 ### Installation
 
 Using npm:
@@ -48,16 +50,19 @@ ReactDOM.render(
 Add the hook to your component. There are two options: `useQueryParam`:
 ```js
 import * as React from 'react';
-import { useQueryParam, NumberParam } from 'use-query-params';
+import { useQueryParam, NumberParam, StringParam } from 'use-query-params';
 
 const UseQueryParamExample = () => {
-  // something like: ?x=123 in the URL
+  // something like: ?x=123&foo=bar in the URL
   const [num, setNum] = useQueryParam('x', NumberParam);
+  const [foo, setFoo] = useQueryParam('foo', StringParam);
 
   return (
     <div>
       <h1>num is {num}</h1>
       <button onClick={() => setNum(Math.random())}>Change</button>
+      <h1>foo is {foo}</h1>
+      <button onClick={() => setFoo(`str${Math.random()}`)}>Change</button>
     </div>
   );
 };
@@ -217,8 +222,6 @@ setQuery({ foo: 500 })
 setQuery({ foo: 123, bar: 'zzz' }, 'push');
 ```
 
-<br/>
-
 **Example with Custom Parameter Type**
 Parameter types are just objects with `{ encode, decode }` functions. You can
 provide your own if the provided ones don't work for your use case.
@@ -326,5 +329,3 @@ npm install
 npm link use-query-params
 npm start
 ```
-
-
