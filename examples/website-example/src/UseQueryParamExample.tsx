@@ -4,14 +4,15 @@ import {
   StringParam,
   NumberParam,
   ArrayParam,
+  NumericArrayParam,
 } from 'use-query-params';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import nanoid from 'nanoid';
 
 const UseQueryParamExample = () => {
-  const [count, setCount] = React.useState(0);
-  const [zzz, setZzz] = useQueryParam('zzz', NumberParam);
-  const [test, setTest] = useQueryParam('test', StringParam);
-  const [anyp, setAnyP] = useQueryParam('anyp');
-  const [arr, setArr] = useQueryParam('arr', ArrayParam);
+  const [foo, setFoo] = useQueryParam('foo', StringParam);
+  const [arr, setArr] = useQueryParam('arr', NumericArrayParam);
 
   // verify we aren't creating new arrays each time
   const prevArr = React.useRef(arr);
@@ -24,91 +25,47 @@ const UseQueryParamExample = () => {
     prevArr.current = arr;
   });
 
+  const nextFoo = nanoid(4);
+  const nextArr = [
+    Math.round(Math.random() * 100),
+    Math.round(Math.random() * 100),
+    Math.round(Math.random() * 100),
+  ];
+
   return (
     <div className="UseQueryParamExample">
-      <h2>useQueryParam Example</h2>
-      <div>
-        <button onClick={() => setCount(count + 1)}>
-          Click to change component state and cause a re-render: {count}
-        </button>
+      <h2 className="text-center">useQueryParam Example</h2>
+      <div className="example-block">
+        <SyntaxHighlighter language="javascript" style={atomOneLight}>
+          const [foo, setFoo] = useQueryParam('foo', StringParam)
+        </SyntaxHighlighter>
+        <div>
+          The value of <b>foo</b> is{' '}
+          <code>{foo === undefined ? 'undefined' : JSON.stringify(foo)}</code>
+          <button className="set-btn" onClick={() => setFoo(nextFoo)}>
+            setFoo({JSON.stringify(nextFoo)})
+          </button>
+        </div>
       </div>
-      <div>
-        <table>
-          <tbody>
-            <tr>
-              <td>zzz</td>
-              <td>{zzz}</td>
-              <td>{typeof zzz}</td>
-              <td>
-                <button
-                  onClick={() => setZzz(Math.floor(Math.random() * 10000))}
-                >
-                  Change
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>test</td>
-              <td>{test}</td>
-              <td>{typeof test}</td>
-              <td>
-                <button
-                  onClick={() =>
-                    setTest('str' + Math.floor(Math.random() * 100))
-                  }
-                >
-                  Change
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>anyp</td>
-              <td>{anyp}</td>
-              <td>{typeof anyp}</td>
-              <td>
-                <button
-                  onClick={() =>
-                    setAnyP('any' + Math.floor(Math.random() * 100))
-                  }
-                >
-                  Change
-                </button>
-                <button
-                  onClick={() =>
-                    setAnyP('any' + Math.floor(Math.random() * 100), 'push')
-                  }
-                >
-                  Change Push
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>arr</td>
-              <td>
-                {arr
-                  ? arr.map((d: string, i: number) => (
-                      <div key={i}>
-                        arr[{i}] = {d}
-                      </div>
-                    ))
-                  : arr}
-              </td>
-              <td>{typeof arr}</td>
-              <td>
-                <button
-                  onClick={() =>
-                    setArr([
-                      'arr' + Math.floor(Math.random() * 10),
-                      'arr' + Math.floor(Math.random() * 10),
-                    ])
-                  }
-                >
-                  Change
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div className="example-block">
+        <SyntaxHighlighter language="javascript" style={atomOneLight}>
+          const [arr, setArr] = useQueryParam('arr', NumericArrayParam)
+        </SyntaxHighlighter>
+        <div>
+          The value of <b>arr</b> is{' '}
+          <code>{arr === undefined ? 'undefined' : JSON.stringify(arr)}</code>
+          <button className="set-btn" onClick={() => setArr(nextArr, 'push')}>
+            setArr({JSON.stringify(nextArr)}, 'push')
+          </button>
+          <p>
+            Since we specify the update type as <code>push</code>, the back
+            button will work. If we used <code>pushIn</code>, the value of{' '}
+            <b>foo</b> would be retained.
+          </p>
+          <button className="set-btn" onClick={() => setArr(nextArr, 'pushIn')}>
+            setArr({JSON.stringify(nextArr)}, 'pushIn')
+          </button>
+        </div>
       </div>
     </div>
   );

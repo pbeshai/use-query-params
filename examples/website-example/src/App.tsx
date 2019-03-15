@@ -5,18 +5,30 @@ import UseQueryParamsExample from './UseQueryParamsExample';
 import './App.css';
 
 const App = (props: any) => {
-  const [example, setExample] = React.useState(0);
+  const [example, setExample] = React.useState(1);
 
   return (
     <div className="App">
-      <h1>useQueryParams</h1>
-      <div>
-        <button onClick={() => setExample(0)}>useQueryParam Example</button>
-        <button onClick={() => setExample(1)}>useQueryParams Example</button>
-        <Link to={`/?test=${Math.floor(Math.random() * 10)}`}>
-          Push New URL
-        </Link>
-      </div>
+      <header className="text-center">
+        <h1>useQueryParams</h1>
+        <div className="ext-nav">
+          <a href="https://github.com/pbeshai/use-query-params">GitHub</a>
+        </div>
+        <div className="nav">
+          <button
+            className={example === 0 ? 'active' : undefined}
+            onClick={() => setExample(0)}
+          >
+            useQueryParam
+          </button>
+          <button
+            className={example === 1 ? 'active' : undefined}
+            onClick={() => setExample(1)}
+          >
+            useQueryParams
+          </button>
+        </div>
+      </header>
       <div>
         {example === 0 && <UseQueryParamExample />}
         {example === 1 && <UseQueryParamsExample />}

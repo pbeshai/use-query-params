@@ -1,20 +1,22 @@
-body {
-  font-family: sans-serif;
-  padding: 2rem;
+
+.App {
+  max-width: 650px;
+  margin: 0 auto;
 }
 
-button {
-  margin: 0 0.5rem;
-  font-size: 16px;
-  padding: 0.5em 1.0em;
-  background: #eee;
+.nav {
+  text-align: center;
+  margin-bottom: 3rem;
 }
 
-table {
-  margin: 1rem;
+.ext-nav {
+  margin-bottom: 1.5em;
 }
 
-td {
-  padding: 0 1rem;
+.example-block {
+  margin-bottom: 3rem;
 }
 
+.set-btn {
+  font-family: monospace;
+}

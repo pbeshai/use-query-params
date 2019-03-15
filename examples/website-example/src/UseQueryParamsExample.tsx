@@ -1,91 +1,94 @@
 import * as React from 'react';
-import { useQueryParams, StringParam, NumberParam } from 'use-query-params';
+import {
+  useQueryParams,
+  StringParam,
+  NumberParam,
+  ArrayParam,
+  NumericArrayParam,
+} from 'use-query-params';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import nanoid from 'nanoid';
 
 const UseQueryParamsExample = () => {
-  const [count, setCount] = React.useState(0);
-
   const [query, setQuery] = useQueryParams({
-    zzz: NumberParam,
-    test: StringParam,
-    anyp: StringParam,
+    foo: StringParam,
+    arr: NumericArrayParam,
   });
-  const { zzz, test, anyp } = query;
+  const { foo, arr } = query;
+
+  // verify we aren't creating new arrays each time
+  const prevArr = React.useRef(arr);
+  React.useEffect(() => {
+    if (prevArr.current !== arr) {
+      console.log('new array. was:', prevArr.current, 'now:', arr);
+    } else {
+      console.log('same array');
+    }
+    prevArr.current = arr;
+  });
+
+  const nextFoo = nanoid(4);
+  const nextArr = [
+    Math.round(Math.random() * 100),
+    Math.round(Math.random() * 100),
+    Math.round(Math.random() * 100),
+  ];
 
   return (
     <div className="UseQueryParamsExample">
-      <h2>useQueryParams Example</h2>
-      <div>
-        <button onClick={() => setCount(count + 1)}>
-          Click to change component state and cause a re-render: {count}
-        </button>
+      <h2 className="text-center">useQueryParams Example</h2>
+      <div className="example-block">
+        <SyntaxHighlighter language="javascript" style={atomOneLight}>
+          {`const [query, setQuery] = useQueryParams({
+  foo: StringParam,
+  arr: NumericArrayParam,
+});
+const { foo, arr } = query;`}
+        </SyntaxHighlighter>
+        <div>
+          The value of <b>foo</b> is{' '}
+          <code>{foo === undefined ? 'undefined' : JSON.stringify(foo)}</code>
+          <button
+            className="set-btn"
+            onClick={() => setQuery({ foo: nextFoo })}
+          >
+            setQuery({JSON.stringify({ foo: nextFoo }, null, 2)})
+          </button>
+        </div>
       </div>
-      <div>
-        <table>
-          <tbody>
-            <tr>
-              <td>zzz</td>
-              <td>{zzz}</td>
-              <td>{typeof zzz}</td>
-              <td>
-                <button
-                  onClick={() =>
-                    setQuery({ zzz: Math.floor(Math.random() * 10000) })
-                  }
-                >
-                  Change
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>test</td>
-              <td>{test}</td>
-              <td>{typeof test}</td>
-              <td>
-                <button
-                  onClick={() =>
-                    setQuery({ test: 'str' + Math.floor(Math.random() * 100) })
-                  }
-                >
-                  Change
-                </button>
-                <button
-                  onClick={() =>
-                    setQuery({
-                      zzz: Math.floor(Math.random() * 10000),
-                      test: 'str' + Math.floor(Math.random() * 100),
-                    })
-                  }
-                >
-                  Change test + zzz
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>anyp</td>
-              <td>{anyp}</td>
-              <td>{typeof anyp}</td>
-              <td>
-                <button
-                  onClick={() =>
-                    setQuery({ anyp: 'any' + Math.floor(Math.random() * 100) })
-                  }
-                >
-                  Change
-                </button>
-                <button
-                  onClick={() =>
-                    setQuery(
-                      { anyp: 'any' + Math.floor(Math.random() * 100) },
-                      'push'
-                    )
-                  }
-                >
-                  Change Push
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div className="example-block">
+        <div>
+          The value of <b>arr</b> is{' '}
+          <code>{arr === undefined ? 'undefined' : JSON.stringify(arr)}</code>
+          <button
+            className="set-btn"
+            onClick={() => setQuery({ arr: nextArr }, 'push')}
+          >
+            setQuery({JSON.stringify({ arr: nextArr }, null, 2)}, 'push')
+          </button>
+          <p>
+            Since we specify the update type as <code>push</code>, the back
+            button will work. If we used <code>pushIn</code>, the value of{' '}
+            <b>foo</b> would be retained.
+          </p>
+          <button
+            className="set-btn"
+            onClick={() => setQuery({ arr: nextArr }, 'pushIn')}
+          >
+            setQuery({JSON.stringify({ arr: nextArr }, null, 2)}, 'pushIn')
+          </button>
+          <p>
+            With <code>setQuery</code>, we can update multiple parameters at
+            once.
+          </p>
+          <button
+            className="set-btn"
+            onClick={() => setQuery({ arr: nextArr, foo: nextFoo })}
+          >
+            setQuery({JSON.stringify({ arr: nextArr, foo: nextFoo }, null, 2)})
+          </button>
+        </div>
       </div>
     </div>
   );
