@@ -20,6 +20,11 @@
   "exclude": [
     "node_modules",
     "lib",
+    "**/__tests__",
+    "*-test.js",
+    "*-test.jsx",
+    "*-test.ts",
+    "*-test.tsx",
     "*.test.ts",
     "*.test.tsx",
     "examples",
