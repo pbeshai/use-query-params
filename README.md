@@ -4,6 +4,11 @@
   </p>
   <p>Works with <a href="https://reacttraining.com/react-router/">React Router</a> and <a href="https://reach.tech/router">Reach Router</a> out of the box. TypeScript supported.</p>
 
+
+  <p>
+    <img alt="npm" src="https://img.shields.io/npm/v/use-query-params.svg">
+
+  </p>
 <hr />
 
 <a href="#installation">Installation</a> | 
@@ -27,6 +32,7 @@ $ npm install --save use-query-params
 ```
 
 Link your routing system (e.g., [React Router example](https://github.com/pbeshai/use-query-params/blob/master/examples/react-router/src/index.tsx), [Reach Router example](https://github.com/pbeshai/use-query-params/blob/master/examples/reach-router/src/index.tsx)):
+
 ```js
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -48,6 +54,7 @@ ReactDOM.render(
 ### Usage
 
 Add the hook to your component. There are two options: `useQueryParam`:
+
 ```js
 import * as React from 'react';
 import { useQueryParam, NumberParam, StringParam } from 'use-query-params';
@@ -71,6 +78,7 @@ export default UseQueryParamExample;
 ```
 
 Or `useQueryParams`:
+
 ```js
 import * as React from 'react';
 import {
@@ -158,6 +166,7 @@ Note that all nully values will encode and decode as `undefined`.
 | NumericArrayParam | number[] | `[1, 2, 3]` | `'1_2_3'` |
 
 **Example**
+
 ```js
 import { ArrayParam, useQueryParam, useQueryParams } from 'use-query-params';
 
@@ -166,6 +175,7 @@ const [foo, setFoo] = useQueryParam('foo', ArrayParam);
 // - OR -
 const [query, setQuery] = useQueryParams({ foo: ArrayParam });
 ```
+
 <br/>
 
 
@@ -187,6 +197,7 @@ You may optionally pass in a rawQuery object, otherwise the query is derived
 from the location available in the QueryParamContext.
 
 **Example**
+
 ```js
 import { useQueryParam, NumberParam } from 'use-query-params';
 
@@ -213,6 +224,7 @@ is one of `'replace' | 'replaceIn' | 'push' | 'pushIn'`, defaulting to
 `'replaceIn'`.
 
 **Example**
+
 ```js
 import { useQueryParams, StringParam, NumberParam } from 'use-query-params';
 
@@ -245,6 +257,7 @@ const [query, setQuery] = useQueryParams({ foo: MyParam });
 // goes to ?foo=99000
 setQuery({ foo: 99 })
 ```
+
 <br/>
 
 #### encodeQueryParams
@@ -261,6 +274,7 @@ in paramConfigMap. This can be useful for constructing links using decoded
 query parameters.
 
 **Example**
+
 ```js
 import { stringify } from 'query-string';
 import { encodeQueryParams, NumberParam } from 'use-query-params';
@@ -273,6 +287,7 @@ const link = `/?${stringify(encodedQuery)}`;
 <br/>
 
 #### QueryParamProvider
+
 ```js
 // Use one of these:
 <QueryParamProvider ReactRouterRoute={Route}><App /></QueryParamProvider>
@@ -293,6 +308,7 @@ See the tests or these examples for how to use it:
 
 
 **Example (Reach Router)**
+
 ```js
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -309,6 +325,7 @@ ReactDOM.render(
   document.getElementById('root')
 );
 ```
+
 <br/>
 
 ### Development
