@@ -5,7 +5,7 @@ import UseQueryParamsExample from './UseQueryParamsExample';
 import './App.css';
 
 const App = (props: any) => {
-  const [example, setExample] = React.useState(1);
+  const [example, setExample] = React.useState(0);
 
   return (
     <div className="App">
