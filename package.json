@@ -10,11 +10,12 @@
   "typings": "lib/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "build-website": "npm run test && npm run build && cd examples/website-example && npm run build && npm run copy-build",
     "dev": "NODE_ENV=development tsc -w",
+    "prepublishOnly": "npm run test && npm run build",
     "test": "jest",
     "test-watch": "jest --watch",
-    "test-coverage": "jest --coverage",
-    "prepublishOnly": "npm run build"
+    "test-coverage": "jest --coverage"
   },
   "repository": {
     "type": "git",
