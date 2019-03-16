@@ -6,7 +6,7 @@
 
 
   <p>
-    <img alt="npm" src="https://img.shields.io/npm/v/use-query-params.svg">
+    <a href="https://www.npmjs.com/package/use-query-params"><img alt="npm" src="https://img.shields.io/npm/v/use-query-params.svg"></a>
 
   </p>
 <hr />
