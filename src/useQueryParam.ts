@@ -1,5 +1,9 @@
 import * as React from 'react';
-import { parse as parseQueryString, ParsedQuery } from 'query-string';
+import {
+  parse as parseQueryString,
+  stringify,
+  ParsedQuery,
+} from 'query-string';
 import { QueryParamContext } from './QueryParamProvider';
 import { StringParam } from './params';
 import { updateUrlQuery } from './updateUrlQuery';
@@ -40,13 +44,22 @@ export const useQueryParam = <D, D2 = D>(
   // read in the encoded string value
   const encodedValue = rawQuery[name];
 
-  // decode if the encoded value has changed, otherwise re-use memoized value
+  // decode if the encoded value has changed, otherwise
+  // re-use memoized value
   const decodedValue = React.useMemo(() => {
     if (encodedValue == null) {
       return undefined;
     }
     return paramConfig.decode(encodedValue);
-  }, [encodedValue]);
+
+    // note that we use the stringified encoded value since the encoded
+    // value may be an array that is recreated if a different query param
+    // changes.
+  }, [
+    encodedValue instanceof Array
+      ? stringify({ name: encodedValue })
+      : encodedValue,
+  ]);
 
   // create the setter, memoizing via useCallback
   const setValue = React.useCallback(

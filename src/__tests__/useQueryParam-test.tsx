@@ -76,5 +76,11 @@ describe('useQueryParam', () => {
     rerender();
     const [decodedValue4, setter4] = result.current;
     expect(decodedValue3).toBe(decodedValue4);
+
+    // if another parameter changes, this one shouldn't be affected
+    location.search = `${location.search}&zzz=123`;
+    rerender();
+    const [decodedValue5, setter5] = result.current;
+    expect(decodedValue5).toBe(decodedValue3);
   });
 });
