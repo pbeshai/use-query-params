@@ -51,7 +51,10 @@ describe('useQueryParams', () => {
 
     expect(decodedQuery).toEqual({ foo: 123, bar: 'xxx' });
     setter({ foo: 555, baz: ['a', 'b'] }, 'push');
-    expect(calledPushQuery(history, 0)).toEqual({ foo: '555', baz: 'a_b' });
+    expect(calledPushQuery(history, 0)).toEqual({
+      foo: '555',
+      baz: ['a', 'b'],
+    });
   });
 
   it('ignores unconfigured parameter', () => {

@@ -90,7 +90,7 @@ import {
 } from 'use-query-params';
 
 const UseQueryParamsExample = () => {
-  // something like: ?x=123&q=foo&filters=a_b_c in the URL
+  // something like: ?x=123&q=foo&filters=a&filters=b&filters=c in the URL
   const [query, setQuery] = useQueryParams({
     x: NumberParam,
     q: StringParam,
@@ -154,17 +154,20 @@ See [all param definitions here](https://github.com/pbeshai/use-query-params/blo
 
 Note that all nully values will encode and decode as `undefined`.
 
+Examples in this table assume query parameter named `qp`.
+
 | Param | Type | Example Decoded | Example Encoded |
 | --- | --- | --- | --- |
-| StringParam | string | `'foo'` | `'foo'` |
-| NumberParam | number | `123` | `'123'` |
-| ObjectParam | { key: string } | `{ foo: 'bar', baz: 'zzz' }` | `'foo-bar_baz-zzz'` |
-| ArrayParam | string[] | `['a','b','c']` | `'a_b_c'` |
-| JsonParam | any | `{ foo: 'bar' }` | `'{"foo":"bar"}'` |
-| DateParam | Date | `Date(2019, 2, 1)` | `'2019-03-01'` |
-| BooleanParam | boolean | `true` | `'1'` |
-| NumericObjectParam | { key: number } | `{ foo: 1, bar: 2 }` | `'foo-1_bar-2'` |
-| NumericArrayParam | number[] | `[1, 2, 3]` | `'1_2_3'` |
+| StringParam | string | `'foo'` | `?qp=foo` |
+| NumberParam | number | `123` | `?qp=123` |
+| ObjectParam | { key: string } | `{ foo: 'bar', baz: 'zzz' }` | `?qp=foo-bar_baz-zzz` |
+| ArrayParam | string[] | `['a','b','c']` | `?qp=a&qp=b&qp=c` |
+| JsonParam | any | `{ foo: 'bar' }` | `?qp=%7B%22foo%22%3A%22bar%22%7D` |
+| DateParam | Date | `Date(2019, 2, 1)` | `?qp=2019-03-01` |
+| BooleanParam | boolean | `true` | `?qp=1` |
+| NumericObjectParam | { key: number } | `{ foo: 1, bar: 2 }` | `?qp=foo-1_bar-2` |
+| DelimitedArrayParam | string[] | `['a','b','c']` | `?qp=a_b_c'` |
+| DelimitedNumericArrayParam | number[] | `[1, 2, 3]` | `?qp=1_2_3'` |
 
 **Example**
 
@@ -175,6 +178,26 @@ import { ArrayParam, useQueryParam, useQueryParams } from 'use-query-params';
 const [foo, setFoo] = useQueryParam('foo', ArrayParam);
 // - OR -
 const [query, setQuery] = useQueryParams({ foo: ArrayParam });
+```
+
+**Example with Custom Param**
+
+You can define your own params if the ones shipped with this package don't work for you. There are included [serialization utility functions](https://github.com/pbeshai/use-query-params/blob/master/src/serialize.ts) to make this easier, but you can use whatever you like.
+
+```js
+import {
+  encodeDelimitedArray,
+  decodeDelimitedArray
+} from 'use-query-params';
+
+/** Uses a comma to delimit entries. e.g. ['a', 'b'] => qp?=a,b */
+const CommaArrayParam = {
+  encode: (array: string[] | null | undefined) => 
+    encodeDelimitedArray(array, ','),
+
+  decode: (arrayStr: string | string[] | null | undefined) => 
+    decodeDelimitedArray(arrayStr, ',')
+};
 ```
 
 <br/>

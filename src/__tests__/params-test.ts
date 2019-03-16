@@ -3,11 +3,13 @@ import {
   NumberParam,
   ObjectParam,
   ArrayParam,
+  NumericArrayParam,
   JsonParam,
   DateParam,
   BooleanParam,
   NumericObjectParam,
-  NumericArrayParam,
+  DelimitedArrayParam,
+  DelimitedNumericArrayParam,
 } from '../index';
 
 describe('params', () => {
@@ -25,8 +27,12 @@ describe('params', () => {
       expect(ObjectParam.decode('foo-bar')).toEqual({ foo: 'bar' });
     });
     it('ArrayParam', () => {
-      expect(ArrayParam.encode(['foo', 'bar'])).toBe('foo_bar');
-      expect(ArrayParam.decode('foo_bar')).toEqual(['foo', 'bar']);
+      expect(ArrayParam.encode(['foo', 'bar'])).toEqual(['foo', 'bar']);
+      expect(ArrayParam.decode(['foo', 'bar'])).toEqual(['foo', 'bar']);
+    });
+    it('NumericArrayParam', () => {
+      expect(NumericArrayParam.encode([1, 2])).toEqual(['1', '2']);
+      expect(NumericArrayParam.decode(['1', '2'])).toEqual([1, 2]);
     });
     it('JsonParam', () => {
       expect(JsonParam.encode({ foo: 'bar' })).toBe('{"foo":"bar"}');
@@ -47,9 +53,13 @@ describe('params', () => {
       expect(NumericObjectParam.encode({ foo: 123 })).toBe('foo-123');
       expect(NumericObjectParam.decode('foo-123')).toEqual({ foo: 123 });
     });
-    it('NumericArrayParam', () => {
-      expect(NumericArrayParam.encode([1, 2])).toBe('1_2');
-      expect(NumericArrayParam.decode('1_2')).toEqual([1, 2]);
+    it('DelimitedArrayParam', () => {
+      expect(DelimitedArrayParam.encode(['foo', 'bar'])).toBe('foo_bar');
+      expect(DelimitedArrayParam.decode('foo_bar')).toEqual(['foo', 'bar']);
+    });
+    it('DelimitedNumericArrayParam', () => {
+      expect(DelimitedNumericArrayParam.encode([1, 2])).toBe('1_2');
+      expect(DelimitedNumericArrayParam.decode('1_2')).toEqual([1, 2]);
     });
   });
 });

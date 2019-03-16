@@ -50,6 +50,17 @@ export const ArrayParam: QueryParamConfig<
 };
 
 /**
+ * For flat arrays of strings, filters out undefined values during decode
+ */
+export const NumericArrayParam: QueryParamConfig<
+  number[] | null | undefined,
+  number[] | undefined
+> = {
+  encode: Serialize.encodeNumericArray,
+  decode: Serialize.decodeNumericArray,
+};
+
+/**
  * For any type of data, encoded via JSON.stringify
  */
 export const JsonParam: QueryParamConfig<any, any> = {
@@ -95,12 +106,23 @@ export const NumericObjectParam: QueryParamConfig<
 };
 
 /**
+ * For flat arrays of strings, filters out undefined values during decode
+ */
+export const DelimitedArrayParam: QueryParamConfig<
+  string[] | null | undefined,
+  string[] | undefined
+> = {
+  encode: Serialize.encodeDelimitedArray,
+  decode: Serialize.decodeDelimitedArray,
+};
+
+/**
  * For flat arrays where the values are numbers, filters out undefined values during decode
  */
-export const NumericArrayParam: QueryParamConfig<
+export const DelimitedNumericArrayParam: QueryParamConfig<
   number[] | null | undefined,
   number[] | undefined
 > = {
-  encode: Serialize.encodeNumericArray,
-  decode: Serialize.decodeNumericArray,
+  encode: Serialize.encodeDelimitedNumericArray,
+  decode: Serialize.decodeDelimitedNumericArray,
 };

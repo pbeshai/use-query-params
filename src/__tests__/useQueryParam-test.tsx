@@ -8,7 +8,7 @@ import {
   calledPushQuery,
   calledReplaceQuery,
 } from './helpers';
-import { NumberParam, ArrayParam } from '../params';
+import { NumberParam, NumericArrayParam } from '../params';
 
 // helper to setup tests
 function setupWrapper(query: ParsedQuery) {
@@ -49,30 +49,38 @@ describe('useQueryParam', () => {
   });
 
   it("doesn't decode more than necessary", () => {
-    const { wrapper, history, location } = setupWrapper({ foo: 'a_b_c' });
+    const { wrapper, history, location } = setupWrapper({
+      foo: ['1', '2', '3'],
+    });
     const { result, rerender } = renderHook(
-      () => useQueryParam('foo', ArrayParam),
+      () => useQueryParam('foo', NumericArrayParam),
       {
         wrapper,
       }
     );
 
     const [decodedValue, setter] = result.current;
-    expect(decodedValue).toEqual(['a', 'b', 'c']);
+    expect(decodedValue).toEqual([1, 2, 3]);
 
     rerender();
     const [decodedValue2, setter2] = result.current;
     expect(decodedValue).toBe(decodedValue2);
 
-    setter2(['d', 'e', 'f'], 'replaceIn');
+    setter2([4, 5, 6], 'replaceIn');
     rerender();
     const [decodedValue3, setter3] = result.current;
     expect(decodedValue).not.toBe(decodedValue3);
-    expect(decodedValue3).toEqual(['d', 'e', 'f']);
+    expect(decodedValue3).toEqual([4, 5, 6]);
 
-    setter3(['d', 'e', 'f'], 'push');
+    setter3([4, 5, 6], 'push');
     rerender();
     const [decodedValue4, setter4] = result.current;
     expect(decodedValue3).toBe(decodedValue4);
+
+    // if another parameter changes, this one shouldn't be affected
+    location.search = `${location.search}&zzz=123`;
+    rerender();
+    const [decodedValue5, setter5] = result.current;
+    expect(decodedValue5).toBe(decodedValue3);
   });
 });
