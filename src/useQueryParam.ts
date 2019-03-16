@@ -28,19 +28,25 @@ export const useQueryParam = <D, D2 = D>(
 
   // read in the raw query
   if (!rawQuery) {
-    rawQuery =
-      (location.query as ParsedQuery) ||
-      parseQueryString(location.search) ||
-      {};
+    rawQuery = React.useMemo(
+      () =>
+        (location.query as ParsedQuery) ||
+        parseQueryString(location.search) ||
+        {},
+      [location.query, location.search]
+    );
   }
 
   // read in the encoded string value
-  const encodedValue = rawQuery[name] as string;
+  const encodedValue = rawQuery[name];
 
   // decode if the encoded value has changed, otherwise re-use memoized value
-  const decodedValue = React.useMemo(() => paramConfig.decode(encodedValue), [
-    encodedValue,
-  ]);
+  const decodedValue = React.useMemo(() => {
+    if (encodedValue == null) {
+      return undefined;
+    }
+    return paramConfig.decode(encodedValue);
+  }, [encodedValue]);
 
   // create the setter, memoizing via useCallback
   const setValue = React.useCallback(

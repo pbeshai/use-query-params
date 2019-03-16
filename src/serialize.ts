@@ -28,8 +28,13 @@ export function encodeDate(date: Date | null | undefined): string | undefined {
  * @return {Date} parsed date
  */
 export function decodeDate(
-  dateString: string | null | undefined
+  input: string | string[] | null | undefined
 ): Date | undefined {
+  if (input == null || !input.length) {
+    return undefined;
+  }
+
+  const dateString = input instanceof Array ? input[0] : input;
   if (dateString == null || !dateString.length) {
     return undefined;
   }
@@ -77,8 +82,14 @@ export function encodeBoolean(
  * @return {Boolean} the boolean value
  */
 export function decodeBoolean(
-  boolStr: string | null | undefined
+  input: string | string[] | null | undefined
 ): boolean | undefined {
+  if (input == null) {
+    return undefined;
+  }
+
+  const boolStr = input instanceof Array ? input[0] : input;
+
   if (boolStr === '1') {
     return true;
   } else if (boolStr === '0') {
@@ -112,8 +123,14 @@ export function encodeNumber(
  * @return {Number} the number value
  */
 export function decodeNumber(
-  numStr: string | null | undefined
+  input: string | string[] | null | undefined
 ): number | undefined {
+  if (input == null) {
+    return undefined;
+  }
+
+  const numStr = input instanceof Array ? input[0] : input;
+
   if (numStr == null || numStr === '') {
     return undefined;
   }
@@ -134,7 +151,7 @@ export function decodeNumber(
  * @return {String} the encoded string
  */
 export function encodeString(
-  str: string | null | undefined
+  str: string | string[] | null | undefined
 ): string | undefined {
   if (str == null) {
     return undefined;
@@ -150,8 +167,14 @@ export function encodeString(
  * @return {String} the string value
  */
 export function decodeString(
-  str: string | null | undefined
+  input: string | string[] | null | undefined
 ): string | undefined {
+  if (input == null) {
+    return undefined;
+  }
+
+  const str = input instanceof Array ? input[0] : input;
+
   if (str == null) {
     return undefined;
   }
@@ -180,8 +203,14 @@ export function encodeJson(any: any | null | undefined): string | undefined {
  * @return {Any} The javascript representation
  */
 export function decodeJson(
-  jsonStr: string | null | undefined
+  input: string | string[] | null | undefined
 ): any | undefined {
+  if (input == null) {
+    return undefined;
+  }
+
+  const jsonStr = input instanceof Array ? input[0] : input;
+
   if (!jsonStr) {
     return undefined;
   }
@@ -200,9 +229,89 @@ export function decodeJson(
  * Encodes an array as a JSON string.
  *
  * @param {Array} array The array to be encoded
- * @return {String} The JSON string representation of array
+ * @return {String[]} The array of strings to be put in the URL
+ * as repeated query parameters
  */
 export function encodeArray(
+  array: string[] | null | undefined
+): string[] | undefined {
+  if (!array) {
+    return undefined;
+  }
+
+  return array;
+}
+
+/**
+ * Decodes an array or singular value and returns it as an array
+ * or undefined if falsy. Filters out undefined values.
+ *
+ * @param {String | Array} input The input value
+ * @return {Array} The javascript representation
+ */
+export function decodeArray(
+  input: string | string[] | null | undefined
+): string[] | undefined {
+  if (!input) {
+    return undefined;
+  }
+
+  if (!(input instanceof Array)) {
+    return [input];
+  }
+
+  return input
+    .map(item => (item === '' ? undefined : item))
+    .filter(item => item !== undefined) as string[];
+}
+
+/**
+ * Encodes a numeric array as a JSON string.
+ *
+ * @param {Array} array The array to be encoded
+ * @return {String[]} The array of strings to be put in the URL
+ * as repeated query parameters
+ */
+export function encodeNumericArray(
+  array: number[] | null | undefined
+): string[] | undefined {
+  if (!array) {
+    return undefined;
+  }
+
+  return array.map(d => `${d}`);
+}
+
+/**
+ * Decodes an array or singular value and returns it as an array
+ * or undefined if falsy. Filters out undefined and NaN values.
+ *
+ * @param {String | Array} input The input value
+ * @return {Array} The javascript representation
+ */
+export function decodeNumericArray(
+  input: string | string[] | null | undefined
+): number[] | undefined {
+  const arr = decodeArray(input);
+
+  if (!arr) {
+    return undefined;
+  }
+
+  return arr
+    .map(item => +item)
+    .filter(item => item !== undefined && !isNaN(item)) as number[];
+}
+
+/**
+ * Encodes an array as a JSON string.
+ *
+ * @param array The array to be encoded
+ * @param entrySeparator The string used to delimit entries
+ * @return The array as a string with elements joined by the
+ * entry separator
+ */
+export function encodeDelimitedArray(
   array: string[] | null | undefined,
   entrySeparator = '_'
 ): string | undefined {
@@ -214,15 +323,23 @@ export function encodeArray(
 }
 
 /**
- * Decodes a JSON string into javascript array
+ * Decodes a delimited string into javascript array
  *
+ * @param entrySeparator The array as a string with elements joined by the
+ * entry separator
  * @param {String} jsonStr The JSON string representation
  * @return {Array} The javascript representation
  */
-export function decodeArray(
-  arrayStr: string | null | undefined,
+export function decodeDelimitedArray(
+  input: string | string[] | null | undefined,
   entrySeparator = '_'
 ): string[] | undefined {
+  if (input == null) {
+    return undefined;
+  }
+
+  const arrayStr = input instanceof Array ? input[0] : input;
+
   if (!arrayStr) {
     return undefined;
   }
@@ -234,12 +351,12 @@ export function decodeArray(
 }
 
 /**
- * Encodes a numeric array as a JSON string. (alias of encodeArray)
+ * Encodes a numeric array as a JSON string. (alias of encodeDelimitedArray)
  *
  * @param {Array} array The array to be encoded
  * @return {String} The JSON string representation of array
  */
-export const encodeNumericArray = encodeArray as (
+export const encodeDelimitedNumericArray = encodeDelimitedArray as (
   array: number[] | null | undefined,
   entrySeparator?: string
 ) => string | undefined;
@@ -250,11 +367,11 @@ export const encodeNumericArray = encodeArray as (
  * @param {String} jsonStr The JSON string representation
  * @return {Array} The javascript representation
  */
-export function decodeNumericArray(
-  arrayStr: string | null | undefined,
+export function decodeDelimitedNumericArray(
+  arrayStr: string | string[] | null | undefined,
   entrySeparator = '_'
 ): number[] | undefined {
-  const decoded = decodeArray(arrayStr, entrySeparator);
+  const decoded = decodeDelimitedArray(arrayStr, entrySeparator);
 
   if (!decoded) {
     return undefined;
@@ -262,7 +379,7 @@ export function decodeNumericArray(
 
   return decoded
     .map(d => (d == null ? undefined : +d))
-    .filter(d => d !== undefined) as number[];
+    .filter(d => d !== undefined && !isNaN(d)) as number[];
 }
 
 /**
@@ -302,10 +419,16 @@ export function encodeObject(
  * @return {Object} The javascript object
  */
 export function decodeObject(
-  objStr: string | null | undefined,
+  input: string | string[] | null | undefined,
   keyValSeparator = '-',
   entrySeparator = '_'
 ): { [key: string]: string | undefined } | undefined {
+  if (input == null) {
+    return undefined;
+  }
+
+  const objStr = input instanceof Array ? input[0] : input;
+
   if (!objStr || !objStr.length) {
     return undefined;
   }
@@ -347,7 +470,7 @@ export const encodeNumericObject = encodeObject as (
  * @return {Object} The javascript object
  */
 export function decodeNumericObject(
-  objStr: string | null | undefined,
+  objStr: string | string[] | null | undefined,
   keyValSeparator = '-',
   entrySeparator = '_'
 ): { [key: string]: number | undefined } | undefined {

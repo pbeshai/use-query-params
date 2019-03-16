@@ -28,16 +28,15 @@ export interface ExtendedLocation extends Location {
  * Encoded query parameters (all strings)
  */
 export interface EncodedQuery {
-  [key: string]: string;
+  [key: string]: string | string[];
 }
 
 /**
  * Encoded query parameters, possibly including null or undefined values
  */
 export interface EncodedQueryWithNulls {
-  [key: string]: string | null | undefined;
+  [key: string]: string | string[] | null | undefined;
 }
-
 /**
  * Configuration for a query param specifying how to encode it
  * (convert it to a string) and decode it (convert it from a string
@@ -48,10 +47,10 @@ export interface EncodedQueryWithNulls {
  */
 export interface QueryParamConfig<D, D2 = D> {
   /** Convert the query param value to a string */
-  encode: (value: D) => string | undefined;
+  encode: (value: D) => string | string[] | undefined;
 
   /** Convert the query param string value to its native type */
-  decode: (value: string) => D2;
+  decode: (value: string | string[]) => D2;
 }
 
 /**

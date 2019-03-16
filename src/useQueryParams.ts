@@ -50,8 +50,13 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   const { history, location } = React.useContext(QueryParamContext);
 
   // read in the raw query
-  const rawQuery =
-    (location.query as ParsedQuery) || parseQueryString(location.search) || {};
+  const rawQuery = React.useMemo(
+    () =>
+      (location.query as ParsedQuery) ||
+      parseQueryString(location.search) ||
+      {},
+    [location.query, location.search]
+  );
 
   // parse each parameter via usQueryParam
   const paramNames = Object.keys(paramConfigMap);
