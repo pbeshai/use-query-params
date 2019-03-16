@@ -24,7 +24,9 @@ export function encodeDate(date: Date | null | undefined): string | undefined {
  * as necessary (aka, '2015', '2015-10', '2015-10-01').
  * It will not work for dates that have times included in them.
  *
- * @param  {String} dateString String date form like '2015-10-01'
+ * If an array is provided, only the first entry is used.
+ *
+ * @param  {String} input String date form like '2015-10-01'
  * @return {Date} parsed date
  */
 export function decodeDate(
@@ -78,7 +80,9 @@ export function encodeBoolean(
  * Decodes a boolean from a string. "1" -> true, "0" -> false.
  * Everything else maps to undefined.
  *
- * @param {String} boolStr the encoded boolean string
+ * If an array is provided, only the first entry is used.
+ *
+ * @param {String} input the encoded boolean string
  * @return {Boolean} the boolean value
  */
 export function decodeBoolean(
@@ -116,10 +120,12 @@ export function encodeNumber(
 }
 
 /**
- * Decodes a number from a string via parseFloat. If the number is invalid,
+ * Decodes a number from a string. If the number is invalid,
  * it returns undefined.
  *
- * @param {String} numStr the encoded number string
+ * If an array is provided, only the first entry is used.
+ *
+ * @param {String} input the encoded number string
  * @return {Number} the number value
  */
 export function decodeNumber(
@@ -147,7 +153,7 @@ export function decodeNumber(
 /**
  * Encodes a string while safely handling null and undefined values.
  *
- * @param {String} string
+ * @param {String} str a string to encode
  * @return {String} the encoded string
  */
 export function encodeString(
@@ -163,7 +169,9 @@ export function encodeString(
 /**
  * Decodes a string while safely handling null and undefined values.
  *
- * @param {String} str the encoded string
+ * If an array is provided, only the first entry is used.
+ *
+ * @param {String} input the encoded string
  * @return {String} the string value
  */
 export function decodeString(
@@ -199,7 +207,9 @@ export function encodeJson(any: any | null | undefined): string | undefined {
 /**
  * Decodes a JSON string into javascript
  *
- * @param {String} jsonStr The JSON string representation
+ * If an array is provided, only the first entry is used.
+ *
+ * @param {String} input The JSON string representation
  * @return {Any} The javascript representation
  */
 export function decodeJson(
@@ -304,7 +314,8 @@ export function decodeNumericArray(
 }
 
 /**
- * Encodes an array as a JSON string.
+ * Encodes an array as a delimited string. For example,
+ * ['a', 'b'] -> 'a_b' with entrySeparator='_'
  *
  * @param array The array to be encoded
  * @param entrySeparator The string used to delimit entries
@@ -323,11 +334,14 @@ export function encodeDelimitedArray(
 }
 
 /**
- * Decodes a delimited string into javascript array
+ * Decodes a delimited string into javascript array. For example,
+ * 'a_b' -> ['a', 'b'] with entrySeparator='_'
  *
+ * If an array is provided as input, only the first entry is used.
+ *
+ * @param {String} input The JSON string representation
  * @param entrySeparator The array as a string with elements joined by the
  * entry separator
- * @param {String} jsonStr The JSON string representation
  * @return {Array} The javascript representation
  */
 export function decodeDelimitedArray(
@@ -351,7 +365,8 @@ export function decodeDelimitedArray(
 }
 
 /**
- * Encodes a numeric array as a JSON string. (alias of encodeDelimitedArray)
+ * Encodes a numeric array as a delimited string. (alias of encodeDelimitedArray)
+ * For example, [1, 2] -> '1_2' with entrySeparator='_'
  *
  * @param {Array} array The array to be encoded
  * @return {String} The JSON string representation of array
@@ -362,7 +377,10 @@ export const encodeDelimitedNumericArray = encodeDelimitedArray as (
 ) => string | undefined;
 
 /**
- * Decodes a JSON string into javascript array where all entries are numbers
+ * Decodes a delimited string into javascript array where all entries are numbers
+ * For example, '1_2' -> [1, 2] with entrySeparator='_'
+ *
+ * If an array is provided as input, only the first entry is used.
  *
  * @param {String} jsonStr The JSON string representation
  * @return {Array} The javascript representation
@@ -383,8 +401,8 @@ export function decodeDelimitedNumericArray(
 }
 
 /**
- * Encode simple objects as readable strings. Currently works only for simple,
- * flat objects where values are numbers, booleans or strings.
+ * Encode simple objects as readable strings. Works only for simple,
+ * flat objects where values are numbers, strings.
  *
  * For example { foo: bar, boo: baz } -> "foo-bar_boo-baz"
  *
@@ -394,7 +412,7 @@ export function decodeDelimitedNumericArray(
  * @return {String} The encoded object
  */
 export function encodeObject(
-  obj: { [key: string]: string | undefined } | null | undefined,
+  obj: { [key: string]: string | number | undefined } | null | undefined,
   keyValSeparator = '-',
   entrySeparator = '_'
 ): string | undefined {
@@ -409,11 +427,13 @@ export function encodeObject(
 
 /**
  * Decodes a simple object to javascript. Currently works only for simple,
- * flat objects where values are numbers, booleans or strings.
+ * flat objects where values are strings.
  *
  * For example "foo-bar_boo-baz" -> { foo: bar, boo: baz }
  *
- * @param {String} objStr The object string to decode
+ * If an array is provided as input, only the first entry is used.
+ *
+ * @param {String} input The object string to decode
  * @param {String} keyValSeparator="-" The separator between keys and values
  * @param {String} entrySeparator="_" The separator between entries
  * @return {Object} The javascript object
@@ -464,19 +484,21 @@ export const encodeNumericObject = encodeObject as (
  *
  * For example "foo-123_boo-521" -> { foo: 123, boo: 521 }
  *
- * @param {String} objStr The object string to decode
+ * If an array is provided as input, only the first entry is used.
+ *
+ * @param {String} input The object string to decode
  * @param {String} keyValSeparator="-" The separator between keys and values
  * @param {String} entrySeparator="_" The separator between entries
  * @return {Object} The javascript object
  */
 export function decodeNumericObject(
-  objStr: string | string[] | null | undefined,
+  input: string | string[] | null | undefined,
   keyValSeparator = '-',
   entrySeparator = '_'
 ): { [key: string]: number | undefined } | undefined {
   const decoded:
     | { [key: string]: number | string | undefined }
-    | undefined = decodeObject(objStr, keyValSeparator, entrySeparator);
+    | undefined = decodeObject(input, keyValSeparator, entrySeparator);
 
   if (!decoded) {
     return undefined;
