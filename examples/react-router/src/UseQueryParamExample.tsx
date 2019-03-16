@@ -8,8 +8,10 @@ import {
 
 const MyParam = {
   encode: (val: number) => `MY_${val}`,
-  decode: (str: string | undefined) =>
-    str == null ? undefined : +str.split('_')[1],
+  decode: (input: string | string[] | undefined) => {
+    const str = input instanceof Array ? input[0] : input;
+    return str == null ? undefined : +str.split('_')[1];
+  },
 };
 
 const UseQueryParamExample = () => {
