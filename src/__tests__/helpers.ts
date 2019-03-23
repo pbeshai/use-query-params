@@ -1,8 +1,8 @@
 import {
   stringify,
   parse as parseQueryString,
-  ParsedQuery,
-} from 'query-string';
+  EncodedQueryWithNulls,
+} from 'serialize-query-params';
 
 // if passed a location, will mutate it so we can see what changes are being made
 export function makeMockHistory(location: any = {}) {
@@ -32,7 +32,7 @@ export function calledPushQuery(
   return parseQueryString(history.push.mock.calls[index][0].search);
 }
 
-export function makeMockLocation(query: ParsedQuery): Location {
+export function makeMockLocation(query: EncodedQueryWithNulls): Location {
   const queryStr = stringify(query);
   return {
     protocol: 'http:',

@@ -1,6 +1,12 @@
 import * as React from 'react';
-import { ParsedQuery } from 'query-string';
 import { renderHook, cleanup } from 'react-hooks-testing-library';
+import {
+  NumberParam,
+  ArrayParam,
+  StringParam,
+  EncodedQueryWithNulls,
+} from 'serialize-query-params';
+
 import { useQueryParams, QueryParamProvider } from '../index';
 import {
   makeMockHistory,
@@ -8,10 +14,9 @@ import {
   calledPushQuery,
   calledReplaceQuery,
 } from './helpers';
-import { NumberParam, ArrayParam, StringParam } from '../params';
 
 // helper to setup tests
-function setupWrapper(query: ParsedQuery) {
+function setupWrapper(query: EncodedQueryWithNulls) {
   const location = makeMockLocation(query);
   const history = makeMockHistory(location);
   const wrapper = ({ children }: any) => (
@@ -57,7 +62,7 @@ describe('useQueryParams', () => {
     });
   });
 
-  it('ignores unconfigured parameter', () => {
+  it('passes through unconfigured parameter as a string', () => {
     const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
     const { result } = renderHook(
       () => useQueryParams({ foo: NumberParam, bar: StringParam }),
@@ -69,6 +74,9 @@ describe('useQueryParams', () => {
 
     expect(decodedQuery).toEqual({ foo: 123, bar: 'xxx' });
     setter({ foo: 555, baz: ['a', 'b'] } as any, 'push');
-    expect(calledPushQuery(history, 0)).toEqual({ foo: '555' });
+    expect(calledPushQuery(history, 0)).toEqual({
+      foo: '555',
+      baz: 'a,b', // ['a,'b'] as string = "a,b"
+    });
   });
 });
