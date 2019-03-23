@@ -85,4 +85,4 @@ typings/
 
 lib/
 .DS_Store
-package-lock.json
+examples/**/package-lock.json
