@@ -2,12 +2,13 @@ import * as React from 'react';
 import {
   parse as parseQueryString,
   stringify,
-  ParsedQuery,
-} from 'query-string';
+  EncodedQueryWithNulls,
+  StringParam,
+  QueryParamConfig,
+} from 'serialize-query-params';
 import { QueryParamContext } from './QueryParamProvider';
-import { StringParam } from './params';
 import { updateUrlQuery } from './updateUrlQuery';
-import { UrlUpdateType, QueryParamConfig } from './types';
+import { UrlUpdateType } from './types';
 
 /**
  * Given a query param name and query parameter configuration ({ encode, decode })
@@ -26,19 +27,15 @@ import { UrlUpdateType, QueryParamConfig } from './types';
 export const useQueryParam = <D, D2 = D>(
   name: string,
   paramConfig: QueryParamConfig<D, D2> = StringParam as QueryParamConfig<any>,
-  rawQuery?: ParsedQuery
+  rawQuery?: EncodedQueryWithNulls
 ): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
   const { history, location } = React.useContext(QueryParamContext);
 
   // read in the raw query
   if (!rawQuery) {
-    rawQuery = React.useMemo(
-      () =>
-        (location.query as ParsedQuery) ||
-        parseQueryString(location.search) ||
-        {},
-      [location.query, location.search]
-    );
+    rawQuery = React.useMemo(() => parseQueryString(location.search) || {}, [
+      location.search,
+    ]);
   }
 
   // read in the encoded string value

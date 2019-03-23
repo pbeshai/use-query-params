@@ -1,44 +1,15 @@
 import * as React from 'react';
-import { parse as parseQueryString, ParsedQuery } from 'query-string';
+import {
+  parse as parseQueryString,
+  encodeQueryParams,
+  EncodedQueryWithNulls,
+  DecodedValueMap,
+  QueryParamConfigMap,
+} from 'serialize-query-params';
 import { useQueryParam } from './useQueryParam';
 import updateUrlQuery from './updateUrlQuery';
 import { QueryParamContext } from './QueryParamProvider';
-import {
-  UrlUpdateType,
-  EncodedQueryWithNulls,
-  DecodedValueMap,
-  SetQuery,
-  QueryParamConfigMap,
-} from './types';
-
-/**
- * Convert the values in query to strings via the encode functions configured
- * in paramConfigMap
- *
- * @param paramConfigMap Map from query name to { encode, decode } config
- * @param query Query updates mapping param name to decoded value
- */
-export function encodeQueryParams<QPCMap extends QueryParamConfigMap>(
-  paramConfigMap: QPCMap,
-  query: Partial<DecodedValueMap<QPCMap>>
-): EncodedQueryWithNulls {
-  const encodedChanges: EncodedQueryWithNulls = {};
-  const changingParamNames = Object.keys(query);
-  for (const paramName of changingParamNames) {
-    if (!paramConfigMap[paramName]) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(
-          `Skipping encoding parameter ${paramName} since it was not configured.`
-        );
-      }
-      continue;
-    }
-    encodedChanges[paramName] = paramConfigMap[paramName].encode(
-      query[paramName]
-    );
-  }
-  return encodedChanges;
-}
+import { UrlUpdateType, SetQuery } from './types';
 
 /**
  * Given a query parameter configuration (mapping query param name to { encode, decode }),
@@ -51,11 +22,8 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
 
   // read in the raw query
   const rawQuery = React.useMemo(
-    () =>
-      (location.query as ParsedQuery) ||
-      parseQueryString(location.search) ||
-      {},
-    [location.query, location.search]
+    () => parseQueryString(location.search) || {},
+    [location.search]
   );
 
   // parse each parameter via usQueryParam

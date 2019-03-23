@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { PushReplaceHistory, ExtendedLocation } from './types';
+import { PushReplaceHistory } from './types';
 
 /**
  * Subset of a @reach/router history object. We only
@@ -21,7 +21,7 @@ interface ReachHistory {
  */
 export interface QueryParamContextValue {
   history: PushReplaceHistory;
-  location: ExtendedLocation;
+  location: Location;
 }
 
 /**
@@ -121,7 +121,7 @@ interface Props {
    * Override location object, otherwise window.location or the
    * location provided by the active routing system is used.
    */
-  location?: ExtendedLocation;
+  location?: Location;
 }
 
 /**

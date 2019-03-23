@@ -1,10 +1,9 @@
-export * from './serialize';
-export * from './params';
+export * from 'serialize-query-params';
 export * from './types';
 
 export { useQueryParam } from './useQueryParam';
-export { useQueryParams, encodeQueryParams } from './useQueryParams';
-
+export { useQueryParams } from './useQueryParams';
+export { updateUrlQuery } from './updateUrlQuery';
 export {
   QueryParamProvider,
   QueryParamContext,

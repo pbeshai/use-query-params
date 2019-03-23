@@ -137,8 +137,10 @@ A few basic [examples](https://github.com/pbeshai/use-query-params/tree/master/e
 - [useQueryParams](#usequeryparams-1)
 - [encodeQueryParams](#encodequeryparams)
 - [QueryParamProvider](#queryparamprovider)
-- [Type Definitions](https://github.com/pbeshai/use-query-params/blob/master/src/types.ts)
-- [Serialization Utility Functions](https://github.com/pbeshai/use-query-params/blob/master/src/serialize.ts)
+- [Type Definitions](https://github.com/pbeshai/use-query-params/blob/master/src/types.ts) and from [serialize-query-params](https://github.com/pbeshai/serialize-query-params/blob/master/src/types.ts).
+- [Serialization Utility Functions](https://github.com/pbeshai/serialize-query-params/blob/master/src/serialize.ts)
+
+For convenience, serialize-query-params exports all of the [serialize-query-params](https://github.com/pbeshai/serialize-query-params) library. This includes most functions from [query-string](https://github.com/sindresorhus/query-string), which is used internally.
 
 #### UrlUpdateType
 
@@ -151,7 +153,7 @@ The `UrlUpdateType` is a string type definings the different methods for updatin
 
 
 #### Param Types
-See [all param definitions here](https://github.com/pbeshai/use-query-params/blob/master/src/params.ts). You can define your own parameter types by creating an object with an `encode` and a `decode` function. See the existing definitions for examples.
+See [all param definitions from serialize-query-params here](https://github.com/pbeshai/serialize-query-params/blob/master/src/params.ts). You can define your own parameter types by creating an object with an `encode` and a `decode` function. See the existing definitions for examples.
 
 Note that all nully values will encode and decode as `undefined`.
 
@@ -301,8 +303,7 @@ query parameters.
 **Example**
 
 ```js
-import { stringify } from 'query-string';
-import { encodeQueryParams, NumberParam } from 'use-query-params';
+import { encodeQueryParams, NumberParam, stringify } from 'use-query-params';
 
 // encode each parameter according to the configuration
 const encodedQuery = encodeQueryParams({ foo: NumberParam }, { foo });

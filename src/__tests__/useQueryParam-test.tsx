@@ -1,6 +1,11 @@
 import * as React from 'react';
-import { ParsedQuery } from 'query-string';
 import { renderHook, cleanup, act } from 'react-hooks-testing-library';
+import {
+  NumberParam,
+  NumericArrayParam,
+  EncodedQueryWithNulls,
+} from 'serialize-query-params';
+
 import { useQueryParam, QueryParamProvider } from '../index';
 import {
   makeMockHistory,
@@ -8,10 +13,9 @@ import {
   calledPushQuery,
   calledReplaceQuery,
 } from './helpers';
-import { NumberParam, NumericArrayParam } from '../params';
 
 // helper to setup tests
-function setupWrapper(query: ParsedQuery) {
+function setupWrapper(query: EncodedQueryWithNulls) {
   const location = makeMockLocation(query);
   const history = makeMockHistory(location);
   const wrapper = ({ children }: any) => (

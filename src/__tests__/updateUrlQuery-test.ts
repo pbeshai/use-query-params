@@ -1,4 +1,4 @@
-import { updateUrlQuery } from '../updateUrlQuery';
+import { updateUrlQuery } from '../index';
 import {
   makeMockHistory,
   makeMockLocation,
@@ -99,27 +99,5 @@ describe('updateUrlQuery', () => {
     expect(calledPushQuery(history, 1)).toEqual({
       foo: '123',
     });
-  });
-
-  it('uses query property if available', () => {
-    const history = makeMockHistory();
-    // test updating existing query param
-    updateUrlQuery(
-      { foo: '123' },
-      {
-        query: { foo: '521', bar: 'zzz' },
-      } as any,
-      history,
-      'replaceIn'
-    );
-
-    expect(history.push).not.toBeCalled();
-    expect(history.replace).toBeCalled();
-    // uses query instead of search (sets search to '')
-    expect(history.replace.mock.calls[0][0].query).toEqual({
-      foo: '123',
-      bar: 'zzz',
-    });
-    expect(history.replace.mock.calls[0][0].search).toBe('');
   });
 });
