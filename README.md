@@ -7,6 +7,7 @@
 
   <p>
     <a href="https://www.npmjs.com/package/use-query-params"><img alt="npm" src="https://img.shields.io/npm/v/use-query-params.svg"></a>
+  <a href="https://travis-ci.com/pbeshai/use-query-params/"><img alt="Travis (.com)" src="https://img.shields.io/travis/com/pbeshai/use-query-params.svg"></a>
 
   </p>
 <hr />
