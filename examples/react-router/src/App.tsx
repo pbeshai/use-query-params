@@ -5,6 +5,7 @@ import ReadmeExample from './ReadmeExample';
 import ReadmeExample2 from './ReadmeExample2';
 import UseQueryParamsExample from './UseQueryParamsExample';
 import './App.css';
+import ContextExample from './ContextExample';
 
 const App = (props: any) => {
   const [example, setExample] = React.useState(0);
@@ -17,6 +18,7 @@ const App = (props: any) => {
         <button onClick={() => setExample(1)}>useQueryParams Example</button>
         <button onClick={() => setExample(2)}>README Example</button>
         <button onClick={() => setExample(3)}>README Example 2</button>
+        <button onClick={() => setExample(4)}>Context Example</button>
         <Link to={`/?test=${Math.floor(Math.random() * 10)}`}>
           Push New URL
         </Link>
@@ -26,6 +28,7 @@ const App = (props: any) => {
         {example === 1 && <UseQueryParamsExample />}
         {example === 2 && <ReadmeExample />}
         {example === 3 && <ReadmeExample2 />}
+        {example === 4 && <ContextExample />}
       </div>
     </div>
   );
