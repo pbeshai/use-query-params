@@ -31,6 +31,8 @@ export const useQueryParam = <D, D2 = D>(
 ): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
   const { history, location } = React.useContext(QueryParamContext);
 
+  const [savedParam, setSavedParam] = React.useState();
+
   // read in the raw query
   if (!rawQuery) {
     rawQuery = React.useMemo(() => parseQueryString(location.search) || {}, [
@@ -69,8 +71,9 @@ export const useQueryParam = <D, D2 = D>(
         history,
         updateType
       );
+      setSavedParam(newEncodedValue);
     },
-    [location]
+    [location, savedParam]
   );
 
   return [decodedValue, setValue];

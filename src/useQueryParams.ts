@@ -19,6 +19,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
   const { history, location } = React.useContext(QueryParamContext);
+  const [savedQueryParams, setSavedQueryParams] = React.useState();
 
   // read in the raw query
   const rawQuery = React.useMemo(
@@ -48,6 +49,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
 
       // update the URL
       updateUrlQuery(encodedChanges, location, history, updateType);
+      setSavedQueryParams(encodedChanges);
     },
     [location]
   );
