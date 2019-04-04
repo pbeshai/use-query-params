@@ -79,4 +79,18 @@ describe('useQueryParams', () => {
       baz: 'a,b', // ['a,'b'] as string = "a,b"
     });
   });
+
+  it('return persistent value if search not changed', () => {
+    const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
+    const { result, rerender } = renderHook(
+      () => useQueryParams({ foo: NumberParam, bar: StringParam }),
+      {
+        wrapper,
+      }
+    );
+    const [decodedQuery1] = result.current;
+    rerender();
+    const [decodedQuery2] = result.current;
+    expect(decodedQuery1 === decodedQuery2).toBe(true);
+  })
 });

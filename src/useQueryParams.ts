@@ -28,14 +28,17 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
 
   // parse each parameter via usQueryParam
   const paramNames = Object.keys(paramConfigMap);
-  const decodedValues: Partial<DecodedValueMap<QPCMap>> = {};
-  for (const paramName of paramNames) {
-    decodedValues[paramName] = useQueryParam(
-      paramName,
-      paramConfigMap[paramName],
-      rawQuery
-    )[0];
-  }
+
+  const paramValues = paramNames.map((paramName) => useQueryParam(
+    paramName,
+    paramConfigMap[paramName],
+    rawQuery
+  )[0]);
+
+  const decodedValues = React.useMemo(() => paramNames.reduce<Partial<DecodedValueMap<QPCMap>>>((result, paramName, i) => {
+    result[paramName] = paramValues[i];
+    return result;
+  }, {}), paramValues)
 
   // create a setter for updating multiple query params at once
   const setQuery = React.useCallback(
