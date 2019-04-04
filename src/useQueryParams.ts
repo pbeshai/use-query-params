@@ -26,19 +26,25 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     [location.search]
   );
 
-  // parse each parameter via usQueryParam
+  // parse each parameter via useQueryParam
+  // we reuse the logic to not recreate objects
   const paramNames = Object.keys(paramConfigMap);
+  const paramValues = paramNames.map(
+    paramName =>
+      useQueryParam(paramName, paramConfigMap[paramName], rawQuery)[0]
+  );
 
-  const paramValues = paramNames.map((paramName) => useQueryParam(
-    paramName,
-    paramConfigMap[paramName],
-    rawQuery
-  )[0]);
+  // we use a memo here to prevent recreating the containing decodedValues object
+  // which would break === comparisons even if no values changed.
+  const decodedValues = React.useMemo(() => {
+    // iterate over the decoded values and build an object
+    const decodedValues: Partial<DecodedValueMap<QPCMap>> = {};
+    for (let i = 0; i < paramNames.length; ++i) {
+      decodedValues[paramNames[i]] = paramValues[i];
+    }
 
-  const decodedValues = React.useMemo(() => paramNames.reduce<Partial<DecodedValueMap<QPCMap>>>((result, paramName, i) => {
-    result[paramName] = paramValues[i];
-    return result;
-  }, {}), paramValues)
+    return decodedValues;
+  }, paramValues);
 
   // create a setter for updating multiple query params at once
   const setQuery = React.useCallback(
