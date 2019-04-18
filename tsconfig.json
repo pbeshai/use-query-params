@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2018",
+    "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
     "jsx": "react",
@@ -15,7 +15,7 @@
     "noImplicitAny": true,
     "noFallthroughCasesInSwitch": true,
     "outDir": "lib",
-    "lib": ["es2018", "dom"]
+    "lib": ["es5", "dom"]
   },
   "exclude": [
     "node_modules",
