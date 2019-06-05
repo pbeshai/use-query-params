@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { renderHook, cleanup } from 'react-hooks-testing-library';
+import { renderHook } from 'react-hooks-testing-library';
 import {
   NumberParam,
   ArrayParam,
@@ -29,7 +29,6 @@ function setupWrapper(query: EncodedQueryWithNulls) {
 }
 
 describe('useQueryParams', () => {
-  afterEach(cleanup);
 
   it('default update type (replaceIn)', () => {
     const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });

@@ -1,10 +1,13 @@
 import * as React from 'react';
-import { render, cleanup } from 'react-testing-library';
+import { render, cleanup } from '@testing-library/react';
 import { QueryParamProvider, QueryParamContext } from '../index';
 import { makeMockLocation, makeMockHistory } from './helpers';
 
 describe('QueryParamProvider', () => {
-  afterEach(cleanup);
+  afterEach((done) => {
+    cleanup()
+    done()
+  });
 
   it('works with @reach/router style history', () => {
     const reachHistory = { navigate: jest.fn() };
