@@ -53,6 +53,6 @@
     "react-dom": "^16.8.0"
   },
   "dependencies": {
-    "serialize-query-params": "^0.1.1"
+    "serialize-query-params": "^0.1.2"
   }
 }
