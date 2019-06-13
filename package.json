@@ -3,14 +3,19 @@
   "version": "0.3.2",
   "description": "React Hook for managing state in URL query parameters with easy serialization.",
   "main": "lib/index.js",
+  "module": "esm/index.js",
   "files": [
-    "lib/"
+    "lib/",
+    "esm/"
   ],
   "types": "lib/index.d.ts",
   "typings": "lib/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build:cjs": "tsc",
+    "build:es": "tsc -m esNext --outDir esm",
+    "build": "npm run build:cjs && npm run build:es",
     "build-website": "npm run test && npm run build && cd examples/website-example && npm run build && npm run copy-build",
+    "clean": "rimraf lib esm",
     "dev": "NODE_ENV=development tsc -w",
     "prepublishOnly": "npm run test && npm run build",
     "test": "jest",
@@ -46,6 +51,7 @@
     "react-dom": "^16.8.4",
     "react-hooks-testing-library": "^0.3.7",
     "react-testing-library": "^6.0.0",
+    "rimraf": "^2.6.3",
     "typescript": "^3.3.3333"
   },
   "peerDependencies": {
@@ -53,6 +59,6 @@
     "react-dom": "^16.8.0"
   },
   "dependencies": {
-    "serialize-query-params": "^0.1.2"
+    "serialize-query-params": "^0.1.3"
   }
 }
