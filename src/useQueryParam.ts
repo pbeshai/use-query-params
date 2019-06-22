@@ -41,7 +41,7 @@ export const useQueryParam = <D, D2 = D>(
       if (typeof location === 'object' && typeof window !== undefined) {
         pathname = parseQueryString(location.search)
       } else if (typeof location === 'object') {
-        pathname = parseQueryURL(location.pathname)
+        pathname = parseQueryURL(location.pathname).query
       }
 
       return pathname
