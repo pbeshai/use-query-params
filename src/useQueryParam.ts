@@ -33,7 +33,6 @@ export const useQueryParam = <D, D2 = D>(
 ): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
   const { history, location } = React.useContext(QueryParamContext);
 
-  // read in the raw query
   if (!rawQuery) {
     rawQuery = React.useMemo(() => {
       let pathname = {}
@@ -44,8 +43,8 @@ export const useQueryParam = <D, D2 = D>(
         pathname = parseQueryURL(location.pathname).query
       }
 
-      return pathname
-    }, [])
+      return parseQueryString(location.search) || {}
+    }, [location.search, location.pathname])
   }
 
   // read in the encoded string value
