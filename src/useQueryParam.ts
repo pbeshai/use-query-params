@@ -10,7 +10,6 @@ import {
 import { QueryParamContext } from './QueryParamProvider';
 import { updateUrlQuery } from './updateUrlQuery';
 import { UrlUpdateType } from './types';
-import { type } from 'os';
 
 /**
  * Given a query param name and query parameter configuration ({ encode, decode })
@@ -37,13 +36,13 @@ export const useQueryParam = <D, D2 = D>(
     rawQuery = React.useMemo(() => {
       let pathname = {}
 
-      if (typeof location === 'object' && typeof window !== undefined) {
+      if (typeof location === 'object' && typeof window !== 'undefined') {
         pathname = parseQueryString(location.search)
       } else if (typeof location === 'object') {
         pathname = parseQueryURL(location.pathname).query
       }
 
-      return parseQueryString(location.search) || {}
+      return pathname || {}
     }, [location.search, location.pathname])
   }
 
