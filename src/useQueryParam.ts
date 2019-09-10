@@ -31,6 +31,24 @@ export const useQueryParam = <D, D2 = D>(
 ): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
   const { history, location } = React.useContext(QueryParamContext);
 
+  // ref for actually version history
+  const refHistory = React.useRef<typeof history>(history);
+  React.useEffect(
+    () => {
+      refHistory.current = history;
+    },
+    [history]
+  );
+
+  // ref for actually version location
+  const refLocation = React.useRef<typeof location>(location);
+  React.useEffect(
+    () => {
+      refLocation.current = location;
+    },
+    [location]
+  );
+
   // read in the raw query
   if (!rawQuery) {
     rawQuery = React.useMemo(() => parseQueryString(location.search) || {}, [
@@ -65,12 +83,12 @@ export const useQueryParam = <D, D2 = D>(
 
       updateUrlQuery(
         { [name]: newEncodedValue },
-        location,
-        history,
+        refLocation.current,
+        refHistory.current,
         updateType
       );
     },
-    [location]
+    []
   );
 
   return [decodedValue, setValue];
