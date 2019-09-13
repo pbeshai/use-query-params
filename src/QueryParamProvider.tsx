@@ -36,18 +36,14 @@ function adaptWindowHistory(history: History): PushReplaceHistory {
       history.replaceState(
         (location as any).state,
         '',
-        `${location.protocol}//${location.host}${location.pathname}${
-          location.search
-        }`
+        `${location.protocol}//${location.host}${location.pathname}${location.search}`
       );
     },
     push(location: Location) {
       history.pushState(
         (location as any).state,
         '',
-        `${location.protocol}//${location.host}${location.pathname}${
-          location.search
-        }`
+        `${location.protocol}//${location.host}${location.pathname}${location.search}`
       );
     },
   };
@@ -63,17 +59,13 @@ function adaptReachHistory(history: ReachHistory): PushReplaceHistory {
   return {
     replace(location: Location) {
       history.navigate(
-        `${location.protocol}//${location.host}${location.pathname}${
-          location.search
-        }`,
+        `${location.protocol}//${location.host}${location.pathname}${location.search}`,
         { replace: true }
       );
     },
     push(location: Location) {
       history.navigate(
-        `${location.protocol}//${location.host}${location.pathname}${
-          location.search
-        }`,
+        `${location.protocol}//${location.host}${location.pathname}${location.search}`,
         { replace: false }
       );
     },
