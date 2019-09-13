@@ -103,4 +103,4 @@ const WithQueryParamsExample: React.FC<Props> = ({ query, setQuery }) => {
   );
 };
 
-export default withQueryParams(queryConfig)(WithQueryParamsExample);
+export default withQueryParams(queryConfig, WithQueryParamsExample);

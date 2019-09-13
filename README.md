@@ -390,8 +390,7 @@ setQuery({ foo: 99 })
 
 ```js
 withQueryParams<QPCMap extends QueryParamConfigMap, P extends InjectedQueryProps<QPCMap>>
-  (paramConfigMap: QPCMap):
-    (WrappedComponent: React.ComponentType<P>):
+  (paramConfigMap: QPCMap, WrappedComponent: React.ComponentType<P>):
       React.FC<Diff<P, InjectedQueryProps<QPCMap>>>
 ```
 
@@ -413,7 +412,7 @@ const MyComponent = ({ query, setQuery, ...others }) => {
 }
 
 // reads query parameters `foo` and `bar` from the URL and stores their decoded values
-export default withQueryParams({ foo: NumberParam, bar: StringParam })(MyComponent);
+export default withQueryParams({ foo: NumberParam, bar: StringParam }, MyComponent);
 ```
 
 <br/>

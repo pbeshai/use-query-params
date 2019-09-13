@@ -29,8 +29,11 @@ const UseQueryParamsExample = ({ query, setQuery }: any) => {
   );
 };
 
-export default withQueryParams({
-  x: NumberParam,
-  q: StringParam,
-  filters: ArrayParam,
-})(UseQueryParamsExample);
+export default withQueryParams(
+  {
+    x: NumberParam,
+    q: StringParam,
+    filters: ArrayParam,
+  },
+  UseQueryParamsExample
+);

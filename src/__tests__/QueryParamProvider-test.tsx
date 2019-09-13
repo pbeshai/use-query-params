@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, cleanup } from 'react-testing-library';
+import { render, cleanup } from '@testing-library/react';
 import { QueryParamProvider, QueryParamContext } from '../index';
 import { makeMockLocation, makeMockHistory } from './helpers';
 
