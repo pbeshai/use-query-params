@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import UseQueryParamExample from './UseQueryParamExample';
 import UseQueryParamsExample from './UseQueryParamsExample';
 import WithQueryParamsExample from './WithQueryParamsExample';
+import RenderPropsExample from './RenderPropsExample';
 import ReadmeExample from './ReadmeExample';
 import ReadmeExample2 from './ReadmeExample2';
 
@@ -18,8 +19,11 @@ const App = (props: any) => {
         <button onClick={() => setExample(0)}>useQueryParam Example</button>
         <button onClick={() => setExample(1)}>useQueryParams Example</button>
         <button onClick={() => setExample(2)}>withQueryParams Example</button>
-        <button onClick={() => setExample(3)}>README Example</button>
-        <button onClick={() => setExample(4)}>README Example 2</button>
+        <button onClick={() => setExample(3)}>
+          &lt;QueryParams&gt; Render Props Example
+        </button>
+        <button onClick={() => setExample(4)}>README Example</button>
+        <button onClick={() => setExample(5)}>README Example 2</button>
         <div>
           <Link to={`/?test=${Math.floor(Math.random() * 10)}`}>
             Push New URL
@@ -30,8 +34,9 @@ const App = (props: any) => {
         {example === 0 && <UseQueryParamExample />}
         {example === 1 && <UseQueryParamsExample />}
         {example === 2 && <WithQueryParamsExample />}
-        {example === 3 && <ReadmeExample />}
-        {example === 4 && <ReadmeExample2 />}
+        {example === 3 && <RenderPropsExample />}
+        {example === 4 && <ReadmeExample />}
+        {example === 5 && <ReadmeExample2 />}
       </div>
     </div>
   );

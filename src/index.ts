@@ -3,7 +3,8 @@ export * from './types';
 
 export { useQueryParam } from './useQueryParam';
 export { useQueryParams } from './useQueryParams';
-export { withQueryParams } from './withQueryParams';
+export { withQueryParams, InjectedQueryProps } from './withQueryParams';
+export { QueryParams, QueryParamsProps, QueryRenderProps } from './QueryParams';
 export { updateUrlQuery } from './updateUrlQuery';
 export {
   QueryParamProvider,
