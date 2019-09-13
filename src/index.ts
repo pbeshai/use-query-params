@@ -3,6 +3,7 @@ export * from './types';
 
 export { useQueryParam } from './useQueryParam';
 export { useQueryParams } from './useQueryParams';
+export { withQueryParams } from './withQueryParams';
 export { updateUrlQuery } from './updateUrlQuery';
 export {
   QueryParamProvider,
