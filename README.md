@@ -1,6 +1,6 @@
 <div align="center">
   <h1>useQueryParams</h1>
-  <p>A <a href="https://reactjs.org/docs/hooks-intro.html">React Hook</a> for managing state in URL query parameters with easy serialization.
+  <p>A <a href="https://reactjs.org/docs/hooks-intro.html">React Hook</a>, HOC, and Render Props for managing state in URL query parameters with easy serialization.
   </p>
   <p>Works with <a href="https://reacttraining.com/react-router/">React Router</a> and <a href="https://reach.tech/router">Reach Router</a> out of the box. TypeScript supported.</p>
 
@@ -12,9 +12,9 @@
   </p>
 <hr />
 
-<a href="#installation">Installation</a> | 
-<a href="#usage">Usage</a> | 
-<a href="#examples">Examples</a> | 
+<a href="#installation">Installation</a> |
+<a href="#usage">Usage</a> |
+<a href="#examples">Examples</a> |
 <a href="#api">API</a> |
 <a href="https://peterbeshai.com/use-query-params/">Demo</a>
 
@@ -23,7 +23,6 @@
 
 When creating apps with easily shareable URLs, you often want to encode state as query parameters, but all query parameters must be encoded as strings. `useQueryParams` allows you to easily encode and decode data of any type as query parameters with smart memoization to prevent creating unnecessary duplicate objects. It uses [serialize-query-params](https://github.com/pbeshai/serialize-query-params).
 
-**Not ready for hooks?** Check out [react-url-query](https://github.com/pbeshai/react-url-query) for a higher-order component (HOC) approach.
 
 ### Installation
 
@@ -122,6 +121,103 @@ const UseQueryParamsExample = () => {
 export default UseQueryParamsExample;
 ```
 
+Or with the higher-order component (HOC) `withQueryParams`:
+
+```js
+import * as React from 'react';
+import {
+  withQueryParams,
+  StringParam,
+  NumberParam,
+  ArrayParam,
+} from 'use-query-params';
+
+const WithQueryParamsExample = ({ query, setQuery }: any) => {
+  const { x: num, q: searchQuery, filters = [] } = query;
+
+  return (
+    <div>
+      <h1>num is {num}</h1>
+      <button onClick={() => setQuery({ x: Math.random() })}>Change</button>
+      <h1>searchQuery is {searchQuery}</h1>
+      <h1>There are {filters.length} filters active.</h1>
+      <button
+        onClick={() =>
+          setQuery(
+            { x: Math.random(), filters: [...filters, 'foo'], q: 'bar' },
+            'push'
+          )
+        }
+      >
+        Change All
+      </button>
+    </div>
+  );
+};
+
+export default withQueryParams({
+  x: NumberParam,
+  q: StringParam,
+  filters: ArrayParam,
+})(WithQueryParamsExample);
+```
+
+Or with render props via `<QueryParams>`:
+
+```js
+import * as React from 'react';
+import {
+  QueryParams,
+  StringParam,
+  NumberParam,
+  ArrayParam,
+} from 'use-query-params';
+
+const RenderPropsExample = () => {
+  const queryConfig = {
+    x: NumberParam,
+    q: StringParam,
+    filters: ArrayParam,
+  };
+  return (
+    <div>
+      <QueryParams config={queryConfig}>
+        {({ query, setQuery }) => {
+          const { x: num, q: searchQuery, filters = [] } = query;
+          return (
+            <>
+              <h1>num is {num}</h1>
+              <button onClick={() => setQuery({ x: Math.random() })}>
+                Change
+              </button>
+              <h1>searchQuery is {searchQuery}</h1>
+              <h1>There are {filters.length} filters active.</h1>
+              <button
+                onClick={() =>
+                  setQuery(
+                    {
+                      x: Math.random(),
+                      filters: [...filters, 'foo'],
+                      q: 'bar',
+                    },
+                    'push'
+                  )
+                }
+              >
+                Change All
+              </button>
+            </>
+          );
+        }}
+      </QueryParams>
+    </div>
+  );
+};
+
+export default RenderPropsExample;
+```
+
+
 ### Examples
 
 A few basic [examples](https://github.com/pbeshai/use-query-params/tree/master/examples) have been put together to demonstrate how `useQueryParams` works with different routing systems.
@@ -135,6 +231,8 @@ A few basic [examples](https://github.com/pbeshai/use-query-params/tree/master/e
 - [Param Types](#param-types)
 - [useQueryParam](#usequeryparam)
 - [useQueryParams](#usequeryparams-1)
+- [withQueryParams](#withqueryparams)
+- [QueryParams](#queryparams)
 - [encodeQueryParams](#encodequeryparams)
 - [QueryParamProvider](#queryparamprovider)
 - [Type Definitions](https://github.com/pbeshai/use-query-params/blob/master/src/types.ts) and from [serialize-query-params](https://github.com/pbeshai/serialize-query-params/blob/master/src/types.ts).
@@ -195,10 +293,10 @@ import {
 
 /** Uses a comma to delimit entries. e.g. ['a', 'b'] => qp?=a,b */
 const CommaArrayParam = {
-  encode: (array: string[] | null | undefined) => 
+  encode: (array: string[] | null | undefined) =>
     encodeDelimitedArray(array, ','),
 
-  decode: (arrayStr: string | string[] | null | undefined) => 
+  decode: (arrayStr: string | string[] | null | undefined) =>
     decodeDelimitedArray(arrayStr, ',')
 };
 ```
@@ -286,6 +384,59 @@ setQuery({ foo: 99 })
 ```
 
 <br/>
+
+
+#### withQueryParams
+
+```js
+withQueryParams<QPCMap extends QueryParamConfigMap, P extends InjectedQueryProps<QPCMap>>
+  (paramConfigMap: QPCMap, WrappedComponent: React.ComponentType<P>):
+      React.FC<Diff<P, InjectedQueryProps<QPCMap>>>
+```
+
+Given a query parameter configuration (mapping query param name to `{ encode, decode }`) and
+a component, inject the props `query` and `setQuery` into the component based on the config.
+
+The setter takes two arguments `(newQuery, updateType)` where updateType
+is one of `'replace' | 'replaceIn' | 'push' | 'pushIn'`, defaulting to
+`'replaceIn'`.
+
+**Example**
+
+```js
+import { withQueryParams, StringParam, NumberParam } from 'use-query-params';
+
+const MyComponent = ({ query, setQuery, ...others }) => {
+  const { foo, bar } = query;
+  return <div>foo = {foo}, bar = {bar}</div>
+}
+
+// reads query parameters `foo` and `bar` from the URL and stores their decoded values
+export default withQueryParams({ foo: NumberParam, bar: StringParam }, MyComponent);
+```
+
+<br/>
+
+
+
+#### QueryParams
+
+```js
+<QueryParams config={{ foo: NumberParam }}>
+  {({ query, setQuery }) => <div>foo = {query.foo}</div>}
+</QueryParams>
+```
+
+Given a query parameter configuration (mapping query param name to `{ encode, decode }`) and
+a component, provide render props `query` and `setQuery` based on the config.
+
+The setter takes two arguments `(newQuery, updateType)` where updateType
+is one of `'replace' | 'replaceIn' | 'push' | 'pushIn'`, defaulting to
+`'replaceIn'`.
+
+
+<br/>
+
 
 #### encodeQueryParams
 
