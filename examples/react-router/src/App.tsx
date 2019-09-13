@@ -6,6 +6,8 @@ import WithQueryParamsExample from './WithQueryParamsExample';
 import RenderPropsExample from './RenderPropsExample';
 import ReadmeExample from './ReadmeExample';
 import ReadmeExample2 from './ReadmeExample2';
+import ReadmeExample3 from './ReadmeExample3';
+import ReadmeExample4 from './ReadmeExample4';
 
 import './App.css';
 
@@ -24,6 +26,8 @@ const App = (props: any) => {
         </button>
         <button onClick={() => setExample(4)}>README Example</button>
         <button onClick={() => setExample(5)}>README Example 2</button>
+        <button onClick={() => setExample(6)}>README Example 3</button>
+        <button onClick={() => setExample(7)}>README Example 4</button>
         <div>
           <Link to={`/?test=${Math.floor(Math.random() * 10)}`}>
             Push New URL
@@ -37,6 +41,8 @@ const App = (props: any) => {
         {example === 3 && <RenderPropsExample />}
         {example === 4 && <ReadmeExample />}
         {example === 5 && <ReadmeExample2 />}
+        {example === 6 && <ReadmeExample3 />}
+        {example === 7 && <ReadmeExample4 />}
       </div>
     </div>
   );
