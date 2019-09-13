@@ -34,16 +34,21 @@ export const useQueryParam = <D, D2 = D>(
 
   if (!rawQuery) {
     rawQuery = React.useMemo(() => {
-      let pathname = {}
+      let pathname = {};
 
-      if (typeof location === 'object' && typeof window !== 'undefined') {
-        pathname = parseQueryString(location.search)
-      } else if (typeof location === 'object') {
-        pathname = parseQueryURL(location.pathname).query
+      // handle checking SSR (#13)
+      if (typeof location === 'object') {
+        // in browser
+        if (typeof window !== 'undefined') {
+          pathname = parseQueryString(location.search);
+        } else {
+          // not in browser
+          pathname = parseQueryURL(location.pathname).query;
+        }
       }
 
-      return pathname || {}
-    }, [location.search, location.pathname])
+      return pathname || {};
+    }, [location.search, location.pathname]);
   }
 
   // read in the encoded string value
@@ -61,10 +66,10 @@ export const useQueryParam = <D, D2 = D>(
     // value may be an array that is recreated if a different query param
     // changes.
   }, [
-      encodedValue instanceof Array
-        ? stringify({ name: encodedValue })
-        : encodedValue,
-    ]);
+    encodedValue instanceof Array
+      ? stringify({ name: encodedValue })
+      : encodedValue,
+  ]);
 
   // create the setter, memoizing via useCallback
   const setValue = React.useCallback(
