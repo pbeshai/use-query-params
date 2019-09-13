@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   parse as parseQueryString,
+  parseUrl as parseQueryURL,
   stringify,
   EncodedQueryWithNulls,
   StringParam,
@@ -31,11 +32,18 @@ export const useQueryParam = <D, D2 = D>(
 ): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
   const { history, location } = React.useContext(QueryParamContext);
 
-  // read in the raw query
   if (!rawQuery) {
-    rawQuery = React.useMemo(() => parseQueryString(location.search) || {}, [
-      location.search,
-    ]);
+    rawQuery = React.useMemo(() => {
+      let pathname = {}
+
+      if (typeof location === 'object' && typeof window !== 'undefined') {
+        pathname = parseQueryString(location.search)
+      } else if (typeof location === 'object') {
+        pathname = parseQueryURL(location.pathname).query
+      }
+
+      return pathname || {}
+    }, [location.search, location.pathname])
   }
 
   // read in the encoded string value
@@ -53,10 +61,10 @@ export const useQueryParam = <D, D2 = D>(
     // value may be an array that is recreated if a different query param
     // changes.
   }, [
-    encodedValue instanceof Array
-      ? stringify({ name: encodedValue })
-      : encodedValue,
-  ]);
+      encodedValue instanceof Array
+        ? stringify({ name: encodedValue })
+        : encodedValue,
+    ]);
 
   // create the setter, memoizing via useCallback
   const setValue = React.useCallback(
