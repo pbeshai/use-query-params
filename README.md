@@ -1,6 +1,6 @@
 <div align="center">
   <h1>useQueryParams</h1>
-  <p>A <a href="https://reactjs.org/docs/hooks-intro.html">React Hook</a>, HOC, and Render Props for managing state in URL query parameters with easy serialization.
+  <p>A <a href="https://reactjs.org/docs/hooks-intro.html">React Hook</a>, HOC, and Render Props solution for managing state in URL query parameters with easy serialization.
   </p>
   <p>Works with <a href="https://reacttraining.com/react-router/">React Router</a> and <a href="https://reach.tech/router">Reach Router</a> out of the box. TypeScript supported.</p>
 
@@ -159,7 +159,7 @@ export default withQueryParams({
   x: NumberParam,
   q: StringParam,
   filters: ArrayParam,
-})(WithQueryParamsExample);
+}, WithQueryParamsExample);
 ```
 
 Or with render props via `<QueryParams>`:
