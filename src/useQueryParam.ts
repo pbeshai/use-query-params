@@ -32,7 +32,6 @@ export const useQueryParam = <D, D2 = D>(
 ): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
   const { history, location } = React.useContext(QueryParamContext);
 
-<<<<<<< HEAD
   // ref with current version history object
   const refHistory = React.useRef<typeof history>(history);
   React.useEffect(
@@ -52,8 +51,6 @@ export const useQueryParam = <D, D2 = D>(
   );
 
   // read in the raw query
-=======
->>>>>>> d7144abeadd27b86910b2b330751f106e0743141
   if (!rawQuery) {
     rawQuery = React.useMemo(() => {
       let pathname = {};
