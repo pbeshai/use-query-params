@@ -20,6 +20,24 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
   const { history, location } = React.useContext(QueryParamContext);
 
+  // ref with current version history object
+  const refHistory = React.useRef<typeof history>(history);
+  React.useEffect(
+    () => {
+      refHistory.current = history;
+    },
+    [history]
+  );
+
+  // ref with current version location object
+  const refLocation = React.useRef<typeof location>(location);
+  React.useEffect(
+    () => {
+      refLocation.current = location;
+    },
+    [location]
+  );
+
   // read in the raw query
   const rawQuery = React.useMemo(
     () => parseQueryString(location.search) || {},
@@ -56,9 +74,9 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       );
 
       // update the URL
-      updateUrlQuery(encodedChanges, location, history, updateType);
+      updateUrlQuery(encodedChanges, refLocation.current, refHistory.current, updateType);
     },
-    [location]
+    []
   );
 
   // no longer Partial

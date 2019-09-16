@@ -31,7 +31,7 @@ export const useQueryParam = <D, D2 = D>(
 ): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
   const { history, location } = React.useContext(QueryParamContext);
 
-  // ref for actually version history
+  // ref with current version history object
   const refHistory = React.useRef<typeof history>(history);
   React.useEffect(
     () => {
@@ -40,7 +40,7 @@ export const useQueryParam = <D, D2 = D>(
     [history]
   );
 
-  // ref for actually version location
+  // ref with current version location object
   const refLocation = React.useRef<typeof location>(location);
   React.useEffect(
     () => {
