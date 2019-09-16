@@ -81,7 +81,7 @@ describe('useQueryParams', () => {
   });
 
   it('return persistent value if search not changed', () => {
-    const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
+    const { wrapper } = setupWrapper({ foo: '123', bar: 'xxx' });
     const { result, rerender } = renderHook(
       () => useQueryParams({ foo: NumberParam, bar: StringParam }),
       {
@@ -92,5 +92,5 @@ describe('useQueryParams', () => {
     rerender();
     const [decodedQuery2] = result.current;
     expect(decodedQuery1 === decodedQuery2).toBe(true);
-  })
+  });
 });

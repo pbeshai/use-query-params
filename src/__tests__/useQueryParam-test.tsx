@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { renderHook, cleanup, act } from 'react-hooks-testing-library';
+import { renderHook, cleanup } from 'react-hooks-testing-library';
 import {
   NumberParam,
   NumericArrayParam,
@@ -53,7 +53,7 @@ describe('useQueryParam', () => {
   });
 
   it("doesn't decode more than necessary", () => {
-    const { wrapper, history, location } = setupWrapper({
+    const { wrapper, location } = setupWrapper({
       foo: ['1', '2', '3'],
     });
     const { result, rerender } = renderHook(
@@ -63,7 +63,7 @@ describe('useQueryParam', () => {
       }
     );
 
-    const [decodedValue, setter] = result.current;
+    const [decodedValue] = result.current;
     expect(decodedValue).toEqual([1, 2, 3]);
 
     rerender();
@@ -78,13 +78,13 @@ describe('useQueryParam', () => {
 
     setter3([4, 5, 6], 'push');
     rerender();
-    const [decodedValue4, setter4] = result.current;
+    const [decodedValue4] = result.current;
     expect(decodedValue3).toBe(decodedValue4);
 
     // if another parameter changes, this one shouldn't be affected
     location.search = `${location.search}&zzz=123`;
     rerender();
-    const [decodedValue5, setter5] = result.current;
+    const [decodedValue5] = result.current;
     expect(decodedValue5).toBe(decodedValue3);
   });
 });

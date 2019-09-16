@@ -1,9 +1,14 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import UseQueryParamExample from './UseQueryParamExample';
+import UseQueryParamsExample from './UseQueryParamsExample';
+import WithQueryParamsExample from './WithQueryParamsExample';
+import RenderPropsExample from './RenderPropsExample';
 import ReadmeExample from './ReadmeExample';
 import ReadmeExample2 from './ReadmeExample2';
-import UseQueryParamsExample from './UseQueryParamsExample';
+import ReadmeExample3 from './ReadmeExample3';
+import ReadmeExample4 from './ReadmeExample4';
+
 import './App.css';
 
 const App = (props: any) => {
@@ -15,17 +20,29 @@ const App = (props: any) => {
       <div>
         <button onClick={() => setExample(0)}>useQueryParam Example</button>
         <button onClick={() => setExample(1)}>useQueryParams Example</button>
-        <button onClick={() => setExample(2)}>README Example</button>
-        <button onClick={() => setExample(3)}>README Example 2</button>
-        <Link to={`/?test=${Math.floor(Math.random() * 10)}`}>
-          Push New URL
-        </Link>
+        <button onClick={() => setExample(2)}>withQueryParams Example</button>
+        <button onClick={() => setExample(3)}>
+          &lt;QueryParams&gt; Render Props Example
+        </button>
+        <button onClick={() => setExample(4)}>README Example</button>
+        <button onClick={() => setExample(5)}>README Example 2</button>
+        <button onClick={() => setExample(6)}>README Example 3</button>
+        <button onClick={() => setExample(7)}>README Example 4</button>
+        <div>
+          <Link to={`/?test=${Math.floor(Math.random() * 10)}`}>
+            Push New URL
+          </Link>
+        </div>
       </div>
       <div>
         {example === 0 && <UseQueryParamExample />}
         {example === 1 && <UseQueryParamsExample />}
-        {example === 2 && <ReadmeExample />}
-        {example === 3 && <ReadmeExample2 />}
+        {example === 2 && <WithQueryParamsExample />}
+        {example === 3 && <RenderPropsExample />}
+        {example === 4 && <ReadmeExample />}
+        {example === 5 && <ReadmeExample2 />}
+        {example === 6 && <ReadmeExample3 />}
+        {example === 7 && <ReadmeExample4 />}
       </div>
     </div>
   );

@@ -58,7 +58,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     // iterate over the decoded values and build an object
     const decodedValues: Partial<DecodedValueMap<QPCMap>> = {};
     for (let i = 0; i < paramNames.length; ++i) {
-      decodedValues[paramNames[i]] = paramValues[i];
+      decodedValues[paramNames[i] as keyof QPCMap] = paramValues[i];
     }
 
     return decodedValues;
