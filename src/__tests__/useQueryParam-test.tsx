@@ -87,4 +87,17 @@ describe('useQueryParam', () => {
     const [decodedValue5] = result.current;
     expect(decodedValue5).toBe(decodedValue3);
   });
+
+  it('causes memoized components to rerender', () => {
+    const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
+    const MemoWrapper = React.memo(wrapper);
+    const { result } = renderHook(() => useQueryParam('foo'), {
+      wrapper: MemoWrapper,
+    });
+    const [decodedValue, setter] = result.current;
+
+    expect(decodedValue).toBe('123');
+    setter('zzz');
+    expect(result.current[0]).toBe('zzz');
+  });
 });
