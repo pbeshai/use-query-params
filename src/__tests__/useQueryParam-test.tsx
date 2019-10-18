@@ -19,7 +19,10 @@ function setupWrapper(query: EncodedQueryWithNulls) {
   const location = makeMockLocation(query);
   const history = makeMockHistory(location);
   const wrapper = ({ children }: any) => (
-    <QueryParamProvider history={history} location={location}>
+    <QueryParamProvider
+      history={history}
+      location={{ ...location }} // generate a new location each time to reproduce #46
+    >
       {children}
     </QueryParamProvider>
   );
@@ -86,5 +89,21 @@ describe('useQueryParam', () => {
     rerender();
     const [decodedValue5] = result.current;
     expect(decodedValue5).toBe(decodedValue3);
+  });
+
+  it('does not generate a new setter with each new query value', () => {
+    const { wrapper } = setupWrapper({ foo: '123', bar: 'xxx' });
+    const { result, rerender } = renderHook(
+      () => useQueryParam('foo', NumberParam),
+      {
+        wrapper,
+      }
+    );
+    const [, setter] = result.current;
+
+    setter(999, 'push');
+    rerender();
+    const [, setter2] = result.current;
+    expect(setter).toBe(setter2);
   });
 });

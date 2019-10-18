@@ -20,7 +20,7 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: 'module',
   },
-  plugins: ['react', '@typescript-eslint'],
+  plugins: ['react', '@typescript-eslint', 'react-hooks'],
   rules: {
     'react/prop-types': 'off',
     // note you must disable the base rule as it can report incorrect errors
@@ -33,5 +33,7 @@ module.exports = {
         ignoreRestSiblings: false,
       },
     ],
+    'react-hooks/rules-of-hooks': 'off',
+    'react-hooks/exhaustive-deps': 'warn',
   },
 };
