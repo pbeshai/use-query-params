@@ -11,6 +11,26 @@ import updateUrlQuery from './updateUrlQuery';
 import { QueryParamContext } from './QueryParamProvider';
 import { UrlUpdateType, SetQuery } from './types';
 
+// from https://usehooks.com/usePrevious/
+function usePrevious<T>(value: T) {
+  const ref = React.useRef(value);
+  React.useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref.current;
+}
+
+// from https://github.com/lodash/lodash/issues/2340#issuecomment-360325395
+function isShallowEqual<T extends object>(objA: T, objB: T) {
+  for (var key in objA)
+    if (!(key in objB) || objA[key] !== objB[key]) return false;
+
+  for (var key in objB)
+    if (!(key in objA) || objA[key] !== objB[key]) return false;
+
+  return true;
+}
+
 /**
  * Given a query parameter configuration (mapping query param name to { encode, decode }),
  * return an object with the decoded values and a setter for updating them.
@@ -20,23 +40,27 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
   const { history, location } = React.useContext(QueryParamContext);
 
-  // ref with current version history object
-  const refHistory = React.useRef<typeof history>(history);
-  React.useEffect(
-    () => {
-      refHistory.current = history;
-    },
-    [history]
-  );
+  // memoize paramConfigMap to make the API nicer for consumers.
+  // otherwise we'd have to useQueryParams(useMemo(() => { foo: NumberParam }, []))
+  const prevParamConfigMap = usePrevious(paramConfigMap);
+  const hasNewParamConfig = isShallowEqual(prevParamConfigMap, paramConfigMap);
+  // prettier-ignore
+  const memoParamConfigMap = React.useMemo(() => paramConfigMap, [ // eslint-disable-line react-hooks/exhaustive-deps
+    hasNewParamConfig,
+  ]);
+  paramConfigMap = memoParamConfigMap;
 
-  // ref with current version location object
+  // ref with current version history object (see #46)
+  const refHistory = React.useRef<typeof history>(history);
+  React.useEffect(() => {
+    refHistory.current = history;
+  }, [history]);
+
+  // ref with current version location object (see #46)
   const refLocation = React.useRef<typeof location>(location);
-  React.useEffect(
-    () => {
-      refLocation.current = location;
-    },
-    [location]
-  );
+  React.useEffect(() => {
+    refLocation.current = location;
+  }, [location]);
 
   // read in the raw query
   const rawQuery = React.useMemo(
@@ -62,7 +86,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     }
 
     return decodedValues;
-  }, paramValues);
+  }, paramValues); // eslint-disable-line react-hooks/exhaustive-deps
 
   // create a setter for updating multiple query params at once
   const setQuery = React.useCallback(
@@ -74,9 +98,14 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       );
 
       // update the URL
-      updateUrlQuery(encodedChanges, refLocation.current, refHistory.current, updateType);
+      updateUrlQuery(
+        encodedChanges,
+        refLocation.current, // see #46
+        refHistory.current,
+        updateType
+      );
     },
-    []
+    [paramConfigMap]
   );
 
   // no longer Partial

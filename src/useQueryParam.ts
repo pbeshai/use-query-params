@@ -32,33 +32,29 @@ export const useQueryParam = <D, D2 = D>(
 ): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
   const { history, location } = React.useContext(QueryParamContext);
 
-  // ref with current version history object
-  const refHistory = React.useRef<typeof history>(history);
-  React.useEffect(
-    () => {
-      refHistory.current = history;
-    },
-    [history]
-  );
+  // ref with current version history object (see #46)
+  const refHistory = React.useRef(history);
+  React.useEffect(() => {
+    refHistory.current = history;
+  }, [history]);
 
-  // ref with current version location object
-  const refLocation = React.useRef<typeof location>(location);
-  React.useEffect(
-    () => {
-      refLocation.current = location;
-    },
-    [location]
-  );
+  // ref with current version location object (see #46)
+  const refLocation = React.useRef(location);
+  React.useEffect(() => {
+    refLocation.current = location;
+  }, [location]);
 
   // read in the raw query
   if (!rawQuery) {
+    const locationIsObject = typeof location === 'object';
+    const windowIsDefined = typeof window !== 'undefined';
     rawQuery = React.useMemo(() => {
       let pathname = {};
 
       // handle checking SSR (#13)
-      if (typeof location === 'object') {
+      if (locationIsObject) {
         // in browser
-        if (typeof window !== 'undefined') {
+        if (windowIsDefined) {
           pathname = parseQueryString(location.search);
         } else {
           // not in browser
@@ -67,11 +63,21 @@ export const useQueryParam = <D, D2 = D>(
       }
 
       return pathname || {};
-    }, [location.search, location.pathname]);
+    }, [location.search, location.pathname, locationIsObject, windowIsDefined]);
   }
 
   // read in the encoded string value
   const encodedValue = rawQuery[name];
+
+  // note that we use the stringified encoded value since the encoded
+  // value may be an array that is recreated if a different query param
+  // changes. It is sufficient to use this instead of encodedValue in
+  // the useMemo dependency array since it will change any time the actual
+  // meaningful value of encodedValue changes.
+  const arraySafeEncodedValue =
+    encodedValue instanceof Array
+      ? stringify({ [name]: encodedValue })
+      : encodedValue;
 
   // decode if the encoded value has changed, otherwise
   // re-use memoized value
@@ -79,16 +85,9 @@ export const useQueryParam = <D, D2 = D>(
     if (encodedValue == null) {
       return undefined;
     }
-    return paramConfig.decode(encodedValue);
 
-    // note that we use the stringified encoded value since the encoded
-    // value may be an array that is recreated if a different query param
-    // changes.
-  }, [
-    encodedValue instanceof Array
-      ? stringify({ name: encodedValue })
-      : encodedValue,
-  ]);
+    return paramConfig.decode(encodedValue);
+  }, [arraySafeEncodedValue, paramConfig]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // create the setter, memoizing via useCallback
   const setValue = React.useCallback(
@@ -97,12 +96,12 @@ export const useQueryParam = <D, D2 = D>(
 
       updateUrlQuery(
         { [name]: newEncodedValue },
-        refLocation.current,
+        refLocation.current, // see #46 for why we use a ref here
         refHistory.current,
         updateType
       );
     },
-    []
+    [paramConfig, name]
   );
 
   return [decodedValue, setValue];
