@@ -39,6 +39,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
   const { history, location } = React.useContext(QueryParamContext);
+  const locationIsObject = typeof location === 'object';
 
   // memoize paramConfigMap to make the API nicer for consumers.
   // otherwise we'd have to useQueryParams(useMemo(() => { foo: NumberParam }, []))
@@ -62,11 +63,12 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     refLocation.current = location;
   }, [location]);
 
+  const search = locationIsObject ? location.search : '';
+
   // read in the raw query
-  const rawQuery = React.useMemo(
-    () => parseQueryString(location.search) || {},
-    [location.search]
-  );
+  const rawQuery = React.useMemo(() => parseQueryString(search) || {}, [
+    search,
+  ]);
 
   // parse each parameter via useQueryParam
   // we reuse the logic to not recreate objects
