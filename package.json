@@ -1,6 +1,6 @@
 {
   "name": "use-query-params",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "React Hook for managing state in URL query parameters with easy serialization.",
   "main": "lib/index.js",
   "module": "esm/index.js",
