@@ -58,7 +58,12 @@ export const useQueryParam = <D, D2 = D>(
           pathname = parseQueryString(location.search);
         } else {
           // not in browser
-          pathname = parseQueryURL(location.pathname).query;
+          let url = location.pathname;
+          if (location.search) {
+            url += location.search;
+          }
+
+          pathname = parseQueryURL(url).query;
         }
       }
 
