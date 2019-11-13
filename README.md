@@ -369,7 +369,7 @@ import { useQueryParams } from 'use-query-params';
 const MyParam = {
   encode(value) {
     return `${value * 10000}`;
-  }
+  },
 
   decode(strValue) {
     return parseFloat(strValue) / 10000;
