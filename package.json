@@ -17,7 +17,7 @@
     "build-website": "npm run test && npm run build && cd examples/website-example && npm run build && npm run copy-build",
     "clean": "rimraf lib esm",
     "dev": "NODE_ENV=development tsc -m esNext --outDir esm -w",
-    "prepublishOnly": "npm run test && npm run build",
+    "prepublishOnly": "npm run test && npm run clean && npm run build",
     "lint": "eslint --ext js,ts,tsx src",
     "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "test": "jest",
@@ -63,7 +63,7 @@
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-hooks-testing-library": "^0.3.7",
-    "rimraf": "^2.6.3",
+    "rimraf": "^3.0.0",
     "typescript": "^3.3.3333"
   },
   "peerDependencies": {
