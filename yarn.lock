@@ -5077,10 +5077,10 @@ semver@^6.0.0, semver@^6.1.2, semver@^6.2.0, semver@^6.3.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
   integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
 
-serialize-query-params@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/serialize-query-params/-/serialize-query-params-0.1.4.tgz#c671f253860bfcb410fe7c64b13c4cd55ca611e8"
-  integrity sha512-d3GHKPAOBULhCMg+jM687vRIMnTXMo8M0lHUOVeFxSGYvfmNlksiOpLyb0orhXPhhFCvZvt+SwC2iPRVIhKS/g==
+serialize-query-params@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/serialize-query-params/-/serialize-query-params-0.3.0.tgz#c815306729463f2a37adb171faf352992fcc0ce8"
+  integrity sha512-gtarsAa5B7L+v2mxbm0zTq8WjqwjgYHZmLsyvxGnlSfW2bWkokV0QKzRxLCGHF2aDqbQYCCNaj1/NP6DqbcEKQ==
   dependencies:
     query-string "^5.0.0"
 
