@@ -44,11 +44,14 @@ export const useQueryParam = <D, D2 = D>(
     refLocation.current = location;
   }, [location]);
 
+  let parsed: EncodedQueryWithNulls;
   // read in the raw query
-  if (!rawQuery) {
+  if (rawQuery) {
+    parsed = rawQuery;
+  } else {
     const locationIsObject = typeof location === 'object';
     const windowIsDefined = typeof window !== 'undefined';
-    rawQuery = React.useMemo(() => {
+    parsed = React.useMemo(() => {
       // handle checking SSR (#13)
       if (locationIsObject) {
         // in browser
@@ -70,7 +73,7 @@ export const useQueryParam = <D, D2 = D>(
   }
 
   // read in the encoded string value
-  const encodedValue = rawQuery[name];
+  const encodedValue = parsed[name];
 
   // note that we use the stringified encoded value since the encoded
   // value may be an array that is recreated if a different query param
