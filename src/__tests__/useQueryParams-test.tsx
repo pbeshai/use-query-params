@@ -109,4 +109,41 @@ describe('useQueryParams', () => {
     const [, setter2] = result.current;
     expect(setter).toBe(setter2);
   });
+
+  it('sets distinct params in the same render', () => {
+    const { wrapper } = setupWrapper({ foo: '123', bar: 'xxx' });
+    const { result, rerender } = renderHook(
+      () => useQueryParams({ foo: NumberParam, bar: StringParam }),
+      {
+        wrapper,
+      }
+    );
+    const [, setter] = result.current;
+
+    setter({ foo: 999 }, 'replaceIn');
+    setter({ bar: 'yyy' }, 'replaceIn');
+    rerender();
+    const [decodedQuery] = result.current;
+    expect(decodedQuery).toEqual({ foo: 999, bar: 'yyy' });
+  });
+
+  it('sets distinct params with different hooks in the same render', () => {
+    const { wrapper } = setupWrapper({ foo: '123', bar: 'xxx' });
+    const { result, rerender } = renderHook(
+      () => [
+        useQueryParams({ foo: NumberParam }),
+        useQueryParams({ bar: StringParam }),
+      ],
+      {
+        wrapper,
+      }
+    );
+    const [[, setFoo], [, setBar]] = result.current;
+
+    setFoo({ foo: 999 }, 'replaceIn');
+    setBar({ bar: 'yyy' }, 'replaceIn');
+    rerender();
+    const [[{ foo }], [{ bar }]] = result.current;
+    expect({ foo, bar }).toEqual({ foo: 999, bar: 'yyy' });
+  });
 });

@@ -8,7 +8,7 @@ import {
   QueryParamConfig,
 } from 'serialize-query-params';
 import { QueryParamContext } from './QueryParamProvider';
-import { updateUrlQuery } from './updateUrlQuery';
+import { getLocation, updateUrlQuery } from './updateUrlQuery';
 import { UrlUpdateType } from './types';
 
 /**
@@ -99,12 +99,12 @@ export const useQueryParam = <D, D2 = D>(
     (newValue: D, updateType?: UrlUpdateType) => {
       const newEncodedValue = paramConfig.encode(newValue);
 
-      updateUrlQuery(
+      refLocation.current = getLocation(
         { [name]: newEncodedValue },
         refLocation.current, // see #46 for why we use a ref here
-        refHistory.current,
         updateType
       );
+      updateUrlQuery(refHistory.current, refLocation.current, updateType);
     },
     [paramConfig, name]
   );

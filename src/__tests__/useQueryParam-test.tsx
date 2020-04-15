@@ -106,4 +106,27 @@ describe('useQueryParam', () => {
     const [, setter2] = result.current;
     expect(setter).toBe(setter2);
   });
+
+  it('sets distinct params in the same render', () => {
+    const { wrapper } = setupWrapper({
+      foo: '1',
+      bar: '1',
+    });
+    const { result, rerender } = renderHook(
+      () => [
+        useQueryParam('foo', NumberParam),
+        useQueryParam('bar', NumberParam),
+      ],
+      { wrapper }
+    );
+    const [[foo1, setFoo], [bar1, setBar]] = result.current;
+    expect([foo1, bar1]).toEqual([1, 1]);
+
+    setFoo(2, 'replaceIn');
+    setBar(2, 'replaceIn');
+    rerender();
+
+    const [[foo2], [bar2]] = result.current;
+    expect([foo2, bar2]).toEqual([2, 2]); // Fails, instead receiving [1, 2]
+  });
 });

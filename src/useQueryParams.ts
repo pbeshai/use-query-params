@@ -7,7 +7,7 @@ import {
   QueryParamConfigMap,
 } from 'serialize-query-params';
 import { useQueryParam } from './useQueryParam';
-import updateUrlQuery from './updateUrlQuery';
+import { getLocation, updateUrlQuery } from './updateUrlQuery';
 import { QueryParamContext } from './QueryParamProvider';
 import { UrlUpdateType, SetQuery } from './types';
 
@@ -100,12 +100,12 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       );
 
       // update the URL
-      updateUrlQuery(
+      refLocation.current = getLocation(
         encodedChanges,
-        refLocation.current, // see #46
-        refHistory.current,
+        refLocation.current, // see #46 for why we use a ref here
         updateType
       );
+      updateUrlQuery(refHistory.current, refLocation.current, updateType);
     },
     [paramConfigMap]
   );
