@@ -101,7 +101,7 @@ export const useQueryParam = <D, D2 = D>(
 
       updateUrlQuery(
         { [name]: newEncodedValue },
-        refHistory.current.location || refLocation.current, // see #46 for why we use a ref here
+        refLocation.current, // see #46 for why we use a ref here
         refHistory.current,
         updateType
       );

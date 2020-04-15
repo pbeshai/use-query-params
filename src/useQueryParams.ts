@@ -102,7 +102,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       // update the URL
       updateUrlQuery(
         encodedChanges,
-        refHistory.current.location || refLocation.current, // see #46
+        refLocation.current, // see #46
         refHistory.current,
         updateType
       );
