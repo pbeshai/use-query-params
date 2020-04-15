@@ -49,13 +49,11 @@ export const useQueryParam = <D, D2 = D>(
     const locationIsObject = typeof location === 'object';
     const windowIsDefined = typeof window !== 'undefined';
     rawQuery = React.useMemo(() => {
-      let pathname = {};
-
       // handle checking SSR (#13)
       if (locationIsObject) {
         // in browser
         if (windowIsDefined) {
-          pathname = parseQueryString(location.search);
+          return parseQueryString(location.search);
         } else {
           // not in browser
           let url = location.pathname;
@@ -63,11 +61,11 @@ export const useQueryParam = <D, D2 = D>(
             url += location.search;
           }
 
-          pathname = parseQueryURL(url).query;
+          return parseQueryURL(url).query;
         }
       }
 
-      return pathname || {};
+      return {};
     }, [location.search, location.pathname, locationIsObject, windowIsDefined]);
   }
 
