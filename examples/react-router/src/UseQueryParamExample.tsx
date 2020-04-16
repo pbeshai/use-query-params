@@ -8,7 +8,7 @@ import {
 
 const MyParam = {
   encode: (val: number) => `MY_${val}`,
-  decode: (input: string | string[] | undefined) => {
+  decode: (input: string | (string| null)[] | null | undefined) => {
     const str = input instanceof Array ? input[0] : input;
     return str == null ? undefined : +str.split('_')[1];
   },
@@ -84,7 +84,7 @@ const UseQueryParamExample = () => {
             </tr>
             <tr>
               <td>anyp</td>
-              <td>{anyp}</td>
+              <td>{anyp as any}</td>
               <td>{typeof anyp}</td>
               <td>
                 <button
@@ -107,7 +107,7 @@ const UseQueryParamExample = () => {
               <td>arr</td>
               <td>
                 {arr
-                  ? arr.map((d: string, i: number) => (
+                  ? arr.map((d: string | null, i: number) => (
                       <div key={i}>
                         arr[{i}] = {d}
                       </div>

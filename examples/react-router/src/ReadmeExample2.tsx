@@ -4,15 +4,17 @@ import {
   StringParam,
   NumberParam,
   ArrayParam,
+  QueryParamConfig,
+  withDefault,
 } from 'use-query-params';
 
 const UseQueryParamsExample = () => {
   const [query, setQuery] = useQueryParams({
     x: NumberParam,
     q: StringParam,
-    filters: ArrayParam,
+    filters: withDefault(ArrayParam, []),
   });
-  const { x: num, q: searchQuery, filters = [] } = query;
+  const { x: num, q: searchQuery, filters } = query;
 
   return (
     <div>

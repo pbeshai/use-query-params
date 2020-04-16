@@ -3,6 +3,9 @@ import {
   parse as parseQueryString,
   parseUrl as parseQueryURL,
   stringify,
+} from 'query-string';
+
+import {
   EncodedQueryWithNulls,
   StringParam,
   QueryParamConfig,
@@ -87,10 +90,6 @@ export const useQueryParam = <D, D2 = D>(
   // decode if the encoded value has changed, otherwise
   // re-use memoized value
   const decodedValue = React.useMemo(() => {
-    if (encodedValue == null) {
-      return undefined;
-    }
-
     return paramConfig.decode(encodedValue);
   }, [arraySafeEncodedValue, paramConfig]); // eslint-disable-line react-hooks/exhaustive-deps
 

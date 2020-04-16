@@ -29,8 +29,10 @@ When creating apps with easily shareable URLs, you often want to encode state as
 Using npm:
 
 ```
-$ npm install --save use-query-params
+$ npm install --save use-query-params query-string
 ```
+
+Note: There is a peer dependency on [query-string](https://github.com/sindresorhus/query-string). For IE11 support, use v5.1.1, otherwise use v6.
 
 Link your routing system (e.g., [React Router example](https://github.com/pbeshai/use-query-params/blob/master/examples/react-router/src/index.tsx), [Reach Router example](https://github.com/pbeshai/use-query-params/blob/master/examples/reach-router/src/index.tsx)):
 
@@ -53,6 +55,8 @@ ReactDOM.render(
 
 
 ### Usage
+
+Be sure to add **QueryParamProvider** as shown in Installation above. 
 
 Add the hook to your component. There are two options: `useQueryParam`:
 
@@ -87,6 +91,7 @@ import {
   StringParam,
   NumberParam,
   ArrayParam,
+  withDefault,
 } from 'use-query-params';
 
 const UseQueryParamsExample = () => {
@@ -94,9 +99,9 @@ const UseQueryParamsExample = () => {
   const [query, setQuery] = useQueryParams({
     x: NumberParam,
     q: StringParam,
-    filters: ArrayParam,
+    filters: withDefault(ArrayParam, []),
   });
-  const { x: num, q: searchQuery, filters = [] } = query;
+  const { x: num, q: searchQuery, filters } = query;
 
   return (
     <div>
@@ -130,10 +135,11 @@ import {
   StringParam,
   NumberParam,
   ArrayParam,
+  withDefault,
 } from 'use-query-params';
 
 const WithQueryParamsExample = ({ query, setQuery }: any) => {
-  const { x: num, q: searchQuery, filters = [] } = query;
+  const { x: num, q: searchQuery, filters } = query;
 
   return (
     <div>
@@ -158,7 +164,7 @@ const WithQueryParamsExample = ({ query, setQuery }: any) => {
 export default withQueryParams({
   x: NumberParam,
   q: StringParam,
-  filters: ArrayParam,
+  filters: withDefault(ArrayParam, []),
 }, WithQueryParamsExample);
 ```
 
@@ -171,19 +177,20 @@ import {
   StringParam,
   NumberParam,
   ArrayParam,
+  withDefault,
 } from 'use-query-params';
 
 const RenderPropsExample = () => {
   const queryConfig = {
     x: NumberParam,
     q: StringParam,
-    filters: ArrayParam,
+    filters: withDefault(ArrayParam, []),
   };
   return (
     <div>
       <QueryParams config={queryConfig}>
         {({ query, setQuery }) => {
-          const { x: num, q: searchQuery, filters = [] } = query;
+          const { x: num, q: searchQuery, filters } = query;
           return (
             <>
               <h1>num is {num}</h1>
@@ -238,7 +245,7 @@ A few basic [examples](https://github.com/pbeshai/use-query-params/tree/master/e
 - [Type Definitions](https://github.com/pbeshai/use-query-params/blob/master/src/types.ts) and from [serialize-query-params](https://github.com/pbeshai/serialize-query-params/blob/master/src/types.ts).
 - [Serialization Utility Functions](https://github.com/pbeshai/serialize-query-params/blob/master/src/serialize.ts)
 
-For convenience, use-query-params exports all of the [serialize-query-params](https://github.com/pbeshai/serialize-query-params) library. This includes most functions from [query-string](https://github.com/sindresorhus/query-string), which is used internally.
+For convenience, use-query-params exports all of the [serialize-query-params](https://github.com/pbeshai/serialize-query-params) library.
 
 #### UrlUpdateType
 

@@ -1,8 +1,5 @@
-import {
-  stringify,
-  parse as parseQueryString,
-  EncodedQueryWithNulls,
-} from 'serialize-query-params';
+import { EncodedQueryWithNulls } from 'serialize-query-params';
+import { stringify, parse as parseQueryString } from 'query-string';
 
 // if passed a location, will mutate it so we can see what changes are being made
 export function makeMockHistory(location: any = {}) {

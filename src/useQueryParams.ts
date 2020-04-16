@@ -1,6 +1,6 @@
 import * as React from 'react';
+import { parse as parseQueryString } from 'query-string';
 import {
-  parse as parseQueryString,
   encodeQueryParams,
   EncodedQueryWithNulls,
   DecodedValueMap,
@@ -74,7 +74,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   // we reuse the logic to not recreate objects
   const paramNames = Object.keys(paramConfigMap);
   const paramValues = paramNames.map(
-    paramName =>
+    (paramName) =>
       useQueryParam(paramName, paramConfigMap[paramName], rawQuery)[0]
   );
 

@@ -4,13 +4,14 @@ import {
   StringParam,
   NumberParam,
   ArrayParam,
+  withDefault,
 } from 'use-query-params';
 
 const RenderPropsExample = () => {
   const queryConfig = {
     x: NumberParam,
     q: StringParam,
-    filters: ArrayParam,
+    filters: withDefault(ArrayParam, []),
   };
   return (
     <div>
