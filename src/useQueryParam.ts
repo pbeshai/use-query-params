@@ -19,7 +19,7 @@ import { UrlUpdateType } from './types';
  * 'replaceIn'.
  *
  * You may optionally pass in a rawQuery object, otherwise the query is derived
- * from the location available in the QueryParamContext.
+ * from the location available in the context.
  *
  * D = decoded type
  * D2 = return value from decode (typically same as D)
