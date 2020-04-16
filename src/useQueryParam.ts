@@ -10,7 +10,7 @@ import {
   StringParam,
   QueryParamConfig,
 } from 'serialize-query-params';
-import { QueryParamContext } from './QueryParamProvider';
+import { useQueryParamContext } from './QueryParamProvider';
 import { updateUrlQuery } from './updateUrlQuery';
 import { UrlUpdateType } from './types';
 
@@ -33,7 +33,7 @@ export const useQueryParam = <D, D2 = D>(
   paramConfig: QueryParamConfig<D, D2> = StringParam as QueryParamConfig<any>,
   rawQuery?: EncodedQueryWithNulls
 ): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
-  const { history, location } = React.useContext(QueryParamContext);
+  const { history, location } = useQueryParamContext();
 
   // ref with current version history object (see #46)
   const refHistory = React.useRef(history);

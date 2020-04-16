@@ -8,7 +8,7 @@ import {
 } from 'serialize-query-params';
 import { useQueryParam } from './useQueryParam';
 import updateUrlQuery from './updateUrlQuery';
-import { QueryParamContext } from './QueryParamProvider';
+import { useQueryParamContext } from './QueryParamProvider';
 import { UrlUpdateType, SetQuery } from './types';
 
 // from https://usehooks.com/usePrevious/
@@ -38,7 +38,7 @@ function isShallowEqual<T extends object>(objA: T, objB: T) {
 export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
-  const { history, location } = React.useContext(QueryParamContext);
+  const { history, location } = useQueryParamContext();
   const locationIsObject = typeof location === 'object';
 
   // memoize paramConfigMap to make the API nicer for consumers.
