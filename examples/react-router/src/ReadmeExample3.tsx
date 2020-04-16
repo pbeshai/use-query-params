@@ -4,11 +4,12 @@ import {
   StringParam,
   NumberParam,
   ArrayParam,
+  withDefault,
 } from 'use-query-params';
 
 const UseQueryParamsExample = ({ query, setQuery }: any) => {
   const { x: num, q: searchQuery, filters = [] } = query;
-
+  console.log('got filters =', filters, query);
   return (
     <div>
       <h1>num is {num}</h1>
@@ -33,7 +34,7 @@ export default withQueryParams(
   {
     x: NumberParam,
     q: StringParam,
-    filters: ArrayParam,
+    filters: withDefault(ArrayParam, []),
   },
   UseQueryParamsExample
 );

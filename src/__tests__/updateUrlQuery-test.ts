@@ -11,8 +11,14 @@ describe('updateUrlQuery', () => {
     const history = makeMockHistory();
     // test updating existing query param
     updateUrlQuery(
-      { foo: '123' },
-      makeMockLocation({ foo: '521', bar: 'zzz' }),
+      { foo: '123', emp: '', nul: null, und: undefined },
+      makeMockLocation({
+        foo: '521',
+        bar: 'zzz',
+        emp: 'emp',
+        nul: 'nul',
+        und: 'und',
+      }),
       history,
       'replaceIn'
     );
@@ -22,12 +28,26 @@ describe('updateUrlQuery', () => {
     expect(calledReplaceQuery(history, 0)).toEqual({
       foo: '123',
       bar: 'zzz',
+      emp: '',
+      nul: null,
+      // und is removed
     });
 
     // test when no query params
     updateUrlQuery({ foo: '123' }, makeMockLocation({}), history, 'replaceIn');
     expect(calledReplaceQuery(history, 1)).toEqual({
       foo: '123',
+    });
+
+    // test when removing query params
+    updateUrlQuery(
+      { foo: undefined },
+      makeMockLocation({ foo: '123', bar: 'zzz' }),
+      history,
+      'replaceIn'
+    );
+    expect(calledReplaceQuery(history, 2)).toEqual({
+      bar: 'zzz',
     });
   });
 
@@ -52,6 +72,17 @@ describe('updateUrlQuery', () => {
     updateUrlQuery({ foo: '123' }, makeMockLocation({}), history, 'pushIn');
     expect(calledPushQuery(history, 1)).toEqual({
       foo: '123',
+    });
+
+    // test when removing query params
+    updateUrlQuery(
+      { foo: undefined },
+      makeMockLocation({ foo: '123', bar: 'zzz' }),
+      history,
+      'pushIn'
+    );
+    expect(calledPushQuery(history, 2)).toEqual({
+      bar: 'zzz',
     });
   });
 

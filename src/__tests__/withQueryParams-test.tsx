@@ -9,11 +9,7 @@ import {
   EncodedQueryWithNulls,
 } from 'serialize-query-params';
 import { SetQuery, withQueryParams, QueryParamProvider } from '../index';
-import {
-  makeMockHistory,
-  makeMockLocation,
-  calledReplaceQuery,
-} from './helpers';
+import { makeMockHistory, makeMockLocation, calledPushQuery } from './helpers';
 
 // helper to setup tests
 function setupWrapper(query: EncodedQueryWithNulls) {
@@ -65,6 +61,6 @@ describe('withQueryParams', () => {
     expect(getByText(/foo = 123/)).toBeInTheDocument();
     expect(getByText(/bar = xxx/)).toBeInTheDocument();
     getByText(/change foo/).click();
-    expect(calledReplaceQuery(history, 0)).toEqual({ foo: '99', bar: 'xxx' });
+    expect(calledPushQuery(history, 0)).toEqual({ foo: '99', bar: 'xxx' });
   });
 });

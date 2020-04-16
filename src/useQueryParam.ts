@@ -3,11 +3,14 @@ import {
   parse as parseQueryString,
   parseUrl as parseQueryURL,
   stringify,
+} from 'query-string';
+
+import {
   EncodedQueryWithNulls,
   StringParam,
   QueryParamConfig,
 } from 'serialize-query-params';
-import { QueryParamContext } from './QueryParamProvider';
+import { useQueryParamContext } from './QueryParamProvider';
 import { updateUrlQuery } from './updateUrlQuery';
 import { UrlUpdateType } from './types';
 
@@ -17,7 +20,7 @@ import { UrlUpdateType } from './types';
  *
  * The setter takes two arguments (newValue, updateType) where updateType
  * is one of 'replace' | 'replaceIn' | 'push' | 'pushIn', defaulting to
- * 'replaceIn'.
+ * 'pushIn'.
  *
  * You may optionally pass in a rawQuery object, otherwise the query is derived
  * from the location available in the QueryParamContext.
@@ -30,7 +33,7 @@ export const useQueryParam = <D, D2 = D>(
   paramConfig: QueryParamConfig<D, D2> = StringParam as QueryParamConfig<any>,
   rawQuery?: EncodedQueryWithNulls
 ): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
-  const { history, location } = React.useContext(QueryParamContext);
+  const { history, location } = useQueryParamContext();
 
   // ref with current version history object (see #46)
   const refHistory = React.useRef(history);
@@ -87,10 +90,6 @@ export const useQueryParam = <D, D2 = D>(
   // decode if the encoded value has changed, otherwise
   // re-use memoized value
   const decodedValue = React.useMemo(() => {
-    if (encodedValue == null) {
-      return undefined;
-    }
-
     return paramConfig.decode(encodedValue);
   }, [arraySafeEncodedValue, paramConfig]); // eslint-disable-line react-hooks/exhaustive-deps
 

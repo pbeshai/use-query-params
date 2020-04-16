@@ -63,7 +63,7 @@ const UseQueryParamExample = () => {
             </tr>
             <tr>
               <td>anyp</td>
-              <td>{anyp}</td>
+              <td>{anyp as any}</td>
               <td>{typeof anyp}</td>
               <td>
                 <button
