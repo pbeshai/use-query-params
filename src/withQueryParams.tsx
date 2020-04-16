@@ -39,3 +39,39 @@ export function withQueryParams<
 }
 
 export default withQueryParams;
+
+/**
+ * HOC to provide query parameters via props mapToProps (similar to
+ * react-redux connect style mapStateToProps)
+ * NOTE: I couldn't get type to automatically infer generic when
+ * using the format withQueryParams(config)(component), so I switched
+ * to withQueryParams(config, component).
+ * See: https://github.com/microsoft/TypeScript/issues/30134
+ */
+export function withQueryParamsMapped<
+  QPCMap extends QueryParamConfigMap,
+  MappedProps extends object,
+  P extends MappedProps
+>(
+  paramConfigMap: QPCMap,
+  mapToProps: (
+    query: DecodedValueMap<QPCMap>,
+    setQuery: SetQuery<QPCMap>,
+    props: Diff<P, MappedProps>
+  ) => MappedProps,
+  WrappedComponent: React.ComponentType<P>
+) {
+  // return a FC that takes props excluding query and setQuery
+  const Component: React.FC<Diff<P, MappedProps>> = (props) => {
+    const [query, setQuery] = useQueryParams(paramConfigMap);
+    const propsToAdd = mapToProps(query, setQuery, props);
+
+    // see https://github.com/microsoft/TypeScript/issues/28938#issuecomment-450636046 for why `...props as P`
+    return <WrappedComponent {...propsToAdd} {...(props as P)} />;
+  };
+  Component.displayName = `withQueryParams(${
+    WrappedComponent.displayName || WrappedComponent.name || 'Component'
+  })`;
+
+  return Component;
+}

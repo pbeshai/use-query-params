@@ -433,6 +433,8 @@ const MyComponent = ({ query, setQuery, ...others }) => {
 export default withQueryParams({ foo: NumberParam, bar: StringParam }, MyComponent);
 ```
 
+Note there is also a variant called `withQueryParamsMapped` that allows you to do a react-redux style mapStateToProps equivalent. See [the code](https://github.com/pbeshai/use-query-params/blob/master/src/withQueryParams.tsx#L51) or [this example](https://github.com/pbeshai/use-query-params/blob/master/examples/react-router/src/ReadmeExample3Mapped.tsx) for details.
+
 <br/>
 
 
