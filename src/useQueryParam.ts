@@ -7,8 +7,8 @@ import {
   StringParam,
   QueryParamConfig,
 } from 'serialize-query-params';
-import { QueryParamContext } from './QueryParamProvider';
-import { getLocation, updateUrlQuery } from './updateUrlQuery';
+import { LocationContext } from './QueryParamProvider';
+import { getLocation } from './updateUrlQuery';
 import { UrlUpdateType } from './types';
 
 /**
@@ -30,19 +30,7 @@ export const useQueryParam = <D, D2 = D>(
   paramConfig: QueryParamConfig<D, D2> = StringParam as QueryParamConfig<any>,
   rawQuery?: EncodedQueryWithNulls
 ): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
-  const { history, location } = React.useContext(QueryParamContext);
-
-  // ref with current version history object (see #46)
-  const refHistory = React.useRef(history);
-  React.useEffect(() => {
-    refHistory.current = history;
-  }, [history]);
-
-  // ref with current version location object (see #46)
-  const refLocation = React.useRef(location);
-  React.useEffect(() => {
-    refLocation.current = location;
-  }, [location]);
+  const [location, setLocation] = React.useContext(LocationContext);
 
   // read in the raw query
   if (!rawQuery) {
@@ -98,15 +86,12 @@ export const useQueryParam = <D, D2 = D>(
   const setValue = React.useCallback(
     (newValue: D, updateType?: UrlUpdateType) => {
       const newEncodedValue = paramConfig.encode(newValue);
-
-      refLocation.current = getLocation(
-        { [name]: newEncodedValue },
-        refLocation.current, // see #46 for why we use a ref here
+      setLocation(
+        l => getLocation({ [name]: newEncodedValue }, l, updateType),
         updateType
       );
-      updateUrlQuery(refHistory.current, refLocation.current, updateType);
     },
-    [paramConfig, name]
+    [setLocation, paramConfig, name]
   );
 
   return [decodedValue, setValue];

@@ -1,5 +1,12 @@
 import * as React from 'react';
 import { PushReplaceHistory } from './types';
+import {
+  LocationContext,
+  LocationProvider,
+  HistoryLocation,
+} from './LocationProvider';
+
+export { LocationContext };
 
 /**
  * Subset of a @reach/router history object. We only
@@ -13,15 +20,6 @@ interface ReachHistory {
       replace?: boolean;
     }
   ) => void;
-}
-
-/**
- * Shape of the QueryParamContext, needed to update the URL
- * and know its current state.
- */
-export interface QueryParamContextValue {
-  history: PushReplaceHistory;
-  location: Location;
 }
 
 /**
@@ -75,11 +73,14 @@ function adaptReachHistory(history: ReachHistory): PushReplaceHistory {
 /**
  * Helper to produce the context value falling back to
  * window history and location if not provided.
+ *
+ * TODO type better.
  */
-function getContextValue(
-  contextValue: Partial<QueryParamContextValue> = {}
-): QueryParamContextValue {
-  const value = { ...contextValue };
+function getLocationProps({
+  history,
+  location,
+}: Partial<HistoryLocation> = {}) {
+  const value = { history, location };
 
   const hasWindow = typeof window !== 'undefined';
   if (hasWindow) {
@@ -91,16 +92,14 @@ function getContextValue(
     }
   }
 
-  return value as QueryParamContextValue;
+  return value as HistoryLocation;
 }
-
-export const QueryParamContext = React.createContext(getContextValue());
 
 /**
  * Props for the Provider component, used to hook the active routing
  * system into our controls.
  */
-interface Props {
+interface QueryParamProviderProps {
   /** Main app goes here */
   children: React.ReactNode;
   /** `Route` from react-router */
@@ -126,16 +125,16 @@ export function QueryParamProvider({
   reachHistory,
   history,
   location,
-}: Props) {
+}: QueryParamProviderProps) {
   // if we have React Router, use it to get the context value
   if (ReactRouterRoute) {
     return (
       <ReactRouterRoute>
         {(routeProps: any) => {
           return (
-            <QueryParamContext.Provider value={getContextValue(routeProps)}>
+            <LocationProvider {...getLocationProps(routeProps)}>
               {children}
-            </QueryParamContext.Provider>
+            </LocationProvider>
           );
         }}
       </ReactRouterRoute>
@@ -145,22 +144,22 @@ export function QueryParamProvider({
   // if we are using reach router, use its history
   if (reachHistory) {
     return (
-      <QueryParamContext.Provider
-        value={getContextValue({
+      <LocationProvider
+        {...getLocationProps({
           history: adaptReachHistory(reachHistory),
           location,
         })}
       >
         {children}
-      </QueryParamContext.Provider>
+      </LocationProvider>
     );
   }
 
   // neither reach nor react-router, so allow manual overrides
   return (
-    <QueryParamContext.Provider value={getContextValue({ history, location })}>
+    <LocationProvider {...getLocationProps({ history, location })}>
       {children}
-    </QueryParamContext.Provider>
+    </LocationProvider>
   );
 }
 

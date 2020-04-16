@@ -7,8 +7,8 @@ import {
   QueryParamConfigMap,
 } from 'serialize-query-params';
 import { useQueryParam } from './useQueryParam';
-import { getLocation, updateUrlQuery } from './updateUrlQuery';
-import { QueryParamContext } from './QueryParamProvider';
+import { getLocation } from './updateUrlQuery';
+import { LocationContext } from './QueryParamProvider';
 import { UrlUpdateType, SetQuery } from './types';
 
 // from https://usehooks.com/usePrevious/
@@ -38,30 +38,18 @@ function isShallowEqual<T extends object>(objA: T, objB: T) {
 export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
-  const { history, location } = React.useContext(QueryParamContext);
+  const [location, setLocation] = React.useContext(LocationContext);
   const locationIsObject = typeof location === 'object';
 
   // memoize paramConfigMap to make the API nicer for consumers.
   // otherwise we'd have to useQueryParams(useMemo(() => { foo: NumberParam }, []))
   const prevParamConfigMap = usePrevious(paramConfigMap);
   const hasNewParamConfig = isShallowEqual(prevParamConfigMap, paramConfigMap);
-  // prettier-ignore
-  const memoParamConfigMap = React.useMemo(() => paramConfigMap, [ // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const memoParamConfigMap = React.useMemo(() => paramConfigMap, [
     hasNewParamConfig,
   ]);
   paramConfigMap = memoParamConfigMap;
-
-  // ref with current version history object (see #46)
-  const refHistory = React.useRef<typeof history>(history);
-  React.useEffect(() => {
-    refHistory.current = history;
-  }, [history]);
-
-  // ref with current version location object (see #46)
-  const refLocation = React.useRef<typeof location>(location);
-  React.useEffect(() => {
-    refLocation.current = location;
-  }, [location]);
 
   const search = locationIsObject ? location.search : '';
 
@@ -100,14 +88,9 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       );
 
       // update the URL
-      refLocation.current = getLocation(
-        encodedChanges,
-        refLocation.current, // see #46 for why we use a ref here
-        updateType
-      );
-      updateUrlQuery(refHistory.current, refLocation.current, updateType);
+      setLocation(l => getLocation(encodedChanges, l, updateType), updateType);
     },
-    [paramConfigMap]
+    [setLocation, paramConfigMap]
   );
 
   // no longer Partial

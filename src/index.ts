@@ -5,8 +5,4 @@ export { useQueryParam } from './useQueryParam';
 export { useQueryParams } from './useQueryParams';
 export { withQueryParams, InjectedQueryProps } from './withQueryParams';
 export { QueryParams, QueryParamsProps, QueryRenderProps } from './QueryParams';
-export {
-  QueryParamProvider,
-  QueryParamContext,
-  QueryParamContextValue,
-} from './QueryParamProvider';
+export { QueryParamProvider } from './QueryParamProvider';
