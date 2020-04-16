@@ -31,7 +31,7 @@ function setupWrapper(query: EncodedQueryWithNulls) {
 describe('useQueryParams', () => {
   afterEach(cleanup);
 
-  it('default update type (replaceIn)', () => {
+  it('default update type (pushIn)', () => {
     const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
     const { result } = renderHook(() => useQueryParams({ foo: StringParam }), {
       wrapper,
@@ -40,7 +40,7 @@ describe('useQueryParams', () => {
 
     expect(decodedQuery).toEqual({ foo: '123' });
     setter({ foo: 'zzz' });
-    expect(calledReplaceQuery(history, 0)).toEqual({ foo: 'zzz', bar: 'xxx' });
+    expect(calledPushQuery(history, 0)).toEqual({ foo: 'zzz', bar: 'xxx' });
   });
 
   it('multiple params', () => {

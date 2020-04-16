@@ -251,16 +251,21 @@ For convenience, use-query-params exports all of the [serialize-query-params](ht
 
 The `UrlUpdateType` is a string type definings the different methods for updating the URL:
 
+ - `'pushIn'`: Push just a single parameter, leaving the rest as is (back button works) (the default)
+ - `'push'`: Push all parameters with just those specified (back button works)
  - `'replaceIn'`: Replace just a single parameter, leaving the rest as is
  - `'replace'`: Replace all parameters with just those specified
- - `'pushIn'`: Push just a single parameter, leaving the rest as is (back button works)
- - `'push'`: Push all parameters with just those specified (back button works)
-
-
+ 
 #### Param Types
 See [all param definitions from serialize-query-params here](https://github.com/pbeshai/serialize-query-params/blob/master/src/params.ts). You can define your own parameter types by creating an object with an `encode` and a `decode` function. See the existing definitions for examples.
 
-Note that all nully values will encode and decode as `undefined`.
+Note that all null and empty values are typically treated as follows:
+
+| value | encoding |
+| --- | --- |
+| `null` | `?qp` |
+| `""` | `?qp=` |
+| `undefined` | `?` (removed from URL) |
 
 Examples in this table assume query parameter named `qp`.
 
@@ -337,6 +342,9 @@ import { useQueryParam, NumberParam } from 'use-query-params';
 const [foo, setFoo] = useQueryParam('foo', NumberParam);
 setFoo(500);
 setFoo(123, 'push');
+
+// to unset or remove a parameter set it to undefined and use pushIn or replaceIn update types
+setFoo(undefined) // ?foo=123&bar=zzz becomes ?bar=zzz
 ```
 
 <br/>
@@ -364,6 +372,9 @@ import { useQueryParams, StringParam, NumberParam } from 'use-query-params';
 const [query, setQuery] = useQueryParams({ foo: NumberParam, bar: StringParam });
 setQuery({ foo: 500 })
 setQuery({ foo: 123, bar: 'zzz' }, 'push');
+
+// to unset or remove a parameter set it to undefined and use pushIn or replaceIn update types
+setQuery({ foo: undefined }) // ?foo=123&bar=zzz becomes ?bar=zzz
 ```
 
 **Example with Custom Parameter Type**

@@ -20,7 +20,7 @@ import { UrlUpdateType } from './types';
  *
  * The setter takes two arguments (newValue, updateType) where updateType
  * is one of 'replace' | 'replaceIn' | 'push' | 'pushIn', defaulting to
- * 'replaceIn'.
+ * 'pushIn'.
  *
  * You may optionally pass in a rawQuery object, otherwise the query is derived
  * from the location available in the QueryParamContext.
