@@ -26,3 +26,13 @@ export type SetQuery<QPCMap extends QueryParamConfigMap> = (
   changes: Partial<DecodedValueMap<QPCMap>>,
   updateType?: UrlUpdateType
 ) => void;
+
+export interface HistoryLocation {
+  /**
+   * History that meets the { replace, push } interface.
+   * May be missing when run server-side.
+   */
+  history?: PushReplaceHistory;
+  /** The location object */
+  location: Location;
+}

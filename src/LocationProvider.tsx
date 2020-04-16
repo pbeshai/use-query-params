@@ -1,41 +1,25 @@
 import * as React from 'react';
-import { UrlUpdateType, PushReplaceHistory } from './types';
+import { EncodedQueryWithNulls } from 'serialize-query-params';
 
-type LocationProviderContext = [
-  Location,
-  (
-    updater: (oldLocation: Location) => Location,
-    updateType?: UrlUpdateType
-  ) => void
-];
-
-export const LocationContext = React.createContext<LocationProviderContext>([
-  {} as Location,
-  () => {},
-]);
-
-export interface HistoryLocation {
-  /** History that meets the { replace, push } interface */
-  history: PushReplaceHistory;
-  /** * Initial location object */
-  location: Location;
-}
+import { UrlUpdateType, HistoryLocation } from './types';
+import { updateUrlQuery, getLocation } from './updateUrlQuery';
+import { LocationContext } from './LocationContext';
 
 /**
- * Props for the internal-only Location Provider component.
+ * Props for the LocationProvider.
  */
-interface LocationProviderProps {
+type LocationProviderProps = HistoryLocation & {
   /** Main app goes here */
   children: React.ReactNode;
-  /** History that meets the { replace, push } interface */
-  history: PushReplaceHistory;
-  /** * Initial location object */
-  location: Location;
-}
+};
 
+/**
+ * An internal-only context provider which provides down the most
+ * recent location object and a callback to update the history.
+ */
 export function LocationProvider({
-  location,
   history,
+  location,
   children,
 }: LocationProviderProps) {
   const locationRef = React.useRef(location);
@@ -44,22 +28,15 @@ export function LocationProvider({
   }, [location]);
 
   const setContext = React.useCallback(
-    (
-      updater: (oldLocation: Location) => Location,
-      updateType?: UrlUpdateType
-    ) => {
-      // Location ref needed to stop setContext updating constantly - see #46
-      locationRef.current = updater(locationRef.current);
-      switch (updateType) {
-        case 'pushIn':
-        case 'push':
-          history.push(locationRef.current);
-          break;
-        case 'replaceIn':
-        case 'replace':
-        default:
-          history.replace(locationRef.current);
-          break;
+    (queryReplacements: EncodedQueryWithNulls, updateType?: UrlUpdateType) => {
+      // A ref is needed here to stop setContext updating constantly (see #46)
+      locationRef.current = getLocation(
+        queryReplacements,
+        locationRef.current,
+        updateType
+      );
+      if (history) {
+        updateUrlQuery(history, locationRef.current, updateType);
       }
     },
     [history]

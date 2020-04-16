@@ -7,8 +7,7 @@ import {
   StringParam,
   QueryParamConfig,
 } from 'serialize-query-params';
-import { LocationContext } from './QueryParamProvider';
-import { getLocation } from './updateUrlQuery';
+import { LocationContext } from './LocationContext';
 import { UrlUpdateType } from './types';
 
 /**
@@ -86,10 +85,7 @@ export const useQueryParam = <D, D2 = D>(
   const setValue = React.useCallback(
     (newValue: D, updateType?: UrlUpdateType) => {
       const newEncodedValue = paramConfig.encode(newValue);
-      setLocation(
-        l => getLocation({ [name]: newEncodedValue }, l, updateType),
-        updateType
-      );
+      setLocation({ [name]: newEncodedValue }, updateType);
     },
     [setLocation, paramConfig, name]
   );

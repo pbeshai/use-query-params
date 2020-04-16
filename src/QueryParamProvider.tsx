@@ -1,26 +1,6 @@
 import * as React from 'react';
-import { PushReplaceHistory } from './types';
-import {
-  LocationContext,
-  LocationProvider,
-  HistoryLocation,
-} from './LocationProvider';
-
-export { LocationContext };
-
-/**
- * Subset of a @reach/router history object. We only
- * care about the navigate function.
- */
-interface ReachHistory {
-  navigate: (
-    to: string,
-    options?: {
-      state?: any;
-      replace?: boolean;
-    }
-  ) => void;
-}
+import { HistoryLocation, PushReplaceHistory } from './types';
+import { LocationProvider } from './LocationProvider';
 
 /**
  * Adapts standard DOM window history to work with our
@@ -45,6 +25,20 @@ function adaptWindowHistory(history: History): PushReplaceHistory {
       );
     },
   };
+}
+
+/**
+ * Subset of a @reach/router history object. We only
+ * care about the navigate function.
+ */
+interface ReachHistory {
+  navigate: (
+    to: string,
+    options?: {
+      state?: any;
+      replace?: boolean;
+    }
+  ) => void;
 }
 
 /**
@@ -73,26 +67,26 @@ function adaptReachHistory(history: ReachHistory): PushReplaceHistory {
 /**
  * Helper to produce the context value falling back to
  * window history and location if not provided.
- *
- * TODO type better.
  */
-function getLocationProps({
+export function getLocationProps({
   history,
   location,
-}: Partial<HistoryLocation> = {}) {
-  const value = { history, location };
-
+}: Partial<HistoryLocation> = {}): HistoryLocation {
   const hasWindow = typeof window !== 'undefined';
   if (hasWindow) {
-    if (!value.history) {
-      value.history = adaptWindowHistory(window.history);
+    if (!history) {
+      history = adaptWindowHistory(window.history);
     }
-    if (!value.location) {
-      value.location = window.location;
+    if (!location) {
+      location = window.location;
     }
   }
-
-  return value as HistoryLocation;
+  if (!location) {
+    throw new Error(`
+        Could not read the location. Is the router wired up correctly?
+      `);
+  }
+  return { history, location };
 }
 
 /**

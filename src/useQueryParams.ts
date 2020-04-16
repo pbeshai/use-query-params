@@ -7,8 +7,7 @@ import {
   QueryParamConfigMap,
 } from 'serialize-query-params';
 import { useQueryParam } from './useQueryParam';
-import { getLocation } from './updateUrlQuery';
-import { LocationContext } from './QueryParamProvider';
+import { LocationContext } from './LocationContext';
 import { UrlUpdateType, SetQuery } from './types';
 
 // from https://usehooks.com/usePrevious/
@@ -88,7 +87,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       );
 
       // update the URL
-      setLocation(l => getLocation(encodedChanges, l, updateType), updateType);
+      setLocation(encodedChanges, updateType);
     },
     [setLocation, paramConfigMap]
   );
