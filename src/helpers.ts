@@ -13,6 +13,18 @@ export function usePreviousIfShallowEqual<T>(value: T) {
   return hasNew ? value : ref.current;
 }
 
+export function useUpdateRefIfShallowNew<T>(
+  ref: React.MutableRefObject<T>,
+  newValue: T
+) {
+  const hasNew = !shallowEqual(ref.current, newValue);
+  React.useEffect(() => {
+    if (hasNew) {
+      ref.current = newValue;
+    }
+  }, [ref, newValue, hasNew]);
+}
+
 export function getSSRSafeSearchString(location: Location | undefined) {
   // handle checking SSR (#13)
   if (typeof location === 'object') {
