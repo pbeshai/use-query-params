@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { HistoryLocation, PushReplaceHistory } from './types';
 import { LocationProvider } from './LocationProvider';
+import { ExtendedStringifyOptions } from 'serialize-query-params';
+import shallowEqual from './shallowEqual';
 
 // we use a lazy caching solution to prevent #46 from happening
 let cachedWindowHistory: History | undefined;
@@ -117,6 +119,7 @@ export function getLocationProps({
  * Props for the Provider component, used to hook the active routing
  * system into our controls.
  */
+
 interface QueryParamProviderProps {
   /** Main app goes here */
   children: React.ReactNode;
@@ -131,6 +134,14 @@ interface QueryParamProviderProps {
    * location provided by the active routing system is used.
    */
   location?: Location;
+
+  /**
+   * Options to customize the stringifying of the query string
+   * These are passed directly to query-string.stringify, with
+   * the exception of transformSearchString which runs on the result
+   * of stringify if provided.
+   */
+  stringifyOptions?: ExtendedStringifyOptions;
 }
 
 /**
@@ -143,14 +154,32 @@ export function QueryParamProvider({
   reachHistory,
   history,
   location,
+  stringifyOptions,
 }: QueryParamProviderProps) {
+  // cache the stringify options object so we users can just do
+  // <QueryParamProvider stringifyOptions={{ encode: false }} />
+  const stringifyOptionsRef = React.useRef(stringifyOptions);
+  const hasNewStringifyOptions = !shallowEqual(
+    stringifyOptionsRef.current,
+    stringifyOptions
+  );
+  const stringifyOptionsCached = hasNewStringifyOptions
+    ? stringifyOptions
+    : stringifyOptionsRef.current;
+  React.useEffect(() => {
+    stringifyOptionsRef.current = stringifyOptionsCached;
+  }, [stringifyOptionsCached]);
+
   // if we have React Router, use it to get the context value
   if (ReactRouterRoute) {
     return (
       <ReactRouterRoute>
         {(routeProps: any) => {
           return (
-            <LocationProvider {...getLocationProps(routeProps)}>
+            <LocationProvider
+              stringifyOptions={stringifyOptionsCached}
+              {...getLocationProps(routeProps)}
+            >
               {children}
             </LocationProvider>
           );
@@ -163,6 +192,7 @@ export function QueryParamProvider({
   if (reachHistory) {
     return (
       <LocationProvider
+        stringifyOptions={stringifyOptionsCached}
         {...getLocationProps({
           history: adaptReachHistory(reachHistory),
           location,
@@ -175,7 +205,10 @@ export function QueryParamProvider({
 
   // neither reach nor react-router, so allow manual overrides
   return (
-    <LocationProvider {...getLocationProps({ history, location })}>
+    <LocationProvider
+      stringifyOptions={stringifyOptionsCached}
+      {...getLocationProps({ history, location })}
+    >
       {children}
     </LocationProvider>
   );
