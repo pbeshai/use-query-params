@@ -5,10 +5,10 @@ import App from './App';
 import { QueryParamProvider } from 'use-query-params';
 
 ReactDOM.render(
-  <QueryParamProvider reachHistory={globalHistory}>
-    <Router>
+  <Router>
+    <QueryParamProvider {...{ path: '/' }} reachHistory={globalHistory}>
       <App default />
-    </Router>
-  </QueryParamProvider>,
+    </QueryParamProvider>
+  </Router>,
   document.getElementById('root')
 );

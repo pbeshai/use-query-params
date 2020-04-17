@@ -11,6 +11,7 @@ import ReadmeExample4 from './ReadmeExample4';
 
 import './App.css';
 import ReadmeExample3Mapped from './ReadmeExample3Mapped';
+import Issue46 from './Issue46';
 
 const App = (props: any) => {
   const [example, setExample] = React.useState(0);
@@ -30,6 +31,7 @@ const App = (props: any) => {
         <button onClick={() => setExample(6)}>README Example 3</button>
         <button onClick={() => setExample(7)}>README Example 3 (Mapped)</button>
         <button onClick={() => setExample(8)}>README Example 4</button>
+        <button onClick={() => setExample(46)}>Issue46</button>
         <div>
           <Link to={`/?test=${Math.floor(Math.random() * 10)}`}>
             Push New URL
@@ -46,6 +48,7 @@ const App = (props: any) => {
         {example === 6 && <ReadmeExample3 />}
         {example === 7 && <ReadmeExample3Mapped extra={99} />}
         {example === 8 && <ReadmeExample4 />}
+        {example === 46 && <Issue46 />}
       </div>
     </div>
   );
