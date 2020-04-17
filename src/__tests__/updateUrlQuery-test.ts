@@ -1,4 +1,4 @@
-import { getLocation, updateUrlQuery } from '../updateUrlQuery';
+import { createLocationWithChanges, updateUrlQuery } from '../updateUrlQuery';
 import {
   makeMockHistory,
   makeMockLocation,
@@ -7,14 +7,18 @@ import {
 } from './helpers';
 import { UrlUpdateType } from '../types';
 
-describe('getLocation and updateUrlQuery', () => {
+describe('createLocationWithChanges and updateUrlQuery', () => {
   function getAndUpdateLocation(
     queryReplacements,
     location,
     history,
     updateType: UrlUpdateType = 'replaceIn'
   ) {
-    const newLocation = getLocation(queryReplacements, location, updateType);
+    const newLocation = createLocationWithChanges(
+      queryReplacements,
+      location,
+      updateType
+    );
     updateUrlQuery(history, newLocation, updateType);
   }
 

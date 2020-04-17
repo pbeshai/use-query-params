@@ -2,7 +2,7 @@ import * as React from 'react';
 import { EncodedQuery } from 'serialize-query-params';
 
 import { UrlUpdateType, HistoryLocation } from './types';
-import { updateUrlQuery, getLocation } from './updateUrlQuery';
+import { updateUrlQuery, createLocationWithChanges } from './updateUrlQuery';
 import { LocationContext } from './LocationContext';
 
 /**
@@ -30,7 +30,7 @@ export function LocationProvider({
   const setContext = React.useCallback(
     (queryReplacements: EncodedQuery, updateType?: UrlUpdateType) => {
       // A ref is needed here to stop setContext updating constantly (see #46)
-      locationRef.current = getLocation(
+      locationRef.current = createLocationWithChanges(
         queryReplacements,
         locationRef.current,
         updateType
