@@ -9,9 +9,4 @@ export {
   InjectedQueryProps,
 } from './withQueryParams';
 export { QueryParams, QueryParamsProps, QueryRenderProps } from './QueryParams';
-export { updateUrlQuery } from './updateUrlQuery';
-export {
-  QueryParamProvider,
-  QueryParamContext,
-  QueryParamContextValue,
-} from './QueryParamProvider';
+export { QueryParamProvider } from './QueryParamProvider';

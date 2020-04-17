@@ -1,28 +1,6 @@
 import * as React from 'react';
-import { PushReplaceHistory } from './types';
-
-/**
- * Subset of a @reach/router history object. We only
- * care about the navigate function.
- */
-interface ReachHistory {
-  navigate: (
-    to: string,
-    options?: {
-      state?: any;
-      replace?: boolean;
-    }
-  ) => void;
-}
-
-/**
- * Shape of the QueryParamContext, needed to update the URL
- * and know its current state.
- */
-export interface QueryParamContextValue {
-  history: PushReplaceHistory;
-  location: Location;
-}
+import { HistoryLocation, PushReplaceHistory } from './types';
+import { LocationProvider } from './LocationProvider';
 
 /**
  * Adapts standard DOM window history to work with our
@@ -47,6 +25,20 @@ function adaptWindowHistory(history: History): PushReplaceHistory {
       );
     },
   };
+}
+
+/**
+ * Subset of a @reach/router history object. We only
+ * care about the navigate function.
+ */
+interface ReachHistory {
+  navigate: (
+    to: string,
+    options?: {
+      state?: any;
+      replace?: boolean;
+    }
+  ) => void;
 }
 
 /**
@@ -76,31 +68,32 @@ function adaptReachHistory(history: ReachHistory): PushReplaceHistory {
  * Helper to produce the context value falling back to
  * window history and location if not provided.
  */
-function getContextValue(
-  contextValue: Partial<QueryParamContextValue> = {}
-): QueryParamContextValue {
-  const value = { ...contextValue };
-
+export function getLocationProps({
+  history,
+  location,
+}: Partial<HistoryLocation> = {}): HistoryLocation {
   const hasWindow = typeof window !== 'undefined';
   if (hasWindow) {
-    if (!value.history) {
-      value.history = adaptWindowHistory(window.history);
+    if (!history) {
+      history = adaptWindowHistory(window.history);
     }
-    if (!value.location) {
-      value.location = window.location;
+    if (!location) {
+      location = window.location;
     }
   }
-
-  return value as QueryParamContextValue;
+  if (!location) {
+    throw new Error(`
+        Could not read the location. Is the router wired up correctly?
+      `);
+  }
+  return { history, location };
 }
-
-export const QueryParamContext = React.createContext(getContextValue());
 
 /**
  * Props for the Provider component, used to hook the active routing
  * system into our controls.
  */
-interface Props {
+interface QueryParamProviderProps {
   /** Main app goes here */
   children: React.ReactNode;
   /** `Route` from react-router */
@@ -126,16 +119,16 @@ export function QueryParamProvider({
   reachHistory,
   history,
   location,
-}: Props) {
+}: QueryParamProviderProps) {
   // if we have React Router, use it to get the context value
   if (ReactRouterRoute) {
     return (
       <ReactRouterRoute>
         {(routeProps: any) => {
           return (
-            <QueryParamContext.Provider value={getContextValue(routeProps)}>
+            <LocationProvider {...getLocationProps(routeProps)}>
               {children}
-            </QueryParamContext.Provider>
+            </LocationProvider>
           );
         }}
       </ReactRouterRoute>
@@ -145,22 +138,22 @@ export function QueryParamProvider({
   // if we are using reach router, use its history
   if (reachHistory) {
     return (
-      <QueryParamContext.Provider
-        value={getContextValue({
+      <LocationProvider
+        {...getLocationProps({
           history: adaptReachHistory(reachHistory),
           location,
         })}
       >
         {children}
-      </QueryParamContext.Provider>
+      </LocationProvider>
     );
   }
 
   // neither reach nor react-router, so allow manual overrides
   return (
-    <QueryParamContext.Provider value={getContextValue({ history, location })}>
+    <LocationProvider {...getLocationProps({ history, location })}>
       {children}
-    </QueryParamContext.Provider>
+    </LocationProvider>
   );
 }
 

@@ -1,7 +1,12 @@
 import * as React from 'react';
 import { render, cleanup } from '@testing-library/react';
-import { QueryParamProvider, QueryParamContext } from '../index';
+import { QueryParamProvider } from '../QueryParamProvider';
 import { makeMockLocation, makeMockHistory } from './helpers';
+
+// ¯\_(ツ)_/¯
+jest.mock('../LocationProvider', () => ({
+  LocationProvider: ({ history, children }) => children({ history }),
+}));
 
 describe('QueryParamProvider', () => {
   afterEach(cleanup);
@@ -11,13 +16,11 @@ describe('QueryParamProvider', () => {
 
     const tree = (
       <QueryParamProvider reachHistory={reachHistory}>
-        <QueryParamContext.Consumer>
-          {({ history }) => {
-            history.replace(makeMockLocation({ foo: '123' }));
-            history.push(makeMockLocation({ bar: 'zzz' }));
-            return <div>consumed</div>;
-          }}
-        </QueryParamContext.Consumer>
+        {({ history }) => {
+          history.replace(makeMockLocation({ foo: '123' }));
+          history.push(makeMockLocation({ bar: 'zzz' }));
+          return <div>consumed</div>;
+        }}
       </QueryParamProvider>
     );
 
@@ -41,13 +44,11 @@ describe('QueryParamProvider', () => {
 
     const tree = (
       <QueryParamProvider ReactRouterRoute={MockRoute}>
-        <QueryParamContext.Consumer>
-          {({ history }) => {
-            history.replace(makeMockLocation({ foo: '123' }));
-            history.push(makeMockLocation({ bar: 'zzz' }));
-            return <div>consumed</div>;
-          }}
-        </QueryParamContext.Consumer>
+        {({ history }) => {
+          history.replace(makeMockLocation({ foo: '123' }));
+          history.push(makeMockLocation({ bar: 'zzz' }));
+          return <div>consumed</div>;
+        }}
       </QueryParamProvider>
     );
 
@@ -64,14 +65,12 @@ describe('QueryParamProvider', () => {
 
     const tree = (
       <QueryParamProvider>
-        <QueryParamContext.Consumer>
-          {({ history }) => {
-            windowHistory = history;
-            history.replace(makeMockLocation({ foo: '123' }));
-            history.push(makeMockLocation({ bar: 'zzz' }));
-            return <div>consumed</div>;
-          }}
-        </QueryParamContext.Consumer>
+        {({ history }) => {
+          windowHistory = history;
+          history.replace(makeMockLocation({ foo: '123' }));
+          history.push(makeMockLocation({ bar: 'zzz' }));
+          return <div>consumed</div>;
+        }}
       </QueryParamProvider>
     );
 

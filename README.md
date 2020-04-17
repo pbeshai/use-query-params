@@ -331,7 +331,7 @@ is one of `'replace' | 'replaceIn' | 'push' | 'pushIn'`, defaulting to
 `'replaceIn'`.
 
 You may optionally pass in a rawQuery object, otherwise the query is derived
-from the location available in the QueryParamContext.
+from the location in the context.
 
 **Example**
 

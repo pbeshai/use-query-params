@@ -5,10 +5,9 @@ import {
   encodeQueryParams,
   QueryParamConfigMap,
 } from 'serialize-query-params';
+import { LocationContext } from './LocationContext';
 import { usePreviousIfShallowEqual, getSSRSafeSearchString } from './helpers';
-import { useQueryParamContext } from './QueryParamProvider';
 import { SetQuery, UrlUpdateType } from './types';
-import updateUrlQuery from './updateUrlQuery';
 import { sharedMemoizedQueryParser } from './memoizedQueryParser';
 import shallowEqual from './shallowEqual';
 
@@ -27,7 +26,10 @@ type DecodedValueCache<QPCMap extends QueryParamConfigMap> = {
 export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
-  const { history, location } = useQueryParamContext();
+  // const { history, location } = useQueryParamContext();
+  const [location, setLocation] = React.useContext(LocationContext);
+  console.warn('TODO, add back in useLocationContext for dev warning');
+
   const decodedValueCacheRef = React.useRef<DecodedValueCache<QPCMap>>({});
 
   // memoize paramConfigMap to make the API nicer for consumers.
@@ -44,27 +46,10 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       );
 
       // update the URL
-      updateUrlQuery(
-        encodedChanges,
-        refHistory.current.location || refLocation.current, // see #46
-        refHistory.current,
-        updateType
-      );
+      setLocation(encodedChanges, updateType);
     },
-    [paramConfigMap]
+    [paramConfigMap, setLocation]
   );
-
-  // ref with current version history object (see #46)
-  const refHistory = React.useRef<typeof history>(history);
-  React.useEffect(() => {
-    refHistory.current = history;
-  }, [history]);
-
-  // ref with current version location object (see #46)
-  const refLocation = React.useRef<typeof location>(location);
-  React.useEffect(() => {
-    refLocation.current = location;
-  }, [location]);
 
   // read in the raw query
   const parsedQuery = sharedMemoizedQueryParser(

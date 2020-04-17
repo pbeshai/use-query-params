@@ -6,33 +6,45 @@ import {
 import { PushReplaceHistory, UrlUpdateType } from './types';
 
 /**
- * Updates the URL to match the specified query changes.
+ * Creates a new location object containing the specified query changes.
  * If replaceIn or pushIn are used as the updateType, then parameters
  * not specified in queryReplacements are retained. If replace or push
  * are used, only the values in queryReplacements will be available.
  * The default is pushIn.
  */
-export function updateUrlQuery(
+export function getLocation(
   queryReplacements: EncodedQuery,
   location: Location,
-  history: PushReplaceHistory,
-  updateType: UrlUpdateType = 'pushIn'
-): void {
+  updateType: UrlUpdateType = 'replaceIn'
+): Location {
   switch (updateType) {
-    case 'replaceIn':
-      history.replace(updateInLocation(queryReplacements, location));
-      break;
-    case 'pushIn':
-      history.push(updateInLocation(queryReplacements, location));
-      break;
     case 'replace':
-      history.replace(updateLocation(queryReplacements, location));
-      break;
     case 'push':
-      history.push(updateLocation(queryReplacements, location));
-      break;
+      return updateLocation(queryReplacements, location);
+    case 'replaceIn':
+    case 'pushIn':
     default:
+      return updateInLocation(queryReplacements, location);
   }
 }
 
-export default updateUrlQuery;
+/**
+ * Updates the URL to the new location.
+ */
+export function updateUrlQuery(
+  history: PushReplaceHistory,
+  location: Location,
+  updateType: UrlUpdateType = 'pushIn'
+): void {
+  switch (updateType) {
+    case 'pushIn':
+    case 'push':
+      history.push(location);
+      break;
+    case 'replaceIn':
+    case 'replace':
+    default:
+      history.replace(location);
+      break;
+  }
+}
