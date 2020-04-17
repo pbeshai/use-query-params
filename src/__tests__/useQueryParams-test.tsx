@@ -26,7 +26,6 @@ function setupWrapper(query: EncodedQuery) {
 
 describe('useQueryParams', () => {
   afterEach(cleanup);
-
   it('default update type (pushIn)', () => {
     const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
     const { result } = renderHook(() => useQueryParams({ foo: StringParam }), {
@@ -222,5 +221,43 @@ describe('useQueryParams', () => {
     rerender();
     const [[{ foo }], [{ bar }]] = result.current as any;
     expect({ foo, bar }).toEqual({ foo: 999, bar: 'yyy' });
+  });
+
+  it('works with functional updates', () => {
+    const { wrapper, history, location } = setupWrapper({
+      foo: '123',
+      bar: ['a', 'b'],
+    });
+    const { result, rerender } = renderHook(
+      () => useQueryParams({ foo: NumberParam, bar: ArrayParam }),
+      {
+        wrapper,
+      }
+    );
+    const [decodedValue, setter] = result.current;
+
+    expect(decodedValue).toEqual({ foo: 123, bar: ['a', 'b'] });
+    setter(
+      (latestQuery: any) => ({
+        foo: latestQuery.foo + 100,
+      }),
+      'pushIn'
+    );
+    expect(calledPushQuery(history, 0)).toEqual({
+      foo: '223',
+      bar: ['a', 'b'],
+    });
+
+    setter((latestQuery: any) => ({ foo: latestQuery.foo + 110 }), 'pushIn');
+    expect(calledPushQuery(history, 1)).toEqual({
+      foo: '333',
+      bar: ['a', 'b'],
+    });
+
+    // use a stale setter
+    location.search = '?foo=500';
+    rerender();
+    setter((latestQuery: any) => ({ foo: latestQuery.foo + 100 }), 'push');
+    expect(calledPushQuery(history, 2)).toEqual({ foo: '600' });
   });
 });

@@ -3,7 +3,28 @@ import { EncodedQuery } from 'serialize-query-params';
 
 import { UrlUpdateType, HistoryLocation } from './types';
 import { updateUrlQuery, createLocationWithChanges } from './updateUrlQuery';
-import { LocationContext } from './LocationContext';
+
+/**
+ * Shape of the LocationProviderContext, which the hooks consume to read and
+ * update the URL state.
+ */
+type LocationProviderContext = [
+  () => Location,
+  (queryReplacements: EncodedQuery, updateType?: UrlUpdateType) => void
+];
+
+export const LocationContext = React.createContext<LocationProviderContext>([
+  () => ({} as Location),
+  () => {},
+]);
+
+export function useLocationContext() {
+  const context = React.useContext(LocationContext);
+  if (process.env.NODE_ENV === 'development' && context === undefined) {
+    throw new Error('useQueryParams must be used within a QueryParamProvider');
+  }
+  return context;
+}
 
 /**
  * Props for the LocationProvider.
@@ -27,9 +48,13 @@ export function LocationProvider({
     locationRef.current = location;
   }, [location]);
 
-  const setContext = React.useCallback(
+  const getLocation = React.useCallback(() => locationRef.current, [
+    locationRef,
+  ]);
+
+  const setLocation = React.useCallback(
     (queryReplacements: EncodedQuery, updateType?: UrlUpdateType) => {
-      // A ref is needed here to stop setContext updating constantly (see #46)
+      // A ref is needed here to stop setLocation updating constantly (see #46)
       locationRef.current = createLocationWithChanges(
         queryReplacements,
         locationRef.current,
@@ -43,7 +68,7 @@ export function LocationProvider({
   );
 
   return (
-    <LocationContext.Provider value={[location, setContext]}>
+    <LocationContext.Provider value={[getLocation, setLocation]}>
       {children}
     </LocationContext.Provider>
   );

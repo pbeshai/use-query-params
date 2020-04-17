@@ -23,7 +23,11 @@ export interface PushReplaceHistory {
  * The setter function signature mapping
  */
 export type SetQuery<QPCMap extends QueryParamConfigMap> = (
-  changes: Partial<DecodedValueMap<QPCMap>>,
+  changes:
+    | Partial<DecodedValueMap<QPCMap>>
+    | ((
+        latestValues: DecodedValueMap<QPCMap>
+      ) => Partial<DecodedValueMap<QPCMap>>),
   updateType?: UrlUpdateType
 ) => void;
 
