@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { QueryParamConfig, StringParam } from 'serialize-query-params';
 import { getSSRSafeSearchString, usePreviousIfShallowEqual } from './helpers';
+import { useLocationContext } from './LocationContext';
 import { sharedMemoizedQueryParser } from './memoizedQueryParser';
-import { useQueryParamContext } from './QueryParamProvider';
 import { UrlUpdateType } from './types';
-import { updateUrlQuery } from './updateUrlQuery';
 
 /**
  * Given a query param name and query parameter configuration ({ encode, decode })
@@ -15,7 +14,7 @@ import { updateUrlQuery } from './updateUrlQuery';
  * 'pushIn'.
  *
  * You may optionally pass in a rawQuery object, otherwise the query is derived
- * from the location available in the QueryParamContext.
+ * from the location available in the context.
  *
  * D = decoded type
  * D2 = return value from decode (typically same as D)
@@ -24,34 +23,17 @@ export const useQueryParam = <D, D2 = D>(
   name: string,
   paramConfig: QueryParamConfig<D, D2> = StringParam as QueryParamConfig<any>
 ): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
-  const { history, location } = useQueryParamContext();
+  const [location, setLocation] = useLocationContext();
 
   // create the setter, memoizing via useCallback
   const setValue = React.useCallback(
     (newValue: D, updateType?: UrlUpdateType) => {
       const newEncodedValue = paramConfig.encode(newValue);
 
-      updateUrlQuery(
-        { [name]: newEncodedValue },
-        refHistory.current.location || refLocation.current, // see #46 for why we use a ref here
-        refHistory.current,
-        updateType
-      );
+      setLocation({ [name]: newEncodedValue }, updateType);
     },
-    [paramConfig, name]
+    [paramConfig, name, setLocation]
   );
-
-  // ref with current version history object (see #46)
-  const refHistory = React.useRef(history);
-  React.useEffect(() => {
-    refHistory.current = history;
-  }, [history]);
-
-  // ref with current version location object (see #46)
-  const refLocation = React.useRef(location);
-  React.useEffect(() => {
-    refLocation.current = location;
-  }, [location]);
 
   // read in the raw query
   const parsedQuery = sharedMemoizedQueryParser(

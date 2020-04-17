@@ -26,7 +26,7 @@ function setupWrapper(query: EncodedQuery) {
 
 describe('useQueryParams', () => {
   afterEach(cleanup);
-  /*
+
   it('default update type (pushIn)', () => {
     const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
     const { result } = renderHook(() => useQueryParams({ foo: StringParam }), {
@@ -105,7 +105,7 @@ describe('useQueryParams', () => {
     const [, setter2] = result.current;
     expect(setter).toBe(setter2);
   });
-*/
+
   it("doesn't decode more than necessary", () => {
     const { wrapper } = setupWrapper({
       foo: ['1', '2', '3'],
@@ -185,5 +185,42 @@ describe('useQueryParams', () => {
       bar: 'regen',
       newt: '1000',
     });
+  });
+
+  it('sets distinct params in the same render', () => {
+    const { wrapper } = setupWrapper({ foo: '123', bar: 'xxx' });
+    const { result, rerender } = renderHook(
+      () => useQueryParams({ foo: NumberParam, bar: StringParam }),
+      {
+        wrapper,
+      }
+    );
+    const [, setter] = result.current;
+
+    setter({ foo: 999 }, 'replaceIn');
+    setter({ bar: 'yyy' }, 'replaceIn');
+    rerender();
+    const [decodedQuery] = result.current;
+    expect(decodedQuery).toEqual({ foo: 999, bar: 'yyy' });
+  });
+
+  it('sets distinct params with different hooks in the same render', () => {
+    const { wrapper } = setupWrapper({ foo: '123', bar: 'xxx' });
+    const { result, rerender } = renderHook(
+      () => [
+        useQueryParams({ foo: NumberParam }),
+        useQueryParams({ bar: StringParam }),
+      ],
+      {
+        wrapper,
+      }
+    );
+    const [[, setFoo], [, setBar]] = result.current;
+
+    setFoo({ foo: 999 }, 'replaceIn');
+    setBar({ bar: 'yyy' }, 'replaceIn');
+    rerender();
+    const [[{ foo }], [{ bar }]] = result.current as any;
+    expect({ foo, bar }).toEqual({ foo: 999, bar: 'yyy' });
   });
 });

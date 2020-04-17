@@ -5,12 +5,11 @@ import {
   encodeQueryParams,
   QueryParamConfigMap,
 } from 'serialize-query-params';
-import { usePreviousIfShallowEqual, getSSRSafeSearchString } from './helpers';
-import { useQueryParamContext } from './QueryParamProvider';
-import { SetQuery, UrlUpdateType } from './types';
-import updateUrlQuery from './updateUrlQuery';
+import { getSSRSafeSearchString, usePreviousIfShallowEqual } from './helpers';
+import { useLocationContext } from './LocationContext';
 import { sharedMemoizedQueryParser } from './memoizedQueryParser';
 import shallowEqual from './shallowEqual';
+import { SetQuery, UrlUpdateType } from './types';
 
 type DecodedValueCacheEntry<E, D> = { decodedValue: D; encodedValue: E };
 type DecodedValueCache<QPCMap extends QueryParamConfigMap> = {
@@ -27,7 +26,8 @@ type DecodedValueCache<QPCMap extends QueryParamConfigMap> = {
 export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
-  const { history, location } = useQueryParamContext();
+  const [location, setLocation] = useLocationContext();
+
   const decodedValueCacheRef = React.useRef<DecodedValueCache<QPCMap>>({});
 
   // memoize paramConfigMap to make the API nicer for consumers.
@@ -44,27 +44,10 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       );
 
       // update the URL
-      updateUrlQuery(
-        encodedChanges,
-        refHistory.current.location || refLocation.current, // see #46
-        refHistory.current,
-        updateType
-      );
+      setLocation(encodedChanges, updateType);
     },
-    [paramConfigMap]
+    [paramConfigMap, setLocation]
   );
-
-  // ref with current version history object (see #46)
-  const refHistory = React.useRef<typeof history>(history);
-  React.useEffect(() => {
-    refHistory.current = history;
-  }, [history]);
-
-  // ref with current version location object (see #46)
-  const refLocation = React.useRef<typeof location>(location);
-  React.useEffect(() => {
-    refLocation.current = location;
-  }, [location]);
 
   // read in the raw query
   const parsedQuery = sharedMemoizedQueryParser(

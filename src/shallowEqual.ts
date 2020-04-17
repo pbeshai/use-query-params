@@ -64,5 +64,3 @@ export default function shallowEqual(objA: any, objB: any): boolean {
 
   return true;
 }
-
-module.exports = shallowEqual;
