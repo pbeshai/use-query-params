@@ -2,8 +2,8 @@ import * as React from 'react';
 import { cleanup, renderHook } from '@testing-library/react-hooks';
 import {
   EncodedQuery,
-  NumberParam,
-  NumericArrayParam,
+  // NumberParam,
+  // NumericArrayParam,
 } from 'serialize-query-params';
 import { QueryParamProvider, useQueryParam } from '../index';
 import { calledPushQuery, makeMockHistory, makeMockLocation } from './helpers';
