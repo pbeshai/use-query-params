@@ -15,7 +15,7 @@ const UseQueryParamsExample = () => {
     filters: withDefault(ArrayParam, []),
   });
   const { x: num, q: searchQuery, filters } = query;
-
+  console.log('got filters =', filters);
   return (
     <div>
       <h1>num is {num}</h1>

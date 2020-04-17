@@ -1,5 +1,10 @@
 import * as React from 'react';
-import { useQueryParams, StringParam, NumberParam } from 'use-query-params';
+import {
+  useQueryParams,
+  StringParam,
+  NumberParam,
+  JsonParam,
+} from 'use-query-params';
 
 const UseQueryParamsExample = () => {
   const [count, setCount] = React.useState(0);
@@ -8,8 +13,9 @@ const UseQueryParamsExample = () => {
     zzz: NumberParam,
     test: StringParam,
     anyp: StringParam,
+    json: JsonParam,
   });
-  const { zzz, test, anyp } = query;
+  const { zzz, test, anyp, json } = query;
 
   return (
     <div className="UseQueryParamsExample">
@@ -76,6 +82,42 @@ const UseQueryParamsExample = () => {
                   onClick={() =>
                     setQuery(
                       { anyp: 'any' + Math.floor(Math.random() * 100) },
+                      'push'
+                    )
+                  }
+                >
+                  Change Push
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>json</td>
+              <td>{JSON.stringify(json)}</td>
+              <td>{typeof json}</td>
+              <td>
+                <button
+                  onClick={() =>
+                    setQuery({
+                      json: {
+                        foo: [1, 2, 3],
+                        bar: { abc: 'def' },
+                        rand: 'any' + Math.floor(Math.random() * 100),
+                      },
+                    })
+                  }
+                >
+                  Change
+                </button>
+                <button
+                  onClick={() =>
+                    setQuery(
+                      {
+                        json: {
+                          foo: [1, 2, 3],
+                          bar: { abc: 'def' },
+                          rand: 'any' + Math.floor(Math.random() * 100),
+                        },
+                      },
                       'push'
                     )
                   }

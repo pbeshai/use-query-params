@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { EncodedQuery } from 'serialize-query-params';
+import { EncodedQuery, ExtendedStringifyOptions } from 'serialize-query-params';
 
 import { UrlUpdateType, HistoryLocation } from './types';
 import { updateUrlQuery, createLocationWithChanges } from './updateUrlQuery';
@@ -32,6 +32,7 @@ export function useLocationContext() {
 type LocationProviderProps = HistoryLocation & {
   /** Main app goes here */
   children: React.ReactNode;
+  stringifyOptions?: ExtendedStringifyOptions;
 };
 
 /**
@@ -42,6 +43,7 @@ export function LocationProvider({
   history,
   location,
   children,
+  stringifyOptions,
 }: LocationProviderProps) {
   const locationRef = React.useRef(location);
   React.useEffect(() => {
@@ -58,13 +60,14 @@ export function LocationProvider({
       locationRef.current = createLocationWithChanges(
         queryReplacements,
         locationRef.current,
-        updateType
+        updateType,
+        stringifyOptions
       );
       if (history) {
         updateUrlQuery(history, locationRef.current, updateType);
       }
     },
-    [history]
+    [history, stringifyOptions]
   );
 
   return (
