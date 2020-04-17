@@ -1,18 +1,12 @@
 import * as React from 'react';
-import { renderHook, cleanup } from 'react-hooks-testing-library';
+import { cleanup, renderHook } from '@testing-library/react-hooks';
 import {
+  EncodedQuery,
   NumberParam,
   NumericArrayParam,
-  EncodedQuery,
 } from 'serialize-query-params';
-
-import { useQueryParam, QueryParamProvider } from '../index';
-import {
-  makeMockHistory,
-  makeMockLocation,
-  calledPushQuery,
-  calledReplaceQuery,
-} from './helpers';
+import { QueryParamProvider, useQueryParam } from '../index';
+import { calledPushQuery, makeMockHistory, makeMockLocation } from './helpers';
 
 // helper to setup tests
 function setupWrapper(query: EncodedQuery) {

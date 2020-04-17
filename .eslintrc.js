@@ -20,6 +20,11 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: 'module',
   },
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
   plugins: ['react', '@typescript-eslint', 'react-hooks'],
   rules: {
     'react/prop-types': 'off',
