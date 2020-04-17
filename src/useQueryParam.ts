@@ -13,7 +13,7 @@ type NewValueType<D> = D | ((latestValue: D) => D);
  * Abstracted into its own function to allow re-use in a functional setter (#26)
  */
 function getLatestDecodedValue<D, D2 = D>(
-  getLocation: () => Location,
+  location: Location,
   name: string,
   paramConfig: QueryParamConfig<D, D2>,
   paramConfigRef: React.MutableRefObject<QueryParamConfig<D, D2>>,
@@ -27,7 +27,7 @@ function getLatestDecodedValue<D, D2 = D>(
 
   // read in the parsed query
   const parsedQuery = sharedMemoizedQueryParser(
-    getSSRSafeSearchString(getLocation()) // get the latest location object
+    getSSRSafeSearchString(location) // get the latest location object
   );
 
   // read in the encoded string value (we have to check cache if available because
@@ -85,11 +85,11 @@ export const useQueryParam = <D, D2 = D>(
   D2 | undefined,
   (newValue: NewValueType<D>, updateType?: UrlUpdateType) => void
 ] => {
-  const [getLocation, setLocation] = useLocationContext();
+  const { location, getLocation, setLocation } = useLocationContext();
 
   // read in the raw query
   const parsedQuery = sharedMemoizedQueryParser(
-    getSSRSafeSearchString(getLocation())
+    getSSRSafeSearchString(location)
   );
 
   // make caches
@@ -98,7 +98,7 @@ export const useQueryParam = <D, D2 = D>(
   const decodedValueCacheRef = React.useRef<D2 | undefined>();
 
   const decodedValue = getLatestDecodedValue(
-    getLocation,
+    location,
     name,
     paramConfig,
     paramConfigRef,
@@ -123,7 +123,7 @@ export const useQueryParam = <D, D2 = D>(
       if (typeof newValue === 'function') {
         // get latest decoded value to pass as a fresh arg to the setter fn
         const latestValue = getLatestDecodedValue(
-          getLocation,
+          getLocation(),
           name,
           paramConfig,
           paramConfigRef,

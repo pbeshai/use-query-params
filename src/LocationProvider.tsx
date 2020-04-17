@@ -8,15 +8,20 @@ import { updateUrlQuery, createLocationWithChanges } from './updateUrlQuery';
  * Shape of the LocationProviderContext, which the hooks consume to read and
  * update the URL state.
  */
-type LocationProviderContext = [
-  () => Location,
-  (queryReplacements: EncodedQuery, updateType?: UrlUpdateType) => void
-];
+type LocationProviderContext = {
+  location: Location;
+  getLocation: () => Location;
+  setLocation: (
+    queryReplacements: EncodedQuery,
+    updateType?: UrlUpdateType
+  ) => void;
+};
 
-export const LocationContext = React.createContext<LocationProviderContext>([
-  () => ({} as Location),
-  () => {},
-]);
+export const LocationContext = React.createContext<LocationProviderContext>({
+  location: {} as Location,
+  getLocation: () => ({} as Location),
+  setLocation: () => {},
+});
 
 export function useLocationContext() {
   const context = React.useContext(LocationContext);
@@ -71,7 +76,7 @@ export function LocationProvider({
   );
 
   return (
-    <LocationContext.Provider value={[getLocation, setLocation]}>
+    <LocationContext.Provider value={{ location, getLocation, setLocation }}>
       {children}
     </LocationContext.Provider>
   );
