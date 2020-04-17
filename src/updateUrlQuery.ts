@@ -1,5 +1,5 @@
 import {
-  EncodedQueryWithNulls,
+  EncodedQuery,
   updateLocation,
   updateInLocation,
 } from 'serialize-query-params';
@@ -13,7 +13,7 @@ import { PushReplaceHistory, UrlUpdateType } from './types';
  * The default is pushIn.
  */
 export function updateUrlQuery(
-  queryReplacements: EncodedQueryWithNulls,
+  queryReplacements: EncodedQuery,
   location: Location,
   history: PushReplaceHistory,
   updateType: UrlUpdateType = 'pushIn'

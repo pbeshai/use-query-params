@@ -3,7 +3,7 @@ import { renderHook, cleanup } from 'react-hooks-testing-library';
 import {
   NumberParam,
   NumericArrayParam,
-  EncodedQueryWithNulls,
+  EncodedQuery,
 } from 'serialize-query-params';
 
 import { useQueryParam, QueryParamProvider } from '../index';
@@ -15,7 +15,7 @@ import {
 } from './helpers';
 
 // helper to setup tests
-function setupWrapper(query: EncodedQueryWithNulls) {
+function setupWrapper(query: EncodedQuery) {
   const location = makeMockLocation(query);
   const history = makeMockHistory(location);
   const wrapper = ({ children }: any) => (
@@ -32,7 +32,6 @@ function setupWrapper(query: EncodedQueryWithNulls) {
 
 describe('useQueryParam', () => {
   afterEach(cleanup);
-
   it('default param type (string, pushIn)', () => {
     const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
     const { result } = renderHook(() => useQueryParam('foo'), { wrapper });
@@ -76,8 +75,8 @@ describe('useQueryParam', () => {
     setter2([4, 5, 6], 'replaceIn');
     rerender();
     const [decodedValue3, setter3] = result.current;
-    expect(decodedValue).not.toBe(decodedValue3);
     expect(decodedValue3).toEqual([4, 5, 6]);
+    expect(decodedValue).not.toBe(decodedValue3);
 
     setter3([4, 5, 6], 'push');
     rerender();

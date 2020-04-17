@@ -6,13 +6,13 @@ import {
   NumberParam,
   StringParam,
   DecodedValueMap,
-  EncodedQueryWithNulls,
+  EncodedQuery,
 } from 'serialize-query-params';
 import { SetQuery, withQueryParams, QueryParamProvider } from '../index';
 import { makeMockHistory, makeMockLocation, calledPushQuery } from './helpers';
 
 // helper to setup tests
-function setupWrapper(query: EncodedQueryWithNulls) {
+function setupWrapper(query: EncodedQuery) {
   const location = makeMockLocation(query);
   const history = makeMockHistory(location);
   const wrapper = ({ children }: any) => (

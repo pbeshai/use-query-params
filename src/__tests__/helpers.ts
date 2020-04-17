@@ -1,4 +1,4 @@
-import { EncodedQueryWithNulls } from 'serialize-query-params';
+import { EncodedQuery } from 'serialize-query-params';
 import { stringify, parse as parseQueryString } from 'query-string';
 
 // if passed a location, will mutate it so we can see what changes are being made
@@ -6,10 +6,14 @@ export function makeMockHistory(location: any = {}) {
   return {
     replace: jest
       .fn()
-      .mockImplementation(newLocation => Object.assign(location, newLocation)),
+      .mockImplementation((newLocation) =>
+        Object.assign(location, newLocation)
+      ),
     push: jest
       .fn()
-      .mockImplementation(newLocation => Object.assign(location, newLocation)),
+      .mockImplementation((newLocation) =>
+        Object.assign(location, newLocation)
+      ),
   };
 }
 
@@ -29,7 +33,7 @@ export function calledPushQuery(
   return parseQueryString(history.push.mock.calls[index][0].search);
 }
 
-export function makeMockLocation(query: EncodedQueryWithNulls): Location {
+export function makeMockLocation(query: EncodedQuery): Location {
   const queryStr = stringify(query);
   return {
     protocol: 'http:',

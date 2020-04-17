@@ -1,35 +1,24 @@
 import * as React from 'react';
-import { parse as parseQueryString } from 'query-string';
 import {
-  encodeQueryParams,
-  EncodedQueryWithNulls,
   DecodedValueMap,
+  EncodedQuery,
+  encodeQueryParams,
   QueryParamConfigMap,
 } from 'serialize-query-params';
-import { useQueryParam } from './useQueryParam';
-import updateUrlQuery from './updateUrlQuery';
+import { usePreviousIfShallowEqual, getSSRSafeSearchString } from './helpers';
 import { useQueryParamContext } from './QueryParamProvider';
-import { UrlUpdateType, SetQuery } from './types';
+import { SetQuery, UrlUpdateType } from './types';
+import updateUrlQuery from './updateUrlQuery';
+import { sharedMemoizedQueryParser } from './memoizedQueryParser';
+import shallowEqual from './shallowEqual';
 
-// from https://usehooks.com/usePrevious/
-function usePrevious<T>(value: T) {
-  const ref = React.useRef(value);
-  React.useEffect(() => {
-    ref.current = value;
-  }, [value]);
-  return ref.current;
-}
-
-// from https://github.com/lodash/lodash/issues/2340#issuecomment-360325395
-function isShallowEqual<T extends object>(objA: T, objB: T) {
-  for (var key in objA)
-    if (!(key in objB) || objA[key] !== objB[key]) return false;
-
-  for (var key in objB)
-    if (!(key in objA) || objA[key] !== objB[key]) return false;
-
-  return true;
-}
+type DecodedValueCacheEntry<E, D> = { decodedValue: D; encodedValue: E };
+type DecodedValueCache<QPCMap extends QueryParamConfigMap> = {
+  [P in keyof QPCMap]?: DecodedValueCacheEntry<
+    string | (string | null)[] | null | undefined,
+    ReturnType<QPCMap[P]['decode']>
+  >;
+};
 
 /**
  * Given a query parameter configuration (mapping query param name to { encode, decode }),
@@ -39,62 +28,17 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
   const { history, location } = useQueryParamContext();
-  const locationIsObject = typeof location === 'object';
+  const decodedValueCacheRef = React.useRef<DecodedValueCache<QPCMap>>({});
 
   // memoize paramConfigMap to make the API nicer for consumers.
   // otherwise we'd have to useQueryParams(useMemo(() => { foo: NumberParam }, []))
-  const prevParamConfigMap = usePrevious(paramConfigMap);
-  const hasNewParamConfig = isShallowEqual(prevParamConfigMap, paramConfigMap);
-  // prettier-ignore
-  const memoParamConfigMap = React.useMemo(() => paramConfigMap, [ // eslint-disable-line react-hooks/exhaustive-deps
-    hasNewParamConfig,
-  ]);
-  paramConfigMap = memoParamConfigMap;
-
-  // ref with current version history object (see #46)
-  const refHistory = React.useRef<typeof history>(history);
-  React.useEffect(() => {
-    refHistory.current = history;
-  }, [history]);
-
-  // ref with current version location object (see #46)
-  const refLocation = React.useRef<typeof location>(location);
-  React.useEffect(() => {
-    refLocation.current = location;
-  }, [location]);
-
-  const search = locationIsObject ? location.search : '';
-
-  // read in the raw query
-  const rawQuery = React.useMemo(() => parseQueryString(search) || {}, [
-    search,
-  ]);
-
-  // parse each parameter via useQueryParam
-  // we reuse the logic to not recreate objects
-  const paramNames = Object.keys(paramConfigMap);
-  const paramValues = paramNames.map(
-    (paramName) =>
-      useQueryParam(paramName, paramConfigMap[paramName], rawQuery)[0]
-  );
-
-  // we use a memo here to prevent recreating the containing decodedValues object
-  // which would break === comparisons even if no values changed.
-  const decodedValues = React.useMemo(() => {
-    // iterate over the decoded values and build an object
-    const decodedValues: Partial<DecodedValueMap<QPCMap>> = {};
-    for (let i = 0; i < paramNames.length; ++i) {
-      decodedValues[paramNames[i] as keyof QPCMap] = paramValues[i];
-    }
-
-    return decodedValues;
-  }, paramValues); // eslint-disable-line react-hooks/exhaustive-deps
+  paramConfigMap = usePreviousIfShallowEqual(paramConfigMap);
 
   // create a setter for updating multiple query params at once
   const setQuery = React.useCallback(
     (changes: Partial<DecodedValueMap<QPCMap>>, updateType?: UrlUpdateType) => {
       // encode as strings for the URL
-      const encodedChanges: EncodedQueryWithNulls = encodeQueryParams(
+      const encodedChanges: EncodedQuery = encodeQueryParams(
         paramConfigMap,
         changes
       );
@@ -109,6 +53,58 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     },
     [paramConfigMap]
   );
+
+  // ref with current version history object (see #46)
+  const refHistory = React.useRef<typeof history>(history);
+  React.useEffect(() => {
+    refHistory.current = history;
+  }, [history]);
+
+  // ref with current version location object (see #46)
+  const refLocation = React.useRef<typeof location>(location);
+  React.useEffect(() => {
+    refLocation.current = location;
+  }, [location]);
+
+  // read in the raw query
+  const parsedQuery = sharedMemoizedQueryParser(
+    getSSRSafeSearchString(location)
+  );
+
+  // decode all the values if we have changes
+  const decodedValues = React.useMemo(() => {
+    const decodedValueCache = decodedValueCacheRef.current;
+
+    // we are decoding since the parsed query changed or the param config map has changed.
+
+    // recompute new values but only for those that changed
+    const paramNames = Object.keys(paramConfigMap);
+    const decodedValues: Partial<DecodedValueMap<QPCMap>> = {};
+    for (const paramName of paramNames) {
+      const paramConfig = paramConfigMap[paramName];
+      const encodedValue = parsedQuery[paramName];
+      let decodedValue;
+      // re-use cached decoded value if we can, otherwise generate new
+      const cacheEntry = decodedValueCache[paramName];
+      if (
+        cacheEntry != undefined &&
+        shallowEqual(cacheEntry.encodedValue, encodedValue)
+      ) {
+        decodedValue = cacheEntry.decodedValue;
+      } else {
+        if (cacheEntry == null) {
+          decodedValueCache[paramName as keyof QPCMap] = {} as any;
+        }
+        decodedValue = paramConfig.decode(encodedValue);
+        (decodedValueCache[paramName] as any).encodedValue = encodedValue;
+        (decodedValueCache[paramName] as any).decodedValue = decodedValue;
+      }
+
+      decodedValues[paramName as keyof QPCMap] = decodedValue;
+    }
+
+    return decodedValues;
+  }, [paramConfigMap, parsedQuery]);
 
   // no longer Partial
   return [decodedValues as DecodedValueMap<QPCMap>, setQuery];

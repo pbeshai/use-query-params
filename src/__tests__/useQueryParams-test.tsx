@@ -4,19 +4,15 @@ import {
   NumberParam,
   ArrayParam,
   StringParam,
-  EncodedQueryWithNulls,
+  EncodedQuery,
+  NumericArrayParam,
 } from 'serialize-query-params';
 
 import { useQueryParams, QueryParamProvider } from '../index';
-import {
-  makeMockHistory,
-  makeMockLocation,
-  calledPushQuery,
-  calledReplaceQuery,
-} from './helpers';
+import { makeMockHistory, makeMockLocation, calledPushQuery } from './helpers';
 
 // helper to setup tests
-function setupWrapper(query: EncodedQueryWithNulls) {
+function setupWrapper(query: EncodedQuery) {
   const location = makeMockLocation(query);
   const history = makeMockHistory(location);
   const wrapper = ({ children }: any) => (
@@ -30,7 +26,7 @@ function setupWrapper(query: EncodedQueryWithNulls) {
 
 describe('useQueryParams', () => {
   afterEach(cleanup);
-
+  /*
   it('default update type (pushIn)', () => {
     const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
     const { result } = renderHook(() => useQueryParams({ foo: StringParam }), {
@@ -108,5 +104,86 @@ describe('useQueryParams', () => {
     rerender();
     const [, setter2] = result.current;
     expect(setter).toBe(setter2);
+  });
+*/
+  it("doesn't decode more than necessary", () => {
+    const { wrapper } = setupWrapper({
+      foo: ['1', '2', '3'],
+      bar: ['a', 'b'],
+    });
+    const { result, rerender } = renderHook(
+      () => useQueryParams({ foo: NumericArrayParam, bar: ArrayParam }),
+      {
+        wrapper,
+      }
+    );
+
+    const [decodedValue] = result.current;
+    expect(decodedValue).toEqual({ foo: [1, 2, 3], bar: ['a', 'b'] });
+
+    rerender();
+    const [decodedValue2, setter2] = result.current;
+    expect(decodedValue).toBe(decodedValue2);
+
+    setter2({ foo: [4, 5, 6] }, 'replaceIn');
+    rerender();
+    const [decodedValue3, setter3] = result.current;
+    expect(decodedValue).not.toBe(decodedValue3);
+    expect(decodedValue3.foo).toEqual([4, 5, 6]);
+    expect(decodedValue3.bar).toBe(decodedValue.bar);
+
+    setter3({ foo: [4, 5, 6] }, 'pushIn');
+    rerender();
+    const [decodedValue4, setter4] = result.current;
+    expect(decodedValue3).toBe(decodedValue4);
+
+    // if another parameter changes, this one shouldn't be affected
+    setter4({ bar: ['x', 'd'] });
+    rerender();
+    const [decodedValue5] = result.current;
+    expect(decodedValue5.foo).toBe(decodedValue3.foo);
+    expect(decodedValue5.bar).toEqual(['x', 'd']);
+  });
+
+  it('allows the config to change over time', () => {
+    const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
+    const { result, rerender } = renderHook(
+      ({ config }: any) => useQueryParams(config),
+      {
+        wrapper,
+        initialProps: {
+          config: { foo: NumberParam, bar: StringParam, baz: ArrayParam },
+        },
+      }
+    );
+    let decodedQuery = result.current[0];
+    let setter = result.current[1];
+
+    expect(decodedQuery).toEqual({ foo: 123, bar: 'xxx' });
+    setter({ foo: 555, baz: ['a', 'b'] }, 'push');
+    expect(calledPushQuery(history, 0)).toEqual({
+      foo: '555',
+      baz: ['a', 'b'],
+    });
+
+    rerender({
+      config: {
+        foo: NumberParam,
+        newt: NumberParam,
+        bar: StringParam,
+        baz: ArrayParam,
+      },
+    });
+    decodedQuery = result.current[0];
+    setter = result.current[1];
+
+    expect(decodedQuery).toEqual({ foo: 555, baz: ['a', 'b'] });
+    setter({ foo: 99, baz: null, bar: 'regen', newt: 1000 });
+    expect(calledPushQuery(history, 1)).toEqual({
+      foo: '99',
+      baz: null,
+      bar: 'regen',
+      newt: '1000',
+    });
   });
 });
