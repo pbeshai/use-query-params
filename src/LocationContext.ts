@@ -16,3 +16,11 @@ export const LocationContext = React.createContext<LocationProviderContext>([
   {} as Location,
   () => {},
 ]);
+
+export function useLocationContext() {
+  const context = React.useContext(LocationContext);
+  if (process.env.NODE_ENV === 'development' && context === undefined) {
+    throw new Error('useQueryParams must be used within a QueryParamProvider');
+  }
+  return context;
+}

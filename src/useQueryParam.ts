@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { QueryParamConfig, StringParam } from 'serialize-query-params';
 import { getSSRSafeSearchString, usePreviousIfShallowEqual } from './helpers';
+import { useLocationContext } from './LocationContext';
 import { sharedMemoizedQueryParser } from './memoizedQueryParser';
-import { LocationContext } from './LocationContext';
 import { UrlUpdateType } from './types';
 
 /**
@@ -23,9 +23,7 @@ export const useQueryParam = <D, D2 = D>(
   name: string,
   paramConfig: QueryParamConfig<D, D2> = StringParam as QueryParamConfig<any>
 ): [D2 | undefined, (newValue: D, updateType?: UrlUpdateType) => void] => {
-  // const { history, location } = useQueryParamContext();
-  console.warn('TODO, add back in useLocationContext for dev warning');
-  const [location, setLocation] = React.useContext(LocationContext);
+  const [location, setLocation] = useLocationContext();
 
   // create the setter, memoizing via useCallback
   const setValue = React.useCallback(

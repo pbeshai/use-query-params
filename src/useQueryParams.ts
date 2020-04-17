@@ -5,11 +5,11 @@ import {
   encodeQueryParams,
   QueryParamConfigMap,
 } from 'serialize-query-params';
-import { LocationContext } from './LocationContext';
-import { usePreviousIfShallowEqual, getSSRSafeSearchString } from './helpers';
-import { SetQuery, UrlUpdateType } from './types';
+import { getSSRSafeSearchString, usePreviousIfShallowEqual } from './helpers';
+import { useLocationContext } from './LocationContext';
 import { sharedMemoizedQueryParser } from './memoizedQueryParser';
 import shallowEqual from './shallowEqual';
+import { SetQuery, UrlUpdateType } from './types';
 
 type DecodedValueCacheEntry<E, D> = { decodedValue: D; encodedValue: E };
 type DecodedValueCache<QPCMap extends QueryParamConfigMap> = {
@@ -26,9 +26,7 @@ type DecodedValueCache<QPCMap extends QueryParamConfigMap> = {
 export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
-  // const { history, location } = useQueryParamContext();
-  const [location, setLocation] = React.useContext(LocationContext);
-  console.warn('TODO, add back in useLocationContext for dev warning');
+  const [location, setLocation] = useLocationContext();
 
   const decodedValueCacheRef = React.useRef<DecodedValueCache<QPCMap>>({});
 

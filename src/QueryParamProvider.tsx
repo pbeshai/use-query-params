@@ -158,11 +158,3 @@ export function QueryParamProvider({
 }
 
 export default QueryParamProvider;
-
-export function useQueryParamContext() {
-  const context = React.useContext(QueryParamContext);
-  if (process.env.NODE_ENV === 'development' && context === undefined) {
-    throw new Error('useQueryParams must be used within a QueryParamProvider');
-  }
-  return context;
-}
