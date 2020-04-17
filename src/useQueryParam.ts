@@ -42,12 +42,15 @@ export const useQueryParam = <D, D2 = D>(
   const decodedValueCacheRef = React.useRef<D2 | undefined>();
 
   function getLatestDecodedValue(): D2 {
-    // get the latest location object
-    const location = getLocation();
+    // check if we have a new param config
+    const hasNewParamConfig = !shallowEqual(
+      paramConfigRef.current,
+      paramConfig
+    );
 
     // read in the parsed query
     const parsedQuery = sharedMemoizedQueryParser(
-      getSSRSafeSearchString(location)
+      getSSRSafeSearchString(getLocation()) // get the latest location object
     );
 
     // read in the encoded string value (we have to check cache if available because
@@ -61,38 +64,26 @@ export const useQueryParam = <D, D2 = D>(
       ? parsedQuery[name]
       : encodedValueCacheRef.current;
 
-    // check if we have a new param config
-    const hasNewParamConfig = !shallowEqual(
-      paramConfigRef.current,
-      paramConfig
-    );
-
-    let decodedValue: D2;
     // only decode if we have changes to encoded value or the config.
     // check for undefined to handle initial case
     if (
-      hasNewEncodedValue ||
-      hasNewParamConfig ||
-      decodedValueCacheRef.current === undefined
+      !hasNewEncodedValue &&
+      !hasNewParamConfig &&
+      decodedValueCacheRef.current !== undefined
     ) {
-      const newDecodedValue = paramConfig.decode(encodedValue);
-      const hasNewDecodedValue = !shallowEqual(
-        decodedValueCacheRef.current,
-        newDecodedValue
-      );
-
-      // if we have a new decoded value use it, otherwise use cached
-      if (hasNewDecodedValue) {
-        decodedValue = newDecodedValue;
-      } else {
-        decodedValue = decodedValueCacheRef.current as D2;
-      }
-    } else {
-      // no changes to encoded value or param config map, so use cached
-      decodedValue = decodedValueCacheRef.current;
+      return decodedValueCacheRef.current;
     }
 
-    return decodedValue;
+    const newDecodedValue = paramConfig.decode(encodedValue);
+    const hasNewDecodedValue = !shallowEqual(
+      decodedValueCacheRef.current,
+      newDecodedValue
+    );
+
+    // if we have a new decoded value use it, otherwise use cached
+    return hasNewDecodedValue
+      ? newDecodedValue
+      : (decodedValueCacheRef.current as D2);
   }
 
   const decodedValue = getLatestDecodedValue();
@@ -102,34 +93,31 @@ export const useQueryParam = <D, D2 = D>(
   useUpdateRefIfShallowNew(paramConfigRef, paramConfig);
   useUpdateRefIfShallowNew(decodedValueCacheRef, decodedValue);
 
-  // create the setter callback
-  function setValueCallback(
-    newValue: NewValueType<D>,
-    updateType?: UrlUpdateType
-  ): void {
-    let newEncodedValue: string | (string | null)[] | null | undefined;
-
-    // allow functional updates #26
-    if (typeof newValue === 'function') {
-      // get latest decoded value to pass as a fresh arg to the setter fn
-      const latestValue = getLatestDecodedValue();
-      decodedValueCacheRef.current = latestValue; // keep cache in sync
-
-      newEncodedValue = (newValue as Function)(latestValue);
-    } else {
-      newEncodedValue = paramConfig.encode(newValue);
-    }
-
-    // update the URL
-    setLocation({ [name]: newEncodedValue }, updateType);
-  }
-
+  console.warn('TODO: FIX CALLBACK DEPS');
   // create the setter, memoizing via useCallback
-  const setValue = React.useCallback(setValueCallback, [
-    paramConfig,
-    name,
-    setLocation,
-  ]);
+  const setValue = React.useCallback(
+    function setValueCallback(
+      newValue: NewValueType<D>,
+      updateType?: UrlUpdateType
+    ): void {
+      let newEncodedValue: string | (string | null)[] | null | undefined;
+
+      // allow functional updates #26
+      if (typeof newValue === 'function') {
+        // get latest decoded value to pass as a fresh arg to the setter fn
+        const latestValue = getLatestDecodedValue();
+        decodedValueCacheRef.current = latestValue; // keep cache in sync
+
+        newEncodedValue = (newValue as Function)(latestValue);
+      } else {
+        newEncodedValue = paramConfig.encode(newValue);
+      }
+
+      // update the URL
+      setLocation({ [name]: newEncodedValue }, updateType);
+    },
+    [paramConfig, name, setLocation]
+  );
 
   return [decodedValue, setValue];
 };
