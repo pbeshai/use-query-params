@@ -2,6 +2,9 @@ import * as React from 'react';
 import { HistoryLocation, PushReplaceHistory } from './types';
 import { LocationProvider } from './LocationProvider';
 
+// we use a lazy caching solution to prevent #46 from happening
+let cachedWindowHistory: History | undefined;
+let cachedAdaptedWindowHistory: PushReplaceHistory | undefined;
 /**
  * Adapts standard DOM window history to work with our
  * { replace, push } interface.
@@ -9,7 +12,11 @@ import { LocationProvider } from './LocationProvider';
  * @param history Standard history provided by DOM
  */
 function adaptWindowHistory(history: History): PushReplaceHistory {
-  return {
+  if (history === cachedWindowHistory && cachedAdaptedWindowHistory != null) {
+    return cachedAdaptedWindowHistory;
+  }
+
+  const adaptedWindowHistory = {
     replace(location: Location) {
       history.replaceState(
         (location as any).state,
@@ -25,6 +32,11 @@ function adaptWindowHistory(history: History): PushReplaceHistory {
       );
     },
   };
+
+  cachedWindowHistory = history;
+  cachedAdaptedWindowHistory = adaptedWindowHistory;
+
+  return adaptedWindowHistory;
 }
 
 /**
@@ -41,6 +53,9 @@ interface ReachHistory {
   ) => void;
 }
 
+// we use a lazy caching solution to prevent #46 from happening
+let cachedReachHistory: ReachHistory | undefined;
+let cachedAdaptedReachHistory: PushReplaceHistory | undefined;
 /**
  * Adapts @reach/router history to work with our
  * { replace, push } interface.
@@ -48,7 +63,11 @@ interface ReachHistory {
  * @param history globalHistory from @reach/router
  */
 function adaptReachHistory(history: ReachHistory): PushReplaceHistory {
-  return {
+  if (history === cachedReachHistory && cachedAdaptedReachHistory != null) {
+    return cachedAdaptedReachHistory;
+  }
+
+  const adaptedReachHistory = {
     replace(location: Location) {
       history.navigate(
         `${location.protocol}//${location.host}${location.pathname}${location.search}`,
@@ -62,6 +81,11 @@ function adaptReachHistory(history: ReachHistory): PushReplaceHistory {
       );
     },
   };
+
+  cachedReachHistory = history;
+  cachedAdaptedReachHistory = adaptedReachHistory;
+
+  return adaptedReachHistory;
 }
 
 /**
