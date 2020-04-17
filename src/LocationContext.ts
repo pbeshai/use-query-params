@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { EncodedQueryWithNulls } from 'serialize-query-params';
+import { EncodedQuery } from 'serialize-query-params';
 
 import { UrlUpdateType } from './types';
 
@@ -9,7 +9,7 @@ import { UrlUpdateType } from './types';
  */
 type LocationProviderContext = [
   Location,
-  (queryReplacements: EncodedQueryWithNulls, updateType?: UrlUpdateType) => void
+  (queryReplacements: EncodedQuery, updateType?: UrlUpdateType) => void
 ];
 
 export const LocationContext = React.createContext<LocationProviderContext>([
