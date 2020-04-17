@@ -12,10 +12,10 @@ import { PushReplaceHistory, UrlUpdateType } from './types';
  * are used, only the values in queryReplacements will be available.
  * The default is pushIn.
  */
-export function getLocation(
+export function createLocationWithChanges(
   queryReplacements: EncodedQuery,
   location: Location,
-  updateType: UrlUpdateType = 'replaceIn'
+  updateType: UrlUpdateType = 'pushIn'
 ): Location {
   switch (updateType) {
     case 'replace':
