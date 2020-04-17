@@ -345,6 +345,9 @@ setFoo(123, 'push');
 
 // to unset or remove a parameter set it to undefined and use pushIn or replaceIn update types
 setFoo(undefined) // ?foo=123&bar=zzz becomes ?bar=zzz
+
+// functional updates are also supported:
+setFoo((latestFoo) => latestFoo + 150)
 ```
 
 <br/>
@@ -375,6 +378,9 @@ setQuery({ foo: 123, bar: 'zzz' }, 'push');
 
 // to unset or remove a parameter set it to undefined and use pushIn or replaceIn update types
 setQuery({ foo: undefined }) // ?foo=123&bar=zzz becomes ?bar=zzz
+
+// functional updates are also supported:
+setQuery((latestQuery) => ({ foo: latestQuery.foo + 150 }))
 ```
 
 **Example with Custom Parameter Type**
