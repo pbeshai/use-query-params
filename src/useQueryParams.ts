@@ -6,11 +6,7 @@ import {
   QueryParamConfigMap,
   EncodedValueMap,
 } from 'serialize-query-params';
-import {
-  getSSRSafeSearchString,
-  usePreviousIfShallowEqual,
-  useUpdateRefIfShallowNew,
-} from './helpers';
+import { getSSRSafeSearchString, useUpdateRefIfShallowNew } from './helpers';
 import { useLocationContext } from './LocationProvider';
 import { sharedMemoizedQueryParser } from './memoizedQueryParser';
 import shallowEqual from './shallowEqual';
@@ -19,6 +15,99 @@ import { SetQuery, UrlUpdateType } from './types';
 type ChangesType<DecodedValueMapType> =
   | Partial<DecodedValueMapType>
   | ((latestValues: DecodedValueMapType) => Partial<DecodedValueMapType>);
+
+/**
+ * Helper to get the latest decoded values with smart caching.
+ * Abstracted into its own function to allow re-use in a functional setter (#26)
+ */
+function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
+  getLocation: () => Location,
+  paramConfigMap: QPCMap,
+  paramConfigMapRef: React.MutableRefObject<QPCMap>,
+  parsedQueryRef: React.MutableRefObject<EncodedQuery>,
+  encodedValuesCacheRef: React.MutableRefObject<
+    Partial<EncodedValueMap<QPCMap>> | undefined
+  >,
+  decodedValuesCacheRef: React.MutableRefObject<
+    Partial<DecodedValueMap<QPCMap>>
+  >
+): {
+  encodedValues: Partial<EncodedValueMap<QPCMap>>;
+  decodedValues: Partial<DecodedValueMap<QPCMap>>;
+} {
+  // check if we have a new param config
+  const hasNewParamConfigMap = !shallowEqual(
+    paramConfigMapRef.current,
+    paramConfigMap
+  );
+
+  // read in the parsed query
+  const parsedQuery = sharedMemoizedQueryParser(
+    getSSRSafeSearchString(getLocation()) // get the latest location object
+  );
+
+  // check if new encoded values are around (new parsed query).
+  // can use triple equals since we already cache this value
+  const hasNewParsedQuery = parsedQueryRef.current !== parsedQuery;
+
+  // if nothing has changed, use existing.. so long as we have existing.
+  if (
+    !hasNewParsedQuery &&
+    !hasNewParamConfigMap &&
+    encodedValuesCacheRef.current !== undefined
+  ) {
+    return {
+      encodedValues: encodedValuesCacheRef.current,
+      decodedValues: decodedValuesCacheRef.current,
+    };
+  }
+
+  const encodedValuesCache: Partial<EncodedValueMap<QPCMap>> =
+    encodedValuesCacheRef.current || {};
+  const decodedValuesCache: Partial<DecodedValueMap<QPCMap>> =
+    decodedValuesCacheRef.current || {};
+  const encodedValues: Partial<EncodedValueMap<QPCMap>> = {};
+
+  // we have new encoded values, so let's get new decoded values.
+  // recompute new values but only for those that changed
+  const paramNames = Object.keys(paramConfigMap);
+  const decodedValues: Partial<DecodedValueMap<QPCMap>> = {};
+  for (const paramName of paramNames) {
+    // do we have a new encoded value?
+    const paramConfig = paramConfigMap[paramName];
+    const hasNewEncodedValue = !shallowEqual(
+      encodedValuesCache[paramName],
+      parsedQuery[paramName]
+    );
+
+    // if we have a new encoded value, re-decode. otherwise reuse cache
+    let encodedValue;
+    let decodedValue;
+    if (hasNewEncodedValue) {
+      encodedValue = parsedQuery[paramName];
+      decodedValue = paramConfig.decode(encodedValue);
+    } else {
+      encodedValue = encodedValuesCache[paramName];
+      decodedValue = decodedValuesCache[paramName];
+    }
+
+    encodedValues[paramName as keyof QPCMap] = encodedValue;
+    decodedValues[paramName as keyof QPCMap] = decodedValue;
+  }
+
+  // keep referential equality for decoded valus if we didn't actually change anything
+  const hasNewDecodedValues = !shallowEqual(
+    decodedValuesCacheRef.current,
+    decodedValues
+  );
+
+  return {
+    encodedValues,
+    decodedValues: hasNewDecodedValues
+      ? decodedValues
+      : decodedValuesCacheRef.current,
+  };
+}
 
 /**
  * Given a query parameter configuration (mapping query param name to { encode, decode }),
@@ -46,88 +135,19 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
 
   // memoize paramConfigMap to make the API nicer for consumers.
   // otherwise we'd have to useQueryParams(useMemo(() => { foo: NumberParam }, []))
-  paramConfigMap = usePreviousIfShallowEqual(paramConfigMap);
-
-  function getLatestDecodedValues(): {
-    encodedValues: Partial<EncodedValueMap<QPCMap>>;
-    decodedValues: Partial<DecodedValueMap<QPCMap>>;
-  } {
-    // check if we have a new param config
-    const hasNewParamConfigMap = !shallowEqual(
-      paramConfigMapRef.current,
-      paramConfigMap
-    );
-
-    // read in the parsed query
-    const parsedQuery = sharedMemoizedQueryParser(
-      getSSRSafeSearchString(getLocation()) // get the latest location object
-    );
-
-    // check if new encoded values are around (new parsed query).
-    // can use triple equals since we already cache this value
-    const hasNewParsedQuery = parsedQueryRef.current !== parsedQuery;
-
-    // if nothing has changed, use existing.. so long as we have existing.
-    if (
-      !hasNewParsedQuery &&
-      !hasNewParamConfigMap &&
-      encodedValuesCacheRef.current !== undefined
-    ) {
-      return {
-        encodedValues: encodedValuesCacheRef.current,
-        decodedValues: decodedValuesCacheRef.current,
-      };
-    }
-
-    const encodedValuesCache: Partial<EncodedValueMap<QPCMap>> =
-      encodedValuesCacheRef.current || {};
-    const decodedValuesCache: Partial<DecodedValueMap<QPCMap>> =
-      decodedValuesCacheRef.current || {};
-    const encodedValues: Partial<EncodedValueMap<QPCMap>> = {};
-
-    // we have new encoded values, so let's get new decoded values.
-    // recompute new values but only for those that changed
-    const paramNames = Object.keys(paramConfigMap);
-    const decodedValues: Partial<DecodedValueMap<QPCMap>> = {};
-    for (const paramName of paramNames) {
-      // do we have a new encoded value?
-      const paramConfig = paramConfigMap[paramName];
-      const hasNewEncodedValue = !shallowEqual(
-        encodedValuesCache[paramName],
-        parsedQuery[paramName]
-      );
-
-      // if we have a new encoded value, re-decode. otherwise reuse cache
-      let encodedValue;
-      let decodedValue;
-      if (hasNewEncodedValue) {
-        encodedValue = parsedQuery[paramName];
-        decodedValue = paramConfig.decode(encodedValue);
-      } else {
-        encodedValue = encodedValuesCache[paramName];
-        decodedValue = decodedValuesCache[paramName];
-      }
-
-      encodedValues[paramName as keyof QPCMap] = encodedValue;
-      decodedValues[paramName as keyof QPCMap] = decodedValue;
-    }
-
-    // keep referential equality for decoded valus if we didn't actually change anything
-    const hasNewDecodedValues = !shallowEqual(
-      decodedValuesCacheRef.current,
-      decodedValues
-    );
-
-    return {
-      encodedValues,
-      decodedValues: hasNewDecodedValues
-        ? decodedValues
-        : decodedValuesCacheRef.current,
-    };
-  }
+  paramConfigMap = shallowEqual(paramConfigMap, paramConfigMapRef.current)
+    ? paramConfigMapRef.current
+    : paramConfigMap;
 
   // decode all the values if we have changes
-  const { encodedValues, decodedValues } = getLatestDecodedValues();
+  const { encodedValues, decodedValues } = getLatestDecodedValues(
+    getLocation,
+    paramConfigMap,
+    paramConfigMapRef,
+    parsedQueryRef,
+    encodedValuesCacheRef,
+    decodedValuesCacheRef
+  );
 
   // update cached values in useEffects
   useUpdateRefIfShallowNew(parsedQueryRef, parsedQuery);
@@ -144,7 +164,14 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       let encodedChanges: EncodedQuery;
       if (typeof changes === 'function') {
         // get latest decoded value to pass as a fresh arg to the setter fn
-        const { decodedValues: latestValues } = getLatestDecodedValues();
+        const { decodedValues: latestValues } = getLatestDecodedValues(
+          getLocation,
+          paramConfigMap,
+          paramConfigMapRef,
+          parsedQueryRef,
+          encodedValuesCacheRef,
+          decodedValuesCacheRef
+        );
         decodedValuesCacheRef.current = latestValues; // keep cache in sync
 
         encodedChanges = (changes as Function)(latestValues);
@@ -156,7 +183,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       // update the URL
       setLocation(encodedChanges, updateType);
     },
-    [paramConfigMap, setLocation]
+    [paramConfigMap, setLocation, getLocation]
   );
 
   // no longer Partial

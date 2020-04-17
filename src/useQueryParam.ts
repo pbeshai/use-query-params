@@ -9,6 +9,62 @@ import { UrlUpdateType } from './types';
 type NewValueType<D> = D | ((latestValue: D) => D);
 
 /**
+ * Helper to get the latest decoded value with smart caching.
+ * Abstracted into its own function to allow re-use in a functional setter (#26)
+ */
+function getLatestDecodedValue<D, D2 = D>(
+  getLocation: () => Location,
+  name: string,
+  paramConfig: QueryParamConfig<D, D2>,
+  paramConfigRef: React.MutableRefObject<QueryParamConfig<D, D2>>,
+  encodedValueCacheRef: React.MutableRefObject<
+    string | (string | null)[] | null | undefined
+  >,
+  decodedValueCacheRef: React.MutableRefObject<D2 | undefined>
+): D2 {
+  // check if we have a new param config
+  const hasNewParamConfig = !shallowEqual(paramConfigRef.current, paramConfig);
+
+  // read in the parsed query
+  const parsedQuery = sharedMemoizedQueryParser(
+    getSSRSafeSearchString(getLocation()) // get the latest location object
+  );
+
+  // read in the encoded string value (we have to check cache if available because
+  // sometimes the query string changes so we get a new parsedQuery but this value
+  // didn't change, so we should avoid generating a new array or whatever value)
+  const hasNewEncodedValue = !shallowEqual(
+    encodedValueCacheRef.current,
+    parsedQuery[name]
+  );
+
+  const encodedValue = hasNewEncodedValue
+    ? parsedQuery[name]
+    : encodedValueCacheRef.current;
+
+  // only decode if we have changes to encoded value or the config.
+  // check for undefined to handle initial case
+  if (
+    !hasNewEncodedValue &&
+    !hasNewParamConfig &&
+    decodedValueCacheRef.current !== undefined
+  ) {
+    return decodedValueCacheRef.current;
+  }
+
+  const newDecodedValue = paramConfig.decode(encodedValue);
+  const hasNewDecodedValue = !shallowEqual(
+    decodedValueCacheRef.current,
+    newDecodedValue
+  );
+
+  // if we have a new decoded value use it, otherwise use cached
+  return hasNewDecodedValue
+    ? newDecodedValue
+    : (decodedValueCacheRef.current as D2);
+}
+
+/**
  * Given a query param name and query parameter configuration ({ encode, decode })
  * return the decoded value and a setter for updating it.
  *
@@ -37,63 +93,24 @@ export const useQueryParam = <D, D2 = D>(
   );
 
   // make caches
-  const encodedValueCacheRef = React.useRef(parsedQuery[name]);
+  const encodedValueCacheRef = React.useRef();
   const paramConfigRef = React.useRef(paramConfig);
   const decodedValueCacheRef = React.useRef<D2 | undefined>();
 
-  function getLatestDecodedValue(): D2 {
-    // check if we have a new param config
-    const hasNewParamConfig = !shallowEqual(
-      paramConfigRef.current,
-      paramConfig
-    );
-
-    // read in the parsed query
-    const parsedQuery = sharedMemoizedQueryParser(
-      getSSRSafeSearchString(getLocation()) // get the latest location object
-    );
-
-    // read in the encoded string value (we have to check cache if available because
-    // sometimes the query string changes so we get a new parsedQuery but this value
-    // didn't change, so we should avoid generating a new array or whatever value)
-    const hasNewEncodedValue = !shallowEqual(
-      encodedValueCacheRef.current,
-      parsedQuery[name]
-    );
-    const encodedValue = hasNewEncodedValue
-      ? parsedQuery[name]
-      : encodedValueCacheRef.current;
-
-    // only decode if we have changes to encoded value or the config.
-    // check for undefined to handle initial case
-    if (
-      !hasNewEncodedValue &&
-      !hasNewParamConfig &&
-      decodedValueCacheRef.current !== undefined
-    ) {
-      return decodedValueCacheRef.current;
-    }
-
-    const newDecodedValue = paramConfig.decode(encodedValue);
-    const hasNewDecodedValue = !shallowEqual(
-      decodedValueCacheRef.current,
-      newDecodedValue
-    );
-
-    // if we have a new decoded value use it, otherwise use cached
-    return hasNewDecodedValue
-      ? newDecodedValue
-      : (decodedValueCacheRef.current as D2);
-  }
-
-  const decodedValue = getLatestDecodedValue();
+  const decodedValue = getLatestDecodedValue(
+    getLocation,
+    name,
+    paramConfig,
+    paramConfigRef,
+    encodedValueCacheRef,
+    decodedValueCacheRef
+  );
 
   // update cached values in a useEffect
   useUpdateRefIfShallowNew(encodedValueCacheRef, parsedQuery[name]);
   useUpdateRefIfShallowNew(paramConfigRef, paramConfig);
   useUpdateRefIfShallowNew(decodedValueCacheRef, decodedValue);
 
-  console.warn('TODO: FIX CALLBACK DEPS');
   // create the setter, memoizing via useCallback
   const setValue = React.useCallback(
     function setValueCallback(
@@ -105,7 +122,14 @@ export const useQueryParam = <D, D2 = D>(
       // allow functional updates #26
       if (typeof newValue === 'function') {
         // get latest decoded value to pass as a fresh arg to the setter fn
-        const latestValue = getLatestDecodedValue();
+        const latestValue = getLatestDecodedValue(
+          getLocation,
+          name,
+          paramConfig,
+          paramConfigRef,
+          encodedValueCacheRef,
+          decodedValueCacheRef
+        );
         decodedValueCacheRef.current = latestValue; // keep cache in sync
 
         newEncodedValue = (newValue as Function)(latestValue);
@@ -116,7 +140,7 @@ export const useQueryParam = <D, D2 = D>(
       // update the URL
       setLocation({ [name]: newEncodedValue }, updateType);
     },
-    [paramConfig, name, setLocation]
+    [paramConfig, name, setLocation, getLocation]
   );
 
   return [decodedValue, setValue];
