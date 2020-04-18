@@ -36,7 +36,7 @@ describe('useQueryParam', () => {
     setter('zzz');
     expect(calledPushQuery(history, 0)).toEqual({ foo: 'zzz', bar: 'xxx' });
   });
-  /*
+
   it('specific param type and update type', () => {
     const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
     const { result } = renderHook(() => useQueryParam('foo', NumberParam), {
@@ -150,5 +150,4 @@ describe('useQueryParam', () => {
     setter((latestValue: number) => latestValue + 100, 'push');
     expect(calledPushQuery(history, 2)).toEqual({ foo: '600' });
   });
-  */
 });

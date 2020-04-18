@@ -500,6 +500,25 @@ const link = `/?${stringify(encodedQuery)}`;
 <QueryParamProvider reachHistory={globalHisory}><App /></QueryParamProvider>
 
 <QueryParamProvider history={myCustomHistory}><App /></QueryParamProvider>
+
+// optionally specify options to query-string stringify
+const stringifyOptions = { encode: false }
+<QueryParamProvider ReactRouterRoute={Route} stringifyOptions={stringifyOptions}>
+  <App />
+</QueryParamProvider>
+
+// also accepts a transformSearchString function (searchString: string) => string
+import {
+  ExtendedStringifyOptions,
+  transformSearchStringJsonSafe,
+} from 'use-query-params';
+
+const stringifyOptions: ExtendedStringifyOptions = {
+  transformSearchString: transformSearchStringJsonSafe,
+};
+<QueryParamProvider ReactRouterRoute={Route} stringifyOptions={stringifyOptions}>
+  <App />
+</QueryParamProvider>
 ```
 
 The **QueryParamProvider** component links your routing library's history to

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { EncodedQuery } from 'serialize-query-params';
+import { EncodedQuery, ExtendedStringifyOptions } from 'serialize-query-params';
 
 import { UrlUpdateType, HistoryLocation } from './types';
 import { updateUrlQuery, createLocationWithChanges } from './updateUrlQuery';
@@ -8,15 +8,20 @@ import { updateUrlQuery, createLocationWithChanges } from './updateUrlQuery';
  * Shape of the LocationProviderContext, which the hooks consume to read and
  * update the URL state.
  */
-type LocationProviderContext = [
-  () => Location,
-  (queryReplacements: EncodedQuery, updateType?: UrlUpdateType) => void
-];
+type LocationProviderContext = {
+  location: Location;
+  getLocation: () => Location;
+  setLocation: (
+    queryReplacements: EncodedQuery,
+    updateType?: UrlUpdateType
+  ) => void;
+};
 
-export const LocationContext = React.createContext<LocationProviderContext>([
-  () => ({} as Location),
-  () => {},
-]);
+export const LocationContext = React.createContext<LocationProviderContext>({
+  location: {} as Location,
+  getLocation: () => ({} as Location),
+  setLocation: () => {},
+});
 
 export function useLocationContext() {
   const context = React.useContext(LocationContext);
@@ -32,6 +37,7 @@ export function useLocationContext() {
 type LocationProviderProps = HistoryLocation & {
   /** Main app goes here */
   children: React.ReactNode;
+  stringifyOptions?: ExtendedStringifyOptions;
 };
 
 /**
@@ -42,6 +48,7 @@ export function LocationProvider({
   history,
   location,
   children,
+  stringifyOptions,
 }: LocationProviderProps) {
   const locationRef = React.useRef(location);
   React.useEffect(() => {
@@ -58,17 +65,18 @@ export function LocationProvider({
       locationRef.current = createLocationWithChanges(
         queryReplacements,
         locationRef.current,
-        updateType
+        updateType,
+        stringifyOptions
       );
       if (history) {
         updateUrlQuery(history, locationRef.current, updateType);
       }
     },
-    [history]
+    [history, stringifyOptions]
   );
 
   return (
-    <LocationContext.Provider value={[getLocation, setLocation]}>
+    <LocationContext.Provider value={{ location, getLocation, setLocation }}>
       {children}
     </LocationContext.Provider>
   );

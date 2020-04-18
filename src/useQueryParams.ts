@@ -21,7 +21,7 @@ type ChangesType<DecodedValueMapType> =
  * Abstracted into its own function to allow re-use in a functional setter (#26)
  */
 function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
-  getLocation: () => Location,
+  location: Location,
   paramConfigMap: QPCMap,
   paramConfigMapRef: React.MutableRefObject<QPCMap>,
   parsedQueryRef: React.MutableRefObject<EncodedQuery>,
@@ -43,7 +43,7 @@ function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
 
   // read in the parsed query
   const parsedQuery = sharedMemoizedQueryParser(
-    getSSRSafeSearchString(getLocation()) // get the latest location object
+    getSSRSafeSearchString(location) // get the latest location object
   );
 
   // check if new encoded values are around (new parsed query).
@@ -83,7 +83,7 @@ function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
     // if we have a new encoded value, re-decode. otherwise reuse cache
     let encodedValue;
     let decodedValue;
-    if (hasNewEncodedValue) {
+    if (hasNewEncodedValue || encodedValuesCache[paramName] === undefined) {
       encodedValue = parsedQuery[paramName];
       decodedValue = paramConfig.decode(encodedValue);
     } else {
@@ -116,11 +116,11 @@ function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
 export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
-  const [getLocation, setLocation] = useLocationContext();
+  const { location, getLocation, setLocation } = useLocationContext();
 
   // read in the raw query
   const parsedQuery = sharedMemoizedQueryParser(
-    getSSRSafeSearchString(getLocation())
+    getSSRSafeSearchString(location)
   );
 
   // make caches
@@ -141,7 +141,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
 
   // decode all the values if we have changes
   const { encodedValues, decodedValues } = getLatestDecodedValues(
-    getLocation,
+    location,
     paramConfigMap,
     paramConfigMapRef,
     parsedQueryRef,
@@ -165,7 +165,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       if (typeof changes === 'function') {
         // get latest decoded value to pass as a fresh arg to the setter fn
         const { decodedValues: latestValues } = getLatestDecodedValues(
-          getLocation,
+          getLocation(),
           paramConfigMap,
           paramConfigMapRef,
           parsedQueryRef,

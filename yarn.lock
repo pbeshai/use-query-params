@@ -5168,10 +5168,10 @@ semver@^6.0.0, semver@^6.1.2, semver@^6.3.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
   integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
 
-serialize-query-params@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/serialize-query-params/-/serialize-query-params-1.0.1.tgz#dcdaae4e6acfd32c127d1d36a45f0976a1745327"
-  integrity sha512-hh2ILw52Xgm76CIbsiVJGKOabldiDyQR2dWu37NsHAFRncbg4Ize9oVRMIPL4lhQuKaVhpszmZaI48Y75QAw+Q==
+serialize-query-params@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/serialize-query-params/-/serialize-query-params-1.1.0.tgz#b95a15bf0dd4a4df6162c4d72208f1a31e850459"
+  integrity sha512-CF/iHtjCDSj2FzBCsb8JBFruqERpCGgI+8L+236BxhZUwDclwxiOBELvP87HH5EbL9XElvvP+259mP0XgT6l5g==
 
 set-blocking@^2.0.0:
   version "2.0.0"
