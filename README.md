@@ -329,8 +329,8 @@ Given a query param name and query parameter configuration `{ encode, decode }`
 return the decoded value and a setter for updating it.
 
 The setter takes two arguments `(newValue, updateType)` where updateType
-is one of `'replace' | 'replaceIn' | 'push' | 'pushIn'`, defaulting to
-`'replaceIn'`.
+is one of `'pushIn' | 'push' | 'replaceIn' | 'replace'`, defaulting to
+`'pushIn'`.
 
 You may optionally pass in a rawQuery object, otherwise the query is derived
 from the location in the context.
@@ -365,8 +365,8 @@ Given a query parameter configuration (mapping query param name to `{ encode, de
 return an object with the decoded values and a setter for updating them.
 
 The setter takes two arguments `(newQuery, updateType)` where updateType
-is one of `'replace' | 'replaceIn' | 'push' | 'pushIn'`, defaulting to
-`'replaceIn'`.
+is one of `'pushIn' | 'push' | 'replaceIn' | 'replace'`, defaulting to
+`'pushIn'`.
 
 **Example**
 
@@ -424,8 +424,8 @@ Given a query parameter configuration (mapping query param name to `{ encode, de
 a component, inject the props `query` and `setQuery` into the component based on the config.
 
 The setter takes two arguments `(newQuery, updateType)` where updateType
-is one of `'replace' | 'replaceIn' | 'push' | 'pushIn'`, defaulting to
-`'replaceIn'`.
+is one of `'pushIn' | 'push' | 'replaceIn' | 'replace'`, defaulting to
+`'pushIn'`.
 
 **Example**
 
@@ -459,8 +459,8 @@ Given a query parameter configuration (mapping query param name to `{ encode, de
 a component, provide render props `query` and `setQuery` based on the config.
 
 The setter takes two arguments `(newQuery, updateType)` where updateType
-is one of `'replace' | 'replaceIn' | 'push' | 'pushIn'`, defaulting to
-`'replaceIn'`.
+is one of `'pushIn' | 'push' | 'replaceIn' | 'replace'`, defaulting to
+`'pushIn'`.
 
 
 <br/>
