@@ -232,6 +232,8 @@ A few basic [examples](https://github.com/pbeshai/use-query-params/tree/master/e
 - [React Router Example](https://github.com/pbeshai/use-query-params/tree/master/examples/react-router)
 - [Reach Router Example](https://github.com/pbeshai/use-query-params/tree/master/examples/reach-router)
 
+The React Router and Reach Router examples contain simple tests showing how to use the library with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro).
+
 ### API
 
 - [UrlUpdateType](#urlupdatetype)
