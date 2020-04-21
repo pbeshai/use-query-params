@@ -4,11 +4,12 @@ import {
   StringParam,
   NumberParam,
   ArrayParam,
+  withDefault,
 } from 'use-query-params';
 
 const MyParam = {
   encode: (val: number) => `MY_${val}`,
-  decode: (input: string | (string| null)[] | null | undefined) => {
+  decode: (input: string | (string | null)[] | null | undefined) => {
     const str = input instanceof Array ? input[0] : input;
     return str == null ? undefined : +str.split('_')[1];
   },
@@ -20,7 +21,10 @@ const UseQueryParamExample = () => {
   const [custom, setCustom] = useQueryParam('custom', MyParam);
   const [test, setTest] = useQueryParam('test', StringParam);
   const [anyp, setAnyP] = useQueryParam('anyp');
-  const [arr, setArr] = useQueryParam('arr', ArrayParam);
+  const [arr, setArr] = useQueryParam(
+    'arr',
+    withDefault(ArrayParam, [] as (string | null)[])
+  );
 
   // verify we aren't creating new arrays each time
   const prevArr = React.useRef(arr);
@@ -106,13 +110,11 @@ const UseQueryParamExample = () => {
             <tr>
               <td>arr</td>
               <td>
-                {arr
-                  ? arr.map((d: string | null, i: number) => (
-                      <div key={i}>
-                        arr[{i}] = {d}
-                      </div>
-                    ))
-                  : arr}
+                {arr.map((d: any, i: number) => (
+                  <div key={i}>
+                    arr[{i}] = {d}
+                  </div>
+                ))}
               </td>
               <td>{typeof arr}</td>
               <td>

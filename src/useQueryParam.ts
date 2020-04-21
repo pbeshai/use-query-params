@@ -81,10 +81,7 @@ function getLatestDecodedValue<D, D2 = D>(
 export const useQueryParam = <D, D2 = D>(
   name: string,
   paramConfig: QueryParamConfig<D, D2> = StringParam as QueryParamConfig<any>
-): [
-  D2 | undefined,
-  (newValue: NewValueType<D>, updateType?: UrlUpdateType) => void
-] => {
+): [D2, (newValue: NewValueType<D>, updateType?: UrlUpdateType) => void] => {
   const { location, getLocation, setLocation } = useLocationContext();
 
   // read in the raw query
