@@ -14,6 +14,7 @@ export function makeMockHistory(location: any = {}) {
       .mockImplementation((newLocation) =>
         Object.assign(location, newLocation)
       ),
+    location,
   };
 }
 
