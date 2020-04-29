@@ -482,7 +482,10 @@ query parameters.
 **Example**
 
 ```js
-import { encodeQueryParams, NumberParam, stringify } from 'use-query-params';
+import { encodeQueryParams, NumberParam } from 'use-query-params';
+// since v1.0 stringify is not exported from 'use-query-params',
+// so you must install the 'query-string' package in case you need it
+import { stringify } from 'query-string';
 
 // encode each parameter according to the configuration
 const encodedQuery = encodeQueryParams({ foo: NumberParam }, { foo });
