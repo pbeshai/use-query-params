@@ -55,6 +55,7 @@ export function LocationProvider({
     locationRef.current = location;
   }, [location]);
 
+  // TODO: we can probably simplify this now that we are reading location from history
   const getLocation = React.useCallback(() => locationRef.current, [
     locationRef,
   ]);
@@ -64,7 +65,9 @@ export function LocationProvider({
       // A ref is needed here to stop setLocation updating constantly (see #46)
       locationRef.current = createLocationWithChanges(
         queryReplacements,
-        locationRef.current,
+        history == null || history.location == null
+          ? locationRef.current
+          : history.location,
         updateType,
         stringifyOptions
       );

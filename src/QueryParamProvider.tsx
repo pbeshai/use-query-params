@@ -33,6 +33,9 @@ function adaptWindowHistory(history: History): PushReplaceHistory {
         `${location.protocol}//${location.host}${location.pathname}${location.search}`
       );
     },
+    get location() {
+      return window.location;
+    },
   };
 
   cachedWindowHistory = history;
@@ -53,6 +56,7 @@ interface ReachHistory {
       replace?: boolean;
     }
   ) => void;
+  location: Location;
 }
 
 // we use a lazy caching solution to prevent #46 from happening
@@ -81,6 +85,9 @@ function adaptReachHistory(history: ReachHistory): PushReplaceHistory {
         `${location.protocol}//${location.host}${location.pathname}${location.search}`,
         { replace: false }
       );
+    },
+    get location() {
+      return history.location;
     },
   };
 
