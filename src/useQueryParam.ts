@@ -24,6 +24,7 @@ function getLatestDecodedValue<D, D2 = D>(
 ): D2 {
   // check if we have a new param config
   const hasNewParamConfig = !shallowEqual(paramConfigRef.current, paramConfig);
+  const isValueEqual = paramConfig.equals ?? shallowEqual;
 
   // read in the parsed query
   const parsedQuery = sharedMemoizedQueryParser(
@@ -53,10 +54,10 @@ function getLatestDecodedValue<D, D2 = D>(
   }
 
   const newDecodedValue = paramConfig.decode(encodedValue);
-  const hasNewDecodedValue = !shallowEqual(
-    decodedValueCacheRef.current,
-    newDecodedValue
-  );
+  const hasNewDecodedValue =
+    ((decodedValueCacheRef.current == null || newDecodedValue == null) &&
+      decodedValueCacheRef.current === newDecodedValue) ||
+    !isValueEqual(decodedValueCacheRef.current as D2, newDecodedValue);
 
   // if we have a new decoded value use it, otherwise use cached
   return hasNewDecodedValue
@@ -106,7 +107,11 @@ export const useQueryParam = <D, D2 = D>(
   // update cached values in a useEffect
   useUpdateRefIfShallowNew(encodedValueCacheRef, parsedQuery[name]);
   useUpdateRefIfShallowNew(paramConfigRef, paramConfig);
-  useUpdateRefIfShallowNew(decodedValueCacheRef, decodedValue);
+  useUpdateRefIfShallowNew(
+    decodedValueCacheRef,
+    decodedValue,
+    paramConfig.equals
+  );
 
   // create the setter, memoizing via useCallback
   const setValue = React.useCallback(
