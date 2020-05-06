@@ -4,6 +4,7 @@ import {
   EncodedQuery,
   NumberParam,
   NumericArrayParam,
+  DateParam,
 } from 'serialize-query-params';
 import { QueryParamProvider, useQueryParam } from '../index';
 import { calledPushQuery, makeMockHistory, makeMockLocation } from './helpers';
@@ -149,5 +150,31 @@ describe('useQueryParam', () => {
     rerender();
     setter((latestValue: number) => latestValue + 100, 'push');
     expect(calledPushQuery(history, 2)).toEqual({ foo: '600' });
+  });
+
+  it('properly detects new values when equals is overridden', () => {
+    const { wrapper } = setupWrapper({
+      foo: '2020-01-01',
+    });
+    const { result, rerender } = renderHook(
+      () => useQueryParam('foo', DateParam),
+      {
+        wrapper,
+      }
+    );
+
+    const [decodedValue, setter] = result.current;
+    expect(decodedValue).toEqual(new Date(2020, 0, 1));
+
+    setter(new Date(2020, 0, 2));
+    rerender();
+    const [decodedValue2, setter2] = result.current;
+    expect(decodedValue2).toEqual(new Date(2020, 0, 2));
+    // expect(decodedValue).not.toBe(decodedValue3);
+
+    setter2(new Date(2020, 0, 2));
+    rerender();
+    const [decodedValue3] = result.current;
+    expect(decodedValue3).toBe(decodedValue2);
   });
 });

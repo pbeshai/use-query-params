@@ -9,7 +9,7 @@ import {
 import { getSSRSafeSearchString, useUpdateRefIfShallowNew } from './helpers';
 import { useLocationContext } from './LocationProvider';
 import { sharedMemoizedQueryParser } from './memoizedQueryParser';
-import shallowEqual from './shallowEqual';
+import shallowEqual, { shallowEqualMap } from './shallowEqual';
 import { SetQuery, UrlUpdateType } from './types';
 
 type ChangesType<DecodedValueMapType> =
@@ -96,9 +96,10 @@ function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
   }
 
   // keep referential equality for decoded valus if we didn't actually change anything
-  const hasNewDecodedValues = !shallowEqual(
+  const hasNewDecodedValues = !shallowEqualMap(
     decodedValuesCacheRef.current,
-    decodedValues
+    decodedValues,
+    paramConfigMap
   );
 
   return {
@@ -153,7 +154,10 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   useUpdateRefIfShallowNew(parsedQueryRef, parsedQuery);
   useUpdateRefIfShallowNew(paramConfigMapRef, paramConfigMap);
   useUpdateRefIfShallowNew(encodedValuesCacheRef, encodedValues);
-  useUpdateRefIfShallowNew(decodedValuesCacheRef, decodedValues);
+
+  useUpdateRefIfShallowNew(decodedValuesCacheRef, decodedValues, (a, b) =>
+    shallowEqualMap(a, b, paramConfigMap)
+  );
 
   // create a setter for updating multiple query params at once
   const setQuery = React.useCallback(
