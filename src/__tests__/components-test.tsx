@@ -4,7 +4,11 @@ import { parse } from 'query-string';
 import * as React from 'react';
 import { Router, Switch } from 'react-router';
 import { Link, Route } from 'react-router-dom';
-import { decodeQueryParams, withDefault } from 'serialize-query-params';
+import {
+  decodeQueryParams,
+  withDefault,
+  DateParam,
+} from 'serialize-query-params';
 import { NumberParam, QueryParamProvider, useQueryParam } from '../index';
 
 function renderWithRouter(ui: React.ReactNode, initialRoute: string) {
@@ -173,4 +177,30 @@ test('issue 46', async () => {
   await new Promise((resolve) => setTimeout(() => resolve(), 0));
   getByText('a: 4');
   getByText('b: 4');
+});
+
+test('date withDefault', () => {
+  // An example counter component to be tested
+  const DateQueryParamExample = () => {
+    const [x, setX] = useQueryParam(
+      'x',
+      withDefault(DateParam, new Date(2020, 0, 1))
+    );
+
+    return (
+      <div>
+        <h1>{`x is ${x.toISOString()}`}</h1>
+        <button onClick={() => setX(new Date(2020, 5, 6))}>Change</button>
+      </div>
+    );
+  };
+
+  const { queryByText, getByText } = renderWithRouter(
+    <DateQueryParamExample />,
+    ''
+  );
+
+  expect(queryByText(/x is 2020-01-01/)).toBeTruthy();
+  getByText(/Change/).click();
+  expect(queryByText(/x is 2020-06-06/)).toBeTruthy();
 });

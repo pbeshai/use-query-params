@@ -80,7 +80,7 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "serialize-query-params": "^1.2.0"
+    "serialize-query-params": "^1.2.1"
   },
   "husky": {
     "hooks": {
