@@ -5283,10 +5283,10 @@ semver@^6.0.0, semver@^6.1.2, semver@^6.3.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
   integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
 
-serialize-query-params@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/serialize-query-params/-/serialize-query-params-1.2.0.tgz#12842a42881ad65c1c257e786f7bb00f2fbb2d10"
-  integrity sha512-rkcZFpQjGAA1tTncuon/CyBa81pTMztz0rxspHEnVlTfW+UQNa1rtgfl0PlL6b2Gwp5T1HyIZKyc1xwhZjYUHQ==
+serialize-query-params@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/serialize-query-params/-/serialize-query-params-1.2.1.tgz#b849d0c004fb6958eabae114e24eb55aa8a50429"
+  integrity sha512-dycN0Cx4cXXIc3E3IaejBHlFWRRO0m/CzIkS41MhjQLwuvRobY1LHgdzPAfUj9sFeSnCmlMQM7iwVdyuhz2PIQ==
 
 set-blocking@^2.0.0:
   version "2.0.0"
