@@ -9,7 +9,7 @@ import {
 import { getSSRSafeSearchString, useUpdateRefIfShallowNew } from './helpers';
 import { useLocationContext } from './LocationProvider';
 import { sharedMemoizedQueryParser } from './memoizedQueryParser';
-import shallowEqual, { shallowEqualMap } from './shallowEqual';
+import shallowEqual from './shallowEqual';
 import { SetQuery, UrlUpdateType } from './types';
 
 type ChangesType<DecodedValueMapType> =
@@ -96,7 +96,7 @@ function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
   }
 
   // keep referential equality for decoded valus if we didn't actually change anything
-  const hasNewDecodedValues = !shallowEqualMap(
+  const hasNewDecodedValues = !shallowEqual(
     decodedValuesCacheRef.current,
     decodedValues,
     paramConfigMap
@@ -156,7 +156,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   useUpdateRefIfShallowNew(encodedValuesCacheRef, encodedValues);
 
   useUpdateRefIfShallowNew(decodedValuesCacheRef, decodedValues, (a, b) =>
-    shallowEqualMap(a, b, paramConfigMap)
+    shallowEqual(a, b, paramConfigMap)
   );
 
   // create a setter for updating multiple query params at once
