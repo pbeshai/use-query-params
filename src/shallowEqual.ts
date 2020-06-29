@@ -30,46 +30,15 @@ function is(x: any, y: any): boolean {
  * Performs equality by iterating through keys on an object and returning false
  * when any key has values which are not strictly equal between the arguments.
  * Returns true when the values of all keys are strictly equal.
- */
-export default function shallowEqual(objA: any, objB: any): boolean {
-  if (is(objA, objB)) {
-    return true;
-  }
 
-  if (
-    typeof objA !== 'object' ||
-    objA === null ||
-    typeof objB !== 'object' ||
-    objB === null
-  ) {
-    return false;
-  }
-
-  const keysA = Object.keys(objA);
-  const keysB = Object.keys(objB);
-
-  if (keysA.length !== keysB.length) {
-    return false;
-  }
-
-  // Test for A's keys different from B.
-  for (let i = 0; i < keysA.length; i++) {
-    if (
-      !hasOwnProperty.call(objB, keysA[i]) ||
-      !is(objA[keysA[i]], objB[keysA[i]])
-    ) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-/**
  * @pbeshai modification of shallowEqual to take into consideration a map providing
  * equals functions
  */
-export function shallowEqualMap(objA: any, objB: any, equalMap: any): boolean {
+export default function shallowEqual(
+  objA: any,
+  objB: any,
+  equalMap?: any
+): boolean {
   if (is(objA, objB)) {
     return true;
   }
@@ -92,7 +61,7 @@ export function shallowEqualMap(objA: any, objB: any, equalMap: any): boolean {
 
   // Test for A's keys different from B.
   for (let i = 0; i < keysA.length; i++) {
-    const isEqual = equalMap[keysA[i]]?.equals ?? is;
+    const isEqual = equalMap?.[keysA[i]]?.equals ?? is;
     if (
       !hasOwnProperty.call(objB, keysA[i]) ||
       !isEqual(objA[keysA[i]], objB[keysA[i]])
