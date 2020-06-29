@@ -92,7 +92,7 @@ export function shallowEqualMap(objA: any, objB: any, equalMap: any): boolean {
 
   // Test for A's keys different from B.
   for (let i = 0; i < keysA.length; i++) {
-    const isEqual = equalMap[keysA[i]].equals ?? is;
+    const isEqual = equalMap[keysA[i]]?.equals ?? is;
     if (
       !hasOwnProperty.call(objB, keysA[i]) ||
       !isEqual(objA[keysA[i]], objB[keysA[i]])
