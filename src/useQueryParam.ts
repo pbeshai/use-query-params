@@ -134,7 +134,7 @@ export const useQueryParam = <D, D2 = D>(
         );
         decodedValueCacheRef.current = latestValue; // keep cache in sync
 
-        newEncodedValue = (newValue as Function)(latestValue);
+        newEncodedValue = paramConfig.encode((newValue as Function)(latestValue));
       } else {
         newEncodedValue = paramConfig.encode(newValue);
       }

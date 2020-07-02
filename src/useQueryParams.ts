@@ -178,7 +178,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
         );
         decodedValuesCacheRef.current = latestValues; // keep cache in sync
 
-        encodedChanges = (changes as Function)(latestValues);
+        encodedChanges = encodeQueryParams(paramConfigMap, (changes as Function)(latestValues));
       } else {
         // encode as strings for the URL
         encodedChanges = encodeQueryParams(paramConfigMap, changes);
