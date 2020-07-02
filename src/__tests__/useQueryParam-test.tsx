@@ -5,6 +5,7 @@ import {
   NumberParam,
   NumericArrayParam,
   DateParam,
+  JsonParam
 } from 'serialize-query-params';
 import { QueryParamProvider, useQueryParam } from '../index';
 import { calledPushQuery, makeMockHistory, makeMockLocation } from './helpers';
@@ -150,6 +151,28 @@ describe('useQueryParam', () => {
     rerender();
     setter((latestValue: number) => latestValue + 100, 'push');
     expect(calledPushQuery(history, 2)).toEqual({ foo: '600' });
+  });
+
+  it('works with functional JsonParam updates', () => {
+    type ParamType = {a: number, b: string};
+    const { wrapper, history, location } = setupWrapper({
+      foo: '{"a":1,"b":"abc"}',
+      bar: 'xxx',
+    });
+    const { result, rerender } = renderHook(
+      () => useQueryParam('foo', JsonParam),
+      {
+        wrapper,
+      }
+    );
+    const [decodedValue, setter] = result.current;
+
+    expect(decodedValue).toEqual({a: 1, b: 'abc'});
+    setter((latestValue: ParamType) => ({...latestValue, a: latestValue.a + 1}), 'push');
+    expect(calledPushQuery(history, 0)).toEqual({ foo: '{"a":2,"b":"abc"}' });
+
+    setter((latestValue: ParamType) => ({...latestValue, b: "yyy"}), 'push');
+    expect(calledPushQuery(history, 1)).toEqual({ foo: '{"a":2,"b":"yyy"}' });
   });
 
   it('properly detects new values when equals is overridden', () => {
