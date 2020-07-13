@@ -7,6 +7,7 @@ import {
   EncodedQuery,
   NumericArrayParam,
   DateParam,
+  JsonParam
 } from 'serialize-query-params';
 
 import { useQueryParams, QueryParamProvider } from '../index';
@@ -260,6 +261,32 @@ describe('useQueryParams', () => {
     rerender();
     setter((latestQuery: any) => ({ foo: latestQuery.foo + 100 }), 'push');
     expect(calledPushQuery(history, 2)).toEqual({ foo: '600' });
+  });
+
+  it('works with functional JsonParam updates', () => {
+    const { wrapper, history, location } = setupWrapper({
+      foo: '{"a":1,"b":"abc"}',
+      bar: 'xxx',
+    });
+    const { result, rerender } = renderHook(
+      () => useQueryParams({ foo: JsonParam, bar: StringParam }),
+      {
+        wrapper,
+      }
+    );
+    const [decodedValue, setter] = result.current;
+
+    expect(decodedValue).toEqual({ foo: {a: 1, b: 'abc'}, bar: 'xxx' });
+    setter(
+      (latestQuery: any) => ({
+        foo: {...latestQuery.foo, a: latestQuery.foo.a + 1},
+      }),
+      'pushIn'
+    );
+    expect(calledPushQuery(history, 0)).toEqual({
+      foo: '{"a":2,"b":"abc"}',
+      bar: 'xxx',
+    });
   });
 
   it('properly detects new values when equals is overridden', () => {
