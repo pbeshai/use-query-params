@@ -103,6 +103,20 @@ describe('useQueryParam', () => {
     expect(setter).toBe(setter2);
   });
 
+  it('does not generate a new setter with each new parameter type', () => {
+    const { wrapper } = setupWrapper({ foo: '123' });
+    const { result, rerender } = renderHook(
+      () => useQueryParam('foo', { ...NumberParam }),
+      {
+        wrapper,
+      }
+    );
+    const [, setter] = result.current;
+    rerender();
+    const [, setter2] = result.current;
+    expect(setter).toBe(setter2);
+  });
+
   it('sets distinct params in the same render', () => {
     const { wrapper } = setupWrapper({
       foo: '1',
@@ -155,11 +169,11 @@ describe('useQueryParam', () => {
 
   it('works with functional JsonParam updates', () => {
     type ParamType = {a: number, b: string};
-    const { wrapper, history, location } = setupWrapper({
+    const { wrapper, history } = setupWrapper({
       foo: '{"a":1,"b":"abc"}',
       bar: 'xxx',
     });
-    const { result, rerender } = renderHook(
+    const { result } = renderHook(
       () => useQueryParam('foo', JsonParam),
       {
         wrapper,

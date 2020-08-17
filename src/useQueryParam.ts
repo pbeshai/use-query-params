@@ -114,36 +114,45 @@ export const useQueryParam = <D, D2 = D>(
   );
 
   // create the setter, memoizing via useCallback
-  const setValue = React.useCallback(
-    function setValueCallback(
-      newValue: NewValueType<D>,
-      updateType?: UrlUpdateType
-    ): void {
-      let newEncodedValue: string | (string | null)[] | null | undefined;
+  const setValueDeps = {
+    paramConfig,
+    name,
+    setLocation,
+    getLocation,
+  };
+  const setValueDepsRef = React.useRef(setValueDeps);
+  setValueDepsRef.current = setValueDeps;
+  const setValue = React.useCallback(function setValueCallback(
+    newValue: NewValueType<D>,
+    updateType?: UrlUpdateType
+  ): void {
+    const deps = setValueDepsRef.current;
+    let newEncodedValue: string | (string | null)[] | null | undefined;
 
-      // allow functional updates #26
-      if (typeof newValue === 'function') {
-        // get latest decoded value to pass as a fresh arg to the setter fn
-        const latestValue = getLatestDecodedValue(
-          getLocation(),
-          name,
-          paramConfig,
-          paramConfigRef,
-          encodedValueCacheRef,
-          decodedValueCacheRef
-        );
-        decodedValueCacheRef.current = latestValue; // keep cache in sync
+    // allow functional updates #26
+    if (typeof newValue === 'function') {
+      // get latest decoded value to pass as a fresh arg to the setter fn
+      const latestValue = getLatestDecodedValue(
+        deps.getLocation(),
+        deps.name,
+        deps.paramConfig,
+        paramConfigRef,
+        encodedValueCacheRef,
+        decodedValueCacheRef
+      );
+      decodedValueCacheRef.current = latestValue; // keep cache in sync
 
-        newEncodedValue = paramConfig.encode((newValue as Function)(latestValue));
-      } else {
-        newEncodedValue = paramConfig.encode(newValue);
-      }
+      newEncodedValue = deps.paramConfig.encode(
+        (newValue as Function)(latestValue)
+      );
+    } else {
+      newEncodedValue = deps.paramConfig.encode(newValue);
+    }
 
-      // update the URL
-      setLocation({ [name]: newEncodedValue }, updateType);
-    },
-    [paramConfig, name, setLocation, getLocation]
-  );
+    // update the URL
+    deps.setLocation({ [deps.name]: newEncodedValue }, updateType);
+  },
+  []);
 
   return [decodedValue, setValue];
 };

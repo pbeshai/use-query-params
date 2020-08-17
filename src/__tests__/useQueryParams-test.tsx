@@ -7,7 +7,7 @@ import {
   EncodedQuery,
   NumericArrayParam,
   DateParam,
-  JsonParam
+  JsonParam,
 } from 'serialize-query-params';
 
 import { useQueryParams, QueryParamProvider } from '../index';
@@ -102,6 +102,20 @@ describe('useQueryParams', () => {
     const [, setter] = result.current;
 
     setter({ foo: 999 }, 'push');
+    rerender();
+    const [, setter2] = result.current;
+    expect(setter).toBe(setter2);
+  });
+
+  it('does not generate a new setter with each new parameter type', () => {
+    const { wrapper } = setupWrapper({ foo: '123' });
+    const { result, rerender } = renderHook(
+      () => useQueryParams({ foo: { ...NumberParam } }),
+      {
+        wrapper,
+      }
+    );
+    const [, setter] = result.current;
     rerender();
     const [, setter2] = result.current;
     expect(setter).toBe(setter2);
@@ -264,11 +278,11 @@ describe('useQueryParams', () => {
   });
 
   it('works with functional JsonParam updates', () => {
-    const { wrapper, history, location } = setupWrapper({
+    const { wrapper, history } = setupWrapper({
       foo: '{"a":1,"b":"abc"}',
       bar: 'xxx',
     });
-    const { result, rerender } = renderHook(
+    const { result } = renderHook(
       () => useQueryParams({ foo: JsonParam, bar: StringParam }),
       {
         wrapper,
