@@ -160,17 +160,26 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   );
 
   // create a setter for updating multiple query params at once
+  const setQueryDeps = {
+    paramConfigMap,
+    setLocation,
+    getLocation,
+  };
+  const setQueryDepsRef = React.useRef(setQueryDeps);
+  setQueryDepsRef.current = setQueryDeps;
   const setQuery = React.useCallback(
     (
       changes: ChangesType<DecodedValueMap<QPCMap>>,
       updateType?: UrlUpdateType
     ) => {
+      const deps = setQueryDepsRef.current;
+
       let encodedChanges: EncodedQuery;
       if (typeof changes === 'function') {
         // get latest decoded value to pass as a fresh arg to the setter fn
         const { decodedValues: latestValues } = getLatestDecodedValues(
-          getLocation(),
-          paramConfigMap,
+          deps.getLocation(),
+          deps.paramConfigMap,
           paramConfigMapRef,
           parsedQueryRef,
           encodedValuesCacheRef,
@@ -178,16 +187,19 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
         );
         decodedValuesCacheRef.current = latestValues; // keep cache in sync
 
-        encodedChanges = encodeQueryParams(paramConfigMap, (changes as Function)(latestValues));
+        encodedChanges = encodeQueryParams(
+          deps.paramConfigMap,
+          (changes as Function)(latestValues)
+        );
       } else {
         // encode as strings for the URL
-        encodedChanges = encodeQueryParams(paramConfigMap, changes);
+        encodedChanges = encodeQueryParams(deps.paramConfigMap, changes);
       }
 
       // update the URL
-      setLocation(encodedChanges, updateType);
+      deps.setLocation(encodedChanges, updateType);
     },
-    [paramConfigMap, setLocation, getLocation]
+    []
   );
 
   // no longer Partial
