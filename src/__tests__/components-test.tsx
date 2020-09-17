@@ -204,3 +204,18 @@ test('date withDefault', () => {
   getByText(/Change/).click();
   expect(queryByText(/x is 2020-06-06/)).toBeTruthy();
 });
+
+test('error when no QueryParamProvider is used', async () => {
+  const history = createMemoryHistory({ initialEntries: ['?x=3'] });
+
+  // silence the react console.error call
+  let errMock = jest.spyOn(console, 'error').mockImplementation(() => {});
+  expect(() =>
+    render(
+      <Router history={history}>
+        <QueryParamExample />
+      </Router>
+    )
+  ).toThrow('useQueryParams must be used within a QueryParamProvider');
+  errMock.mockRestore();
+});
