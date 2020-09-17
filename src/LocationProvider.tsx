@@ -17,15 +17,22 @@ type LocationProviderContext = {
   ) => void;
 };
 
-export const LocationContext = React.createContext<LocationProviderContext>({
+const providerlessContextValue = {
   location: {} as Location,
   getLocation: () => ({} as Location),
   setLocation: () => {},
-});
+};
+
+export const LocationContext = React.createContext<LocationProviderContext>(
+  providerlessContextValue
+);
 
 export function useLocationContext() {
   const context = React.useContext(LocationContext);
-  if (process.env.NODE_ENV === 'development' && context === undefined) {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    (context === undefined || context === providerlessContextValue)
+  ) {
     throw new Error('useQueryParams must be used within a QueryParamProvider');
   }
   return context;
