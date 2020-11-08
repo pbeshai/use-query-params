@@ -83,7 +83,11 @@ function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
     // if we have a new encoded value, re-decode. otherwise reuse cache
     let encodedValue;
     let decodedValue;
-    if (hasNewEncodedValue || encodedValuesCache[paramName] === undefined) {
+    if (
+      hasNewEncodedValue ||
+      (encodedValuesCache[paramName] === undefined &&
+        decodedValuesCache[paramName] === undefined)
+    ) {
       encodedValue = parsedQuery[paramName];
       decodedValue = paramConfig.decode(encodedValue);
     } else {
