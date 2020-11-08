@@ -328,4 +328,62 @@ describe('useQueryParams', () => {
     const [decodedValue3] = result.current;
     expect(decodedValue3.foo).toBe(decodedValue2.foo);
   });
+
+
+  describe('should call custom paramConfig.decode properly', () => {
+    it('when custom paramConfig decode undefined as non-undefined value, should not call decode function when irrelevant update happens', () => {
+      const { wrapper } = setupWrapper({ bar: "1" });
+      const customQueryParam = {
+        encode: (str: string | undefined | null) => str,
+        decode: (str: string | undefined | null) => {
+          if(str === undefined) {
+            return null;
+          }
+          return str;
+        },
+      }
+      const decodeSpy = jest.spyOn(customQueryParam, 'decode');
+      const { result, rerender } = renderHook(
+        () => useQueryParams({ foo: customQueryParam, bar: StringParam }),
+        {
+          wrapper,
+        }
+      );
+
+      const [decodedValue, setter] = result.current;
+      expect(decodedValue).toEqual({ foo: null, bar: "1" });
+      expect(decodeSpy).toHaveBeenCalledTimes(1);
+
+      setter({ bar: "2" });
+      rerender();
+      setter({ bar: "3" });
+      rerender();
+      expect(decodeSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('when custom paramConfig decode undefined as undefined, should call decode function when irrelevant update happens', () => {
+      const { wrapper } = setupWrapper({bar: "1"});
+      const customQueryParam = {
+        encode: (str: string | undefined | null) => str,
+        decode: (str: string | undefined | null) => str,
+      }
+      const decodeSpy = jest.spyOn(customQueryParam, 'decode');
+      const { result, rerender } = renderHook(
+        () => useQueryParams({ foo: customQueryParam, bar: StringParam }),
+        {
+          wrapper,
+        }
+      );
+
+      const [decodedValue, setter] = result.current;
+      expect(decodedValue).toEqual({ foo: undefined, bar: "1" });
+      expect(decodeSpy).toHaveBeenCalledTimes(1);
+
+      setter({ bar: "2" });
+      rerender();
+      setter({ bar: "3" });
+      rerender();
+      expect(decodeSpy).toHaveBeenCalledTimes(3);
+    });
+  });
 });
