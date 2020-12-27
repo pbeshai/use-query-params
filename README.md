@@ -500,7 +500,7 @@ const link = `/?${stringify(encodedQuery)}`;
 // Use one of these:
 <QueryParamProvider ReactRouterRoute={Route}><App /></QueryParamProvider>
 
-<QueryParamProvider reachHistory={globalHisory}><App /></QueryParamProvider>
+<QueryParamProvider reachHistory={globalHistory}><App /></QueryParamProvider>
 
 <QueryParamProvider history={myCustomHistory}><App /></QueryParamProvider>
 
