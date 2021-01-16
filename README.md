@@ -297,7 +297,7 @@ const [query, setQuery] = useQueryParams({ foo: ArrayParam });
 
 **Example with Custom Param**
 
-You can define your own params if the ones shipped with this package don't work for you. There are included [serialization utility functions](https://github.com/pbeshai/use-query-params/blob/master/src/serialize.ts) to make this easier, but you can use whatever you like.
+You can define your own params if the ones shipped with this package don't work for you. There are included [serialization utility functions](https://github.com/pbeshai/serialize-query-params/blob/master/src/serialize.ts) to make this easier, but you can use whatever you like.
 
 ```js
 import {
