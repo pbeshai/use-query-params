@@ -44,7 +44,6 @@ function adaptWindowHistory(history: History): PushReplaceHistory {
   return adaptedWindowHistory;
 }
 
-
 // we use a lazy caching solution to prevent #46 from happening
 let cachedReactRouterHistory: PushReplaceHistory | undefined;
 let cachedAdaptedReactRouterHistory: PushReplaceHistory | undefined;
@@ -55,8 +54,13 @@ let cachedAdaptedReactRouterHistory: PushReplaceHistory | undefined;
  *
  * @param history history provided by react router
  */
-function adaptReactRouterHistory(history: PushReplaceHistory): PushReplaceHistory {
-  if (history === cachedReactRouterHistory && cachedAdaptedReactRouterHistory != null) {
+function adaptReactRouterHistory(
+  history: PushReplaceHistory
+): PushReplaceHistory {
+  if (
+    history === cachedReactRouterHistory &&
+    cachedAdaptedReactRouterHistory != null
+  ) {
     return cachedAdaptedReactRouterHistory;
   }
 
@@ -70,7 +74,7 @@ function adaptReactRouterHistory(history: PushReplaceHistory): PushReplaceHistor
       history.push(location);
     },
     get location() {
-      return window.location;
+      return history.location;
     },
   };
 
@@ -223,7 +227,7 @@ export function QueryParamProvider({
               stringifyOptions={stringifyOptionsCached}
               {...getLocationProps({
                 ...routeProps,
-                history: adaptReactRouterHistory(routeProps.history)
+                history: adaptReactRouterHistory(routeProps.history),
               })}
             >
               {children}
