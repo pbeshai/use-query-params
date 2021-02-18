@@ -44,6 +44,42 @@ function adaptWindowHistory(history: History): PushReplaceHistory {
   return adaptedWindowHistory;
 }
 
+
+// we use a lazy caching solution to prevent #46 from happening
+let cachedReactRouterHistory: PushReplaceHistory | undefined;
+let cachedAdaptedReactRouterHistory: PushReplaceHistory | undefined;
+
+/**
+ * Adapts standard react router history to work with our
+ * { replace, push } interface.
+ *
+ * @param history history provided by react router
+ */
+function adaptReactRouterHistory(history: PushReplaceHistory): PushReplaceHistory {
+  if (history === cachedReactRouterHistory && cachedAdaptedReactRouterHistory != null) {
+    return cachedAdaptedReactRouterHistory;
+  }
+
+  const adaptedHistory = {
+    replace(location: Location) {
+      (location as any).query = null;
+      history.replace(location);
+    },
+    push(location: Location) {
+      (location as any).query = null;
+      history.push(location);
+    },
+    get location() {
+      return window.location;
+    },
+  };
+
+  cachedReactRouterHistory = history;
+  cachedAdaptedReactRouterHistory = adaptedHistory;
+
+  return adaptedHistory;
+}
+
 /**
  * Subset of a @reach/router history object. We only
  * care about the navigate function.
@@ -185,7 +221,10 @@ export function QueryParamProvider({
           return (
             <LocationProvider
               stringifyOptions={stringifyOptionsCached}
-              {...getLocationProps(routeProps)}
+              {...getLocationProps({
+                ...routeProps,
+                history: adaptReactRouterHistory(routeProps.history)
+              })}
             >
               {children}
             </LocationProvider>
