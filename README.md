@@ -281,8 +281,8 @@ Examples in this table assume query parameter named `qp`.
 | DateParam | Date | `Date(2019, 2, 1)` | `?qp=2019-03-01` |
 | BooleanParam | boolean | `true` | `?qp=1` |
 | NumericObjectParam | { key: number } | `{ foo: 1, bar: 2 }` | `?qp=foo-1_bar-2` |
-| DelimitedArrayParam | string[] | `['a','b','c']` | `?qp=a_b_c'` |
-| DelimitedNumericArrayParam | number[] | `[1, 2, 3]` | `?qp=1_2_3'` |
+| DelimitedArrayParam | string[] | `['a','b','c']` | `?qp=a_b_c` |
+| DelimitedNumericArrayParam | number[] | `[1, 2, 3]` | `?qp=1_2_3` |
 
 **Example**
 
