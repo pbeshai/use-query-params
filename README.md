@@ -16,7 +16,7 @@
 <a href="#usage">Usage</a> |
 <a href="#examples">Examples</a> |
 <a href="#api">API</a> |
-<a href="https://peterbeshai.com/use-query-params/">Demo</a>
+<a href="https://pbeshai.github.com/use-query-params/">Demo</a>
 
 </div>
 <hr/>

@@ -8,7 +8,7 @@ import {
 } from 'use-query-params';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import nanoid from 'nanoid';
+import { nanoid } from 'nanoid';
 
 const UseQueryParamsExample = () => {
   const [query, setQuery] = useQueryParams({
