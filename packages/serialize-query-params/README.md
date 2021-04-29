@@ -11,12 +11,12 @@
 
 <a href="#installation">Installation</a> | 
 <a href="#api">API</a> |
-<a href="https://peterbeshai.com/use-query-params/">useQueryParams</a>
+<a href="https://pbeshai.github.io/use-query-params/">useQueryParams</a>
 
 </div>
 <hr/>
 
-Used in React with [use-query-params](https://github.com/pbeshai/use-query-params).
+Used in React with [use-query-params](../use-query-params).
 
 ### Installation
 
@@ -35,14 +35,14 @@ Note: There is a peer dependency on [query-string](https://github.com/sindresorh
 - [encodeQueryParams](#encodequeryparams)
 - [updateLocation](#usequeryparam)
 - [updateLocationIn](#usequeryparams-1)
-- [Type Definitions](https://github.com/pbeshai/use-query-params/blob/master/packages/serialize-query-params/src/types.ts)
-- [Serialization Utility Functions](https://github.com/pbeshai/use-query-params/blob/master/packages/serialize-query-params/src/serialize.ts)
+- [Type Definitions](./src/types.ts)
+- [Serialization Utility Functions](./src/serialize.ts)
 
 
 
 
 #### Param Types
-See [all param definitions here](https://github.com/pbeshai/use-query-params/blob/master/packages/serialize-query-params/src/params.ts). You can define your own parameter types by creating an object with an `encode` and a `decode` function. See the existing definitions for examples.
+See [all param definitions here](./src/params.ts). You can define your own parameter types by creating an object with an `encode` and a `decode` function. See the existing definitions for examples.
 
 Note that all null and empty values are typically treated as follows:
 
@@ -95,7 +95,7 @@ const NeverUndefinedArrayParam = withDefault(ArrayParam, [], false);
 
 **Example with Custom Param**
 
-You can define your own params if the ones shipped with this package don't work for you. There are included [serialization utility functions](https://github.com/pbeshai/use-query-params/blob/master/packages/serialize-query-params/src/serialize.ts) to make this easier, but you can use whatever you like.
+You can define your own params if the ones shipped with this package don't work for you. There are included [serialization utility functions](./src/serialize.ts) to make this easier, but you can use whatever you like.
 
 ```js
 import {

@@ -21,7 +21,7 @@
 </div>
 <hr/>
 
-When creating apps with easily shareable URLs, you often want to encode state as query parameters, but all query parameters must be encoded as strings. `useQueryParams` allows you to easily encode and decode data of any type as query parameters with smart memoization to prevent creating unnecessary duplicate objects. It uses [serialize-query-params](https://github.com/pbeshai/use-query-params/tree/master/packages/serialize-query-params/).
+When creating apps with easily shareable URLs, you often want to encode state as query parameters, but all query parameters must be encoded as strings. `useQueryParams` allows you to easily encode and decode data of any type as query parameters with smart memoization to prevent creating unnecessary duplicate objects. It uses [serialize-query-params](../serialize-query-params/).
 
 
 ### Installation
@@ -34,7 +34,7 @@ $ npm install --save use-query-params query-string
 
 Note: There is a peer dependency on [query-string](https://github.com/sindresorhus/query-string). For IE11 support, use v5.1.1, otherwise use v6.
 
-Link your routing system (e.g., [React Router example](https://github.com/pbeshai/use-query-params/blob/master/packages/use-query-params/examples/react-router/src/index.tsx), [Reach Router example](https://github.com/pbeshai/use-query-params/blob/master/packages/use-query-params/examples/reach-router/src/index.tsx)):
+Link your routing system (e.g., [React Router example](./examples/react-router/src/index.tsx), [Reach Router example](./examples/reach-router/src/index.tsx)):
 
 ```js
 import React from 'react';
@@ -227,10 +227,10 @@ export default RenderPropsExample;
 
 ### Examples
 
-A few basic [examples](https://github.com/pbeshai/use-query-params/tree/master/examples) have been put together to demonstrate how `useQueryParams` works with different routing systems.
+A few basic [examples](./examples) have been put together to demonstrate how `useQueryParams` works with different routing systems.
 
-- [React Router Example](https://github.com/pbeshai/use-query-params/tree/master/examples/react-router)
-- [Reach Router Example](https://github.com/pbeshai/use-query-params/tree/master/examples/reach-router)
+- [React Router Example](./examples/react-router)
+- [Reach Router Example](./examples/reach-router)
 
 The React Router and Reach Router examples contain simple tests showing how to use the library with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro).
 
@@ -244,10 +244,10 @@ The React Router and Reach Router examples contain simple tests showing how to u
 - [QueryParams](#queryparams)
 - [encodeQueryParams](#encodequeryparams)
 - [QueryParamProvider](#queryparamprovider)
-- [Type Definitions](https://github.com/pbeshai/use-query-params/blob/master/packages/use-query-params/src/types.ts) and from [serialize-query-params](https://github.com/pbeshai/use-query-params/blob/master/packages/serialize-query-params/src/types.ts).
-- [Serialization Utility Functions](https://github.com/pbeshai/use-query-params/blob/master/packages/serialize-query-params/src/serialize.ts)
+- [Type Definitions](./src/types.ts) and from [serialize-query-params](../serialize-query-params/src/types.ts).
+- [Serialization Utility Functions](../serialize-query-params/src/serialize.ts)
 
-For convenience, use-query-params exports all of the [serialize-query-params](https://github.com/pbeshai/use-query-params/tree/master/packages/serialize-query-params) library.
+For convenience, use-query-params exports all of the [serialize-query-params](../serialize-query-params) library.
 
 #### UrlUpdateType
 
@@ -259,7 +259,7 @@ The `UrlUpdateType` is a string type definings the different methods for updatin
  - `'replace'`: Replace all parameters with just those specified
  
 #### Param Types
-See [all param definitions from serialize-query-params here](https://github.com/pbeshai/use-query-params/blob/master/packages/serialize-query-params/src/params.ts). You can define your own parameter types by creating an object with an `encode` and a `decode` function. See the existing definitions for examples.
+See [all param definitions from serialize-query-params here](../serialize-query-params/src/params.ts). You can define your own parameter types by creating an object with an `encode` and a `decode` function. See the existing definitions for examples.
 
 Note that all null and empty values are typically treated as follows:
 
@@ -297,7 +297,7 @@ const [query, setQuery] = useQueryParams({ foo: ArrayParam });
 
 **Example with Custom Param**
 
-You can define your own params if the ones shipped with this package don't work for you. There are included [serialization utility functions](https://github.com/pbeshai/use-query-params/blob/master/packages/serialize-query-params/src/serialize.ts) to make this easier, but you can use whatever you like.
+You can define your own params if the ones shipped with this package don't work for you. There are included [serialization utility functions](../serialize-query-params/src/serialize.ts) to make this easier, but you can use whatever you like.
 
 ```js
 import {
@@ -441,7 +441,7 @@ const MyComponent = ({ query, setQuery, ...others }) => {
 export default withQueryParams({ foo: NumberParam, bar: StringParam }, MyComponent);
 ```
 
-Note there is also a variant called `withQueryParamsMapped` that allows you to do a react-redux style mapStateToProps equivalent. See [the code](https://github.com/pbeshai/use-query-params/blob/master/packages/use-query-params/src/withQueryParams.tsx#L51) or [this example](https://github.com/pbeshai/use-query-params/blob/master/packages/use-query-params/examples/react-router/src/ReadmeExample3Mapped.tsx) for details.
+Note there is also a variant called `withQueryParamsMapped` that allows you to do a react-redux style mapStateToProps equivalent. See [the code](./src/withQueryParams.tsx#L51) or [this example](./examples/react-router/src/ReadmeExample3Mapped.tsx) for details.
 
 <br/>
 
@@ -530,8 +530,8 @@ the URL and have the rest of your app know about it.
 
 See the tests or these examples for how to use it:
 
-- [React Router Example](https://github.com/pbeshai/use-query-params/tree/master/examples/react-router)
-- [Reach Router Example](https://github.com/pbeshai/use-query-params/tree/master/examples/reach-router)
+- [React Router Example](./examples/react-router)
+- [Reach Router Example](./examples/reach-router)
 
 
 **Example (Reach Router)**
