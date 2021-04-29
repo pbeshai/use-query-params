@@ -1,4 +1,12 @@
 language: node_js
 node_js:
-  - "12"
+  - "14"
 cache: npm
+
+before_script:
+  # install dependencies for subpackages
+  - lerna bootstrap --hoist
+  # force linking the local packages so use-query-params has serialize-query-params
+  - lerna link
+  # transpile the typescript so we can run tests (uqp depends on sqp)
+  - npm run build

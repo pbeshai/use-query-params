@@ -2,12 +2,21 @@
   "name": "root",
   "private": true,
   "devDependencies": {
-    "lerna": "^4.0.0"
+    "lerna": "^4.0.0",
+    "@babel/core": "^7.13.16",
+    "@babel/preset-env": "^7.13.15",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/jest": "^26.0.23",
+    "babel-jest": "^26.6.3",
+    "jest": "^26.6.3",
+    "query-string": "^6.12.1",
+    "typescript": "^4.2.4",
+    "rimraf": "^3.0.2"
   },
   "scripts": {
     "build": "lerna run build --stream",
-    "jest": "jest -w 1 --projects ./packages/*/",
-    "test": "lerna run test --stream",
+    "test": "jest -w 1 --projects ./packages/*/",
+    "test:lerna": "lerna run test --stream",
     "lint": "lerna run lint",
     "prettier": "lerna run prettier"
   }
