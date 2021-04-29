@@ -14,10 +14,10 @@
     "rimraf": "^3.0.2"
   },
   "scripts": {
-    "build": "lerna run build --stream",
+    "build": "lerna run build --scope \"*-query-params\" --stream",
     "test": "jest -w 1 --projects ./packages/*/",
-    "test:lerna": "lerna run test --stream",
-    "lint": "lerna run lint",
-    "prettier": "lerna run prettier"
+    "test:lerna": "lerna run test --scope \"*-query-params\"  --stream",
+    "lint": "lerna run lint --scope \"*-query-params\"",
+    "prettier": "lerna run prettier --scope \"*-query-params\" "
   }
 }
