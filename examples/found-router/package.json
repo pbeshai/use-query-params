@@ -1,19 +1,20 @@
 {
-  "name": "no-router",
+  "name": "found-router-example",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "history": "^4.10.1",
+    "found": "^0.4.7",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-scripts": "3.1.1",
-    "use-query-params": "^0.4.0"
+    "use-query-params": "*"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "preinstall": "npm link ../../node_modules/react"
   },
   "eslintConfig": {
     "extends": "react-app"

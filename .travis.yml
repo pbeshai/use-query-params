@@ -5,8 +5,8 @@ cache: npm
 
 before_script:
   # install dependencies for subpackages
-  - lerna bootstrap --hoist
+  - lerna bootstrap --hoist --scope "use-query-params" --scope "serialize-query-params"
   # force linking the local packages so use-query-params has serialize-query-params
-  - lerna link
+  - lerna link --scope "use-query-params" --scope "serialize-query-params"
   # transpile the typescript so we can run tests (uqp depends on sqp)
   - npm run build

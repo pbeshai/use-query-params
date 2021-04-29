@@ -1,5 +1,5 @@
 {
-  "name": "react-router-6",
+  "name": "react-router-6-example",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -13,14 +13,15 @@
     "react-router": "^6.0.0-beta.0",
     "react-router-dom": "^6.0.0-beta.0",
     "react-scripts": "4.0.3",
-    "use-query-params": "^1.2.0",
+    "use-query-params": "*",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "preinstall": "npm link ../../node_modules/react"
   },
   "eslintConfig": {
     "extends": [

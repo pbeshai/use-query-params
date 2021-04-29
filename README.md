@@ -30,3 +30,29 @@ This is a monorepo managed with [Lerna](https://github.com/lerna/lerna).
 | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
 | [`use-query-params`](/packages/use-query-params)              | [![npm](https://img.shields.io/npm/v/use-query-params.svg?style=flat-square)](https://www.npmjs.com/package/use-query-params)             | [![](https://img.shields.io/badge/API%20Docs-readme-orange.svg?style=flat-square)](/packages/use-query-params/#readme)       | use-query-params React library    |
 | [`serialize-query-params`](/packages/serialize-query-params)  | [![npm](https://img.shields.io/npm/v/serialize-query-params.svg?style=flat-square)](https://www.npmjs.com/package/serialize-query-params) | [![](https://img.shields.io/badge/API%20Docs-readme-orange.svg?style=flat-square)](/packages/serialize-query-params/#readme) | serialize-query-params js library |
+
+
+
+## Development
+
+To get running locally:
+
+```
+npm install
+npx lerna bootstrap --hoist --scope "use-query-params" --scope "serialize-query-params"
+npm build
+npm test
+```
+
+Set up examples:
+
+```
+lerna bootstrap --scope "*-example"
+lerna link
+```
+
+Then run one:
+
+```
+lerna run --scope react-router-example start
+```
