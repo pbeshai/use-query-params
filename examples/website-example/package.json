@@ -1,5 +1,5 @@
 {
-  "name": "demo",
+  "name": "website-example",
   "version": "0.1.0",
   "private": true,
   "homepage": "https://pbeshai.github.com/use-query-params",
@@ -19,14 +19,15 @@
     "react-scripts": "4.0.3",
     "react-syntax-highlighter": "^15.4.3",
     "typescript": "^4.2.3",
-    "use-query-params": "^1.2.2"
+    "use-query-params": "*"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "copy-build": "rsync -vaHE --delete ./build/ ../../docs/"
+    "copy-build": "rsync -vaHE --delete ./build/ ../../docs/",
+    "preinstall": "npm link ../../node_modules/react"
   },
   "eslintConfig": {
     "extends": "react-app"

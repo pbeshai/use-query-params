@@ -28,7 +28,7 @@ export function withQueryParams<
 
     // see https://github.com/microsoft/TypeScript/issues/28938#issuecomment-450636046 for why `...props as P`
     return (
-      <WrappedComponent query={query} setQuery={setQuery} {...(props as P)} />
+      <WrappedComponent query={query} setQuery={setQuery} {...(props as any)} />
     );
   };
   Component.displayName = `withQueryParams(${

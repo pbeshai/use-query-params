@@ -1,5 +1,5 @@
 {
-  "name": "demo",
+  "name": "react-router-example",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -15,13 +15,14 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.8",
     "typescript": "^3.3.3333",
-    "use-query-params": "file:../.."
+    "use-query-params": "*"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "preinstall": "npm link ../../node_modules/react"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -1,19 +1,5 @@
 // babel.config.js
 module.exports = {
-  env: {
-    test: {
-      presets: [
-        [
-          '@babel/preset-env',
-          {
-            targets: {
-              node: 'current',
-            },
-          },
-        ],
-        '@babel/preset-react',
-        '@babel/preset-typescript',
-      ],
-    },
-  },
-};
+  // jest: https://github.com/facebook/jest/issues/7359
+  babelrcRoots: ['packages/*'],
+}
