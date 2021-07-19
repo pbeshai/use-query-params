@@ -34,7 +34,7 @@ $ npm install --save use-query-params query-string
 
 Note: There is a peer dependency on [query-string](https://github.com/sindresorhus/query-string). For IE11 support, use v5.1.1, otherwise use v6.
 
-Link your routing system (e.g., [React Router example](./examples/react-router/src/index.tsx), [Reach Router example](./examples/reach-router/src/index.tsx)):
+Link your routing system (e.g., [React Router example](../../examples/react-router/src/index.tsx), [Reach Router example](../../examples/reach-router/src/index.tsx)):
 
 ```js
 import React from 'react';
@@ -227,10 +227,10 @@ export default RenderPropsExample;
 
 ### Examples
 
-A few basic [examples](./examples) have been put together to demonstrate how `useQueryParams` works with different routing systems.
+A few basic [examples](../../examples) have been put together to demonstrate how `useQueryParams` works with different routing systems.
 
-- [React Router Example](./examples/react-router)
-- [Reach Router Example](./examples/reach-router)
+- [React Router Example](../../examples/react-router)
+- [Reach Router Example](../../examples/reach-router)
 
 The React Router and Reach Router examples contain simple tests showing how to use the library with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro).
 
@@ -441,7 +441,7 @@ const MyComponent = ({ query, setQuery, ...others }) => {
 export default withQueryParams({ foo: NumberParam, bar: StringParam }, MyComponent);
 ```
 
-Note there is also a variant called `withQueryParamsMapped` that allows you to do a react-redux style mapStateToProps equivalent. See [the code](./src/withQueryParams.tsx#L51) or [this example](./examples/react-router/src/ReadmeExample3Mapped.tsx) for details.
+Note there is also a variant called `withQueryParamsMapped` that allows you to do a react-redux style mapStateToProps equivalent. See [the code](./src/withQueryParams.tsx#L51) or [this example](../../examples/react-router/src/ReadmeExample3Mapped.tsx) for details.
 
 <br/>
 
@@ -530,8 +530,8 @@ the URL and have the rest of your app know about it.
 
 See the tests or these examples for how to use it:
 
-- [React Router Example](./examples/react-router)
-- [Reach Router Example](./examples/reach-router)
+- [React Router Example](../../examples/react-router)
+- [Reach Router Example](../../examples/reach-router)
 
 
 **Example (Reach Router)**
