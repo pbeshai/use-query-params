@@ -17,7 +17,7 @@ export const StringParam: QueryParamConfig<
  */
 export const createEnumParam = <T extends string>(
   enumValues: T[]
-): QueryParamConfig<string | null | undefined, T | null | undefined> => ({
+): QueryParamConfig<T | null | undefined, T | null | undefined> => ({
   encode: Serialize.encodeString,
   decode: input => Serialize.decodeEnum(input, enumValues),
 })
