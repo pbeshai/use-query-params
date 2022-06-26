@@ -85,5 +85,6 @@ typings/
 
 lib/
 esm/
+dist/
 .DS_Store
 examples/**/package-lock.json
