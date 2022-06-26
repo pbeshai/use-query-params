@@ -29,7 +29,7 @@ const QueryParamExample = () => {
   return (
     <div>
       <h1>{`x is ${x}`}</h1>
-      <button onClick={() => setX(x + 1)}>Change</button>
+      <button onClick={() => setX(x! + 1)}>Change</button>
     </div>
   );
 };
@@ -119,7 +119,7 @@ test('useEffect clobber example', async () => {
 
   // wait for next tick (dont know how to make it do this otherwise...)
   // (await screen.findByText('click-dummy')).click();
-  await new Promise((resolve) => setTimeout(() => resolve(), 0));
+  await new Promise((resolve) => setTimeout(() => resolve(true), 0));
   // verify we are still on second page
   getByText(/link-to-first/);
 });
@@ -161,7 +161,7 @@ test('issue 46', async () => {
   getByText('b: 3');
 
   // wait for use effect
-  await new Promise((resolve) => setTimeout(() => resolve(), 0));
+  await new Promise((resolve) => setTimeout(() => resolve(true), 0));
   getByText('a: 2');
   getByText('b: 3');
 
@@ -174,7 +174,7 @@ test('issue 46', async () => {
   getByText('b: 4');
 
   // wait for another tick for good measure
-  await new Promise((resolve) => setTimeout(() => resolve(), 0));
+  await new Promise((resolve) => setTimeout(() => resolve(true), 0));
   getByText('a: 4');
   getByText('b: 4');
 });

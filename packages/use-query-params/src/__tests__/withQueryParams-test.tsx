@@ -57,8 +57,11 @@ describe('withQueryParams', () => {
       wrapper,
     });
 
+    // @ts-ignore
     expect(getByText(/other = zing/)).toBeInTheDocument();
+    // @ts-ignore
     expect(getByText(/foo = 123/)).toBeInTheDocument();
+    // @ts-ignore
     expect(getByText(/bar = xxx/)).toBeInTheDocument();
     getByText(/change foo/).click();
     expect(calledPushQuery(history, 0)).toEqual({ foo: '99', bar: 'xxx' });

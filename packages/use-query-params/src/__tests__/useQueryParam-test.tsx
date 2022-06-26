@@ -5,7 +5,7 @@ import {
   NumberParam,
   NumericArrayParam,
   DateParam,
-  JsonParam
+  JsonParam,
 } from 'serialize-query-params';
 import { QueryParamProvider, useQueryParam } from '../index';
 import { calledPushQuery, makeMockHistory, makeMockLocation } from './helpers';
@@ -154,38 +154,38 @@ describe('useQueryParam', () => {
     const [decodedValue, setter] = result.current;
 
     expect(decodedValue).toBe(123);
-    setter((latestValue: number) => latestValue + 100, 'push');
+    setter((latestValue) => latestValue! + 100, 'push');
     expect(calledPushQuery(history, 0)).toEqual({ foo: '223' });
 
-    setter((latestValue: number) => latestValue + 110, 'push');
+    setter((latestValue) => latestValue! + 110, 'push');
     expect(calledPushQuery(history, 1)).toEqual({ foo: '333' });
 
     // use a stale setter
     location.search = '?foo=500';
     rerender();
-    setter((latestValue: number) => latestValue + 100, 'push');
+    setter((latestValue) => latestValue! + 100, 'push');
     expect(calledPushQuery(history, 2)).toEqual({ foo: '600' });
   });
 
   it('works with functional JsonParam updates', () => {
-    type ParamType = {a: number, b: string};
+    type ParamType = { a: number; b: string };
     const { wrapper, history } = setupWrapper({
       foo: '{"a":1,"b":"abc"}',
       bar: 'xxx',
     });
-    const { result } = renderHook(
-      () => useQueryParam('foo', JsonParam),
-      {
-        wrapper,
-      }
-    );
+    const { result } = renderHook(() => useQueryParam('foo', JsonParam), {
+      wrapper,
+    });
     const [decodedValue, setter] = result.current;
 
-    expect(decodedValue).toEqual({a: 1, b: 'abc'});
-    setter((latestValue: ParamType) => ({...latestValue, a: latestValue.a + 1}), 'push');
+    expect(decodedValue).toEqual({ a: 1, b: 'abc' });
+    setter(
+      (latestValue: ParamType) => ({ ...latestValue, a: latestValue.a + 1 }),
+      'push'
+    );
     expect(calledPushQuery(history, 0)).toEqual({ foo: '{"a":2,"b":"abc"}' });
 
-    setter((latestValue: ParamType) => ({...latestValue, b: "yyy"}), 'push');
+    setter((latestValue: ParamType) => ({ ...latestValue, b: 'yyy' }), 'push');
     expect(calledPushQuery(history, 1)).toEqual({ foo: '{"a":2,"b":"yyy"}' });
   });
 
@@ -213,5 +213,21 @@ describe('useQueryParam', () => {
     rerender();
     const [decodedValue3] = result.current;
     expect(decodedValue3).toBe(decodedValue2);
+  });
+
+  it.skip('reuses decoded value', () => {
+    const { wrapper } = setupWrapper({
+      foo: '1',
+    });
+    const { result } = renderHook(
+      () => [
+        useQueryParam('foo', NumericArrayParam),
+        useQueryParam('foo', NumericArrayParam),
+      ],
+      { wrapper }
+    );
+    const [[foo1], [foo2]] = result.current;
+    expect([foo1, foo2]).toEqual([[1], [1]]);
+    expect(foo1).toBe(foo2);
   });
 });

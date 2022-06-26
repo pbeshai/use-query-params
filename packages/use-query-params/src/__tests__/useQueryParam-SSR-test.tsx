@@ -6,10 +6,11 @@ import { useQueryParam } from '../useQueryParam';
 import { renderToString } from 'react-dom/server';
 import QueryParamProvider from '../QueryParamProvider';
 import { makeMockLocation } from './helpers';
+import { StringParam } from 'serialize-query-params';
 
 test('SSR initial query param', () => {
   const Component = () => {
-    const [foo] = useQueryParam('foo');
+    const [foo] = useQueryParam('foo', StringParam);
 
     return <div>{foo}</div>;
   };
