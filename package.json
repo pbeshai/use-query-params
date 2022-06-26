@@ -16,8 +16,12 @@
   "scripts": {
     "build": "lerna run build --scope \"*-query-params\" --stream",
     "test": "jest -w 1 --projects ./packages/*/",
+    "test:uqp": "jest -w 1 --projects ./packages/use-query-params/ --watch",
     "test:lerna": "lerna run test --scope \"*-query-params\"  --stream",
     "lint": "lerna run lint --scope \"*-query-params\"",
     "prettier": "lerna run prettier --scope \"*-query-params\" "
+  },
+  "dependencies": {
+    "@better-builds/package-bundler": "^1.3.1"
   }
 }

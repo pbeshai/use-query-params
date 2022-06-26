@@ -21,6 +21,7 @@
     "node_modules",
     "lib",
     "esm",
+    "dist",
     "**/__tests__",
     "*-test.js",
     "*-test.jsx",
