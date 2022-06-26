@@ -163,11 +163,15 @@ describe('useQueryParams', () => {
   it('allows the config to change over time', () => {
     const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
     const { result, rerender } = renderHook(
-      ({ config }: any) => useQueryParams(config),
+      ({ config }) => useQueryParams(config),
       {
         wrapper,
         initialProps: {
-          config: { foo: NumberParam, bar: StringParam, baz: ArrayParam },
+          config: {
+            foo: NumberParam,
+            bar: StringParam,
+            baz: ArrayParam,
+          } as any,
         },
       }
     );
@@ -290,10 +294,10 @@ describe('useQueryParams', () => {
     );
     const [decodedValue, setter] = result.current;
 
-    expect(decodedValue).toEqual({ foo: {a: 1, b: 'abc'}, bar: 'xxx' });
+    expect(decodedValue).toEqual({ foo: { a: 1, b: 'abc' }, bar: 'xxx' });
     setter(
       (latestQuery: any) => ({
-        foo: {...latestQuery.foo, a: latestQuery.foo.a + 1},
+        foo: { ...latestQuery.foo, a: latestQuery.foo.a + 1 },
       }),
       'pushIn'
     );
@@ -329,19 +333,18 @@ describe('useQueryParams', () => {
     expect(decodedValue3.foo).toBe(decodedValue2.foo);
   });
 
-
   describe('should call custom paramConfig.decode properly', () => {
     it('when custom paramConfig decode undefined as non-undefined value, should not call decode function when irrelevant update happens', () => {
-      const { wrapper } = setupWrapper({ bar: "1" });
+      const { wrapper } = setupWrapper({ bar: '1' });
       const customQueryParam = {
         encode: (str: string | undefined | null) => str,
-        decode: (str: string | undefined | null) => {
-          if(str === undefined) {
+        decode: (str: string | (string | null)[] | undefined | null) => {
+          if (str === undefined) {
             return null;
           }
           return str;
         },
-      }
+      };
       const decodeSpy = jest.spyOn(customQueryParam, 'decode');
       const { result, rerender } = renderHook(
         () => useQueryParams({ foo: customQueryParam, bar: StringParam }),
@@ -351,22 +354,22 @@ describe('useQueryParams', () => {
       );
 
       const [decodedValue, setter] = result.current;
-      expect(decodedValue).toEqual({ foo: null, bar: "1" });
+      expect(decodedValue).toEqual({ foo: null, bar: '1' });
       expect(decodeSpy).toHaveBeenCalledTimes(1);
 
-      setter({ bar: "2" });
+      setter({ bar: '2' });
       rerender();
-      setter({ bar: "3" });
+      setter({ bar: '3' });
       rerender();
       expect(decodeSpy).toHaveBeenCalledTimes(1);
     });
 
     it('when custom paramConfig decode undefined as undefined, should call decode function when irrelevant update happens', () => {
-      const { wrapper } = setupWrapper({bar: "1"});
+      const { wrapper } = setupWrapper({ bar: '1' });
       const customQueryParam = {
         encode: (str: string | undefined | null) => str,
-        decode: (str: string | undefined | null) => str,
-      }
+        decode: (str: string | (string | null)[] | undefined | null) => str,
+      };
       const decodeSpy = jest.spyOn(customQueryParam, 'decode');
       const { result, rerender } = renderHook(
         () => useQueryParams({ foo: customQueryParam, bar: StringParam }),
@@ -376,12 +379,12 @@ describe('useQueryParams', () => {
       );
 
       const [decodedValue, setter] = result.current;
-      expect(decodedValue).toEqual({ foo: undefined, bar: "1" });
+      expect(decodedValue).toEqual({ foo: undefined, bar: '1' });
       expect(decodeSpy).toHaveBeenCalledTimes(1);
 
-      setter({ bar: "2" });
+      setter({ bar: '2' });
       rerender();
-      setter({ bar: "3" });
+      setter({ bar: '3' });
       rerender();
       expect(decodeSpy).toHaveBeenCalledTimes(3);
     });

@@ -15,7 +15,7 @@ describe('QueryParamProvider', () => {
     const reachHistory = { navigate: jest.fn() };
 
     const tree = (
-      <QueryParamProvider reachHistory={reachHistory}>
+      <QueryParamProvider reachHistory={reachHistory as any}>
         {({ history }) => {
           history.replace(makeMockLocation({ foo: '123' }));
           history.push(makeMockLocation({ bar: 'zzz' }));
