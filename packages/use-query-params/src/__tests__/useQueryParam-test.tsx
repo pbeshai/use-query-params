@@ -9,6 +9,7 @@ import {
 } from 'serialize-query-params';
 import { QueryParamProvider, useQueryParam } from '../index';
 import { calledPushQuery, makeMockHistory, makeMockLocation } from './helpers';
+import { describe, it, vi, test } from 'vitest';
 
 // helper to setup tests
 function setupWrapper(query: EncodedQuery) {

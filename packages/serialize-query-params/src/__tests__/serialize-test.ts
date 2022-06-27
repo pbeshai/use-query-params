@@ -1,3 +1,4 @@
+import { describe, it, vi, test } from 'vitest';
 import {
   encodeDate,
   decodeDate,
@@ -150,7 +151,7 @@ describe('serialize', () => {
   });
 
   describe('decodeEnum', () => {
-    const enumValues = ['foo', 'bar']
+    const enumValues = ['foo', 'bar'];
 
     it('produces the correct value', () => {
       expect(decodeEnum('foo', enumValues)).toBe('foo');
@@ -164,7 +165,7 @@ describe('serialize', () => {
     it('handles array of values', () => {
       expect(decodeEnum(['foo', 'bar'], enumValues)).toBe('foo');
     });
-  })
+  });
 
   describe('decodeArrayEnum', () => {
     type Color = 'red' | 'green' | 'blue';

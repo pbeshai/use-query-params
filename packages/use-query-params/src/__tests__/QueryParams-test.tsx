@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { describe, it, vi, test } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 

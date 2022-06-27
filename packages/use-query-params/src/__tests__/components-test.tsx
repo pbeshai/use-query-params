@@ -1,3 +1,4 @@
+import { describe, it, vi, test } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 import { parse } from 'query-string';
@@ -209,7 +210,7 @@ test('error when no QueryParamProvider is used', async () => {
   const history = createMemoryHistory({ initialEntries: ['?x=3'] });
 
   // silence the react console.error call
-  let errMock = jest.spyOn(console, 'error').mockImplementation(() => {});
+  let errMock = vi.spyOn(console, 'error').mockImplementation(() => {});
   expect(() =>
     render(
       <Router history={history}>

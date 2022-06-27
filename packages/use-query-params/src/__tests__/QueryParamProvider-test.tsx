@@ -1,10 +1,11 @@
 import * as React from 'react';
+import { describe, it, vi } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import { QueryParamProvider } from '../QueryParamProvider';
 import { makeMockLocation, makeMockHistory } from './helpers';
 
 // ¯\_(ツ)_/¯
-jest.mock('../LocationProvider', () => ({
+vi.mock('../LocationProvider', () => ({
   LocationProvider: ({ history, children }) => children({ history }),
 }));
 
@@ -12,13 +13,13 @@ describe('QueryParamProvider', () => {
   afterEach(cleanup);
 
   it('works with @reach/router style history', () => {
-    const reachHistory = { navigate: jest.fn() };
+    const reachHistory = { navigate: vi.fn() };
 
     const tree = (
       <QueryParamProvider reachHistory={reachHistory as any}>
         {({ history }) => {
-          history.replace(makeMockLocation({ foo: '123' }));
-          history.push(makeMockLocation({ bar: 'zzz' }));
+          history.replace(makeMockLocation({ foo: '123' }, true));
+          history.push(makeMockLocation({ bar: 'zzz' }, true));
           return <div>consumed</div>;
         }}
       </QueryParamProvider>
