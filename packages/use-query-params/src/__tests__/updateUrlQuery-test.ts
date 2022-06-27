@@ -8,7 +8,7 @@ import {
 import { UrlUpdateType } from '../types';
 import { describe, it, vi, test } from 'vitest';
 
-describe('createLocationWithChanges and updateUrlQuery', () => {
+describe.skip('createLocationWithChanges and updateUrlQuery', () => {
   function getAndUpdateLocation(
     queryReplacements,
     location,

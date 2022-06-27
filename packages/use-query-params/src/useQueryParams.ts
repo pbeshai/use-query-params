@@ -8,7 +8,7 @@ import {
 } from 'serialize-query-params';
 import { getSSRSafeSearchString, useUpdateRefIfShallowNew } from './helpers';
 import { useLocationContext } from './LocationProvider';
-import { sharedMemoizedQueryParser } from './memoizedQueryParser';
+import { memoizeParseParams } from './memoizeParseParams';
 import shallowEqual from './shallowEqual';
 import { SetQuery, UrlUpdateType } from './types';
 

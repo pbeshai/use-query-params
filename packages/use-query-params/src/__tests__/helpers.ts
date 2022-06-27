@@ -1,6 +1,36 @@
 import { parse as parseQueryString, stringify } from 'query-string';
 import { EncodedQuery } from 'serialize-query-params';
 import { vi } from 'vitest';
+import {
+  PartialLocation,
+  QueryParamAdapter,
+  QueryParamAdapterComponent,
+} from '../types';
+
+export function makeMockAdapter(
+  currentLocation: PartialLocation
+): QueryParamAdapterComponent {
+  const adapter = {
+    replace: vi
+      .fn()
+      .mockImplementation((newLocation) =>
+        Object.assign(currentLocation, newLocation)
+      ),
+    push: vi
+      .fn()
+      .mockImplementation((newLocation) =>
+        Object.assign(currentLocation, newLocation)
+      ),
+    getCurrentLocation() {
+      return currentLocation;
+    },
+  };
+
+  const Adapter = ({ children }) => children(adapter);
+  Adapter.adapter = adapter;
+
+  return Adapter;
+}
 
 // if passed a location, will mutate it so we can see what changes are being made
 export function makeMockHistory(location: any = {}) {
@@ -28,11 +58,8 @@ export function calledReplaceQuery(
 }
 
 // helper to get the query params from the updated location
-export function calledPushQuery(
-  history: ReturnType<typeof makeMockHistory>,
-  index: number = 0
-) {
-  return parseQueryString(history.push.mock.calls[index][0].search);
+export function calledPushQuery(adapter: QueryParamAdapter, index: number = 0) {
+  return parseQueryString(adapter.push.mock.calls[index][0].search);
 }
 
 export function makeMockLocation(

@@ -4,7 +4,7 @@ import {
   updateInLocation,
   ExtendedStringifyOptions,
 } from 'serialize-query-params';
-import { PushReplaceHistory, UrlUpdateType } from './types';
+import { PartialLocation, PushReplaceHistory, UrlUpdateType } from './types';
 
 /**
  * Creates a new location object containing the specified query changes.
@@ -15,18 +15,26 @@ import { PushReplaceHistory, UrlUpdateType } from './types';
  */
 export function createLocationWithChanges(
   queryReplacements: EncodedQuery,
-  location: Location,
+  location: PartialLocation,
   updateType: UrlUpdateType = 'pushIn',
   stringifyOptions?: ExtendedStringifyOptions
 ): Location {
   switch (updateType) {
     case 'replace':
     case 'push':
-      return updateLocation(queryReplacements, location, stringifyOptions);
+      return updateLocation(
+        queryReplacements,
+        location as Location,
+        stringifyOptions
+      );
     case 'replaceIn':
     case 'pushIn':
     default:
-      return updateInLocation(queryReplacements, location, stringifyOptions);
+      return updateInLocation(
+        queryReplacements,
+        location as Location,
+        stringifyOptions
+      );
   }
 }
 
@@ -35,7 +43,7 @@ export function createLocationWithChanges(
  */
 export function updateUrlQuery(
   history: PushReplaceHistory,
-  location: Location,
+  location: PartialLocation,
   updateType: UrlUpdateType = 'pushIn'
 ): void {
   switch (updateType) {
