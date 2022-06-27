@@ -1,3 +1,4 @@
+import { describe, it, vi, test } from 'vitest';
 import { updateLocation, updateInLocation } from '../index';
 import { makeMockLocation } from './helpers';
 import { parse } from 'query-string';

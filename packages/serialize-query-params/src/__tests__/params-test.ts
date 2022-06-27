@@ -1,3 +1,4 @@
+import { describe, it, vi, test } from 'vitest';
 import {
   StringParam,
   NumberParam,
@@ -53,47 +54,62 @@ describe('params', () => {
       it.each([
         [
           new Date(Date.UTC(2019, 2, 14, 12, 30, 1, 300)),
-          "2019-03-14T12:30:01.300Z"
+          '2019-03-14T12:30:01.300Z',
+        ],
+        [new Date(Date.UTC(2019, 2, 14)), '2019-03-14T00:00:00.000Z'],
+      ])('DateTimeParam encode(%s)', (date, expectedString) => {
+        expect(DateTimeParam.encode(date)).toBe(expectedString);
+      });
+      it.each([
+        [
+          '2019-03-14T10:30:01.300Z',
+          {
+            fullYear: 2019,
+            month: 2,
+            date: 14,
+            hours: 10,
+            minutes: 30,
+            seconds: 1,
+            milliseconds: 300,
+          },
         ],
         [
-          new Date(Date.UTC(2019, 2, 14)),
-          "2019-03-14T00:00:00.000Z"
-        ]
-      ])(
-        'DateTimeParam encode(%s)',
-        (date, expectedString) => {
-          expect(DateTimeParam.encode(date)).toBe(expectedString);
-        }
-      );
-      it.each(
+          'December 17, 1995 03:24:00Z',
+          {
+            fullYear: 1995,
+            month: 11,
+            date: 17,
+            hours: 3,
+            minutes: 24,
+            seconds: 0,
+            milliseconds: 0,
+          },
+        ],
         [
-          [
-            "2019-03-14T10:30:01.300Z",
-            { fullYear: 2019, month: 2, date: 14, hours: 10, minutes: 30, seconds: 1, milliseconds: 300 },
-          ],
-          [
-            "December 17, 1995 03:24:00Z",
-            { fullYear: 1995, month: 11, date: 17, hours: 3, minutes: 24, seconds: 0, milliseconds: 0 },
-          ],
-          [
-            "Jun 30, 1995 03:24:00.321Z",
-            { fullYear: 1995, month: 5, date: 30, hours: 3, minutes: 24, seconds: 0, milliseconds: 321 },
-          ]
-        ]
-      )(
-        'DateTimeParam decode(%s)',
-        (dateString, expectedDate) => {
-          const result = DateTimeParam.decode(new Date(dateString).toISOString()) as Date;
+          'Jun 30, 1995 03:24:00.321Z',
+          {
+            fullYear: 1995,
+            month: 5,
+            date: 30,
+            hours: 3,
+            minutes: 24,
+            seconds: 0,
+            milliseconds: 321,
+          },
+        ],
+      ])('DateTimeParam decode(%s)', (dateString, expectedDate) => {
+        const result = DateTimeParam.decode(
+          new Date(dateString).toISOString()
+        ) as Date;
 
-          expect(result.getUTCFullYear()).toBe(expectedDate.fullYear);
-          expect(result.getUTCMonth()).toBe(expectedDate.month);
-          expect(result.getUTCDate()).toBe(expectedDate.date);
-          expect(result.getUTCHours()).toBe(expectedDate.hours);
-          expect(result.getUTCMinutes()).toBe(expectedDate.minutes);
-          expect(result.getUTCSeconds()).toBe(expectedDate.seconds);
-          expect(result.getUTCMilliseconds()).toBe(expectedDate.milliseconds);
-        },
-      );
+        expect(result.getUTCFullYear()).toBe(expectedDate.fullYear);
+        expect(result.getUTCMonth()).toBe(expectedDate.month);
+        expect(result.getUTCDate()).toBe(expectedDate.date);
+        expect(result.getUTCHours()).toBe(expectedDate.hours);
+        expect(result.getUTCMinutes()).toBe(expectedDate.minutes);
+        expect(result.getUTCSeconds()).toBe(expectedDate.seconds);
+        expect(result.getUTCMilliseconds()).toBe(expectedDate.milliseconds);
+      });
     });
 
     it('BooleanParam', () => {
@@ -113,7 +129,7 @@ describe('params', () => {
       expect(DelimitedNumericArrayParam.decode('1_2')).toEqual([1, 2]);
     });
     it('createEnumParam', () => {
-      const TestEnumParam = createEnumParam(['foo', 'bar'])
+      const TestEnumParam = createEnumParam(['foo', 'bar']);
       expect(TestEnumParam.encode('foo')).toBe('foo');
       expect(TestEnumParam.decode('bar')).toBe('bar');
       expect(TestEnumParam.decode('baz')).toBeUndefined();

@@ -17,9 +17,9 @@
     "prepublishOnly": "npm run test && npm run clean && npm run build",
     "lint": "eslint --ext js,ts,tsx src",
     "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
-    "test": "jest",
-    "test-watch": "jest --watch",
-    "test-coverage": "jest --coverage"
+    "test": "vitest",
+    "test-watch": "vitest watch",
+    "test-coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",

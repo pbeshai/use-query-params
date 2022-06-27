@@ -1,3 +1,4 @@
+import { describe, it, vi, test } from 'vitest';
 import { encodeQueryParams } from '../index';
 import {
   NumberParam,

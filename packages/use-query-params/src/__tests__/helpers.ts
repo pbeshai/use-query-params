@@ -1,15 +1,16 @@
+import { parse as parseQueryString, stringify } from 'query-string';
 import { EncodedQuery } from 'serialize-query-params';
-import { stringify, parse as parseQueryString } from 'query-string';
+import { vi } from 'vitest';
 
 // if passed a location, will mutate it so we can see what changes are being made
 export function makeMockHistory(location: any = {}) {
   return {
-    replace: jest
+    replace: vi
       .fn()
       .mockImplementation((newLocation) =>
         Object.assign(location, newLocation)
       ),
-    push: jest
+    push: vi
       .fn()
       .mockImplementation((newLocation) =>
         Object.assign(location, newLocation)
@@ -34,12 +35,20 @@ export function calledPushQuery(
   return parseQueryString(history.push.mock.calls[index][0].search);
 }
 
-export function makeMockLocation(query: EncodedQuery): Location {
+export function makeMockLocation(
+  query: EncodedQuery,
+  includeHost: boolean = false
+): Location {
   const queryStr = stringify(query);
-  return {
-    protocol: 'http:',
-    host: 'localhost',
+  let newLocation = {
     pathname: '/',
     search: queryStr.length ? `?${queryStr}` : '',
   } as Location;
+
+  if (includeHost) {
+    newLocation.protocol = 'http:';
+    newLocation.host = 'localhost';
+  }
+
+  return newLocation;
 }

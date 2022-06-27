@@ -9,6 +9,7 @@ import {
   DateParam,
   JsonParam,
 } from 'serialize-query-params';
+import { describe, it, vi, test } from 'vitest';
 
 import { useQueryParams, QueryParamProvider } from '../index';
 import { makeMockHistory, makeMockLocation, calledPushQuery } from './helpers';
@@ -345,7 +346,7 @@ describe('useQueryParams', () => {
           return str;
         },
       };
-      const decodeSpy = jest.spyOn(customQueryParam, 'decode');
+      const decodeSpy = vi.spyOn(customQueryParam, 'decode');
       const { result, rerender } = renderHook(
         () => useQueryParams({ foo: customQueryParam, bar: StringParam }),
         {
@@ -370,7 +371,7 @@ describe('useQueryParams', () => {
         encode: (str: string | undefined | null) => str,
         decode: (str: string | (string | null)[] | undefined | null) => str,
       };
-      const decodeSpy = jest.spyOn(customQueryParam, 'decode');
+      const decodeSpy = vi.spyOn(customQueryParam, 'decode');
       const { result, rerender } = renderHook(
         () => useQueryParams({ foo: customQueryParam, bar: StringParam }),
         {

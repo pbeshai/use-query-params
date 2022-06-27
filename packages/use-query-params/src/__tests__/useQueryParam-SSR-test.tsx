@@ -7,6 +7,7 @@ import { renderToString } from 'react-dom/server';
 import QueryParamProvider from '../QueryParamProvider';
 import { makeMockLocation } from './helpers';
 import { StringParam } from 'serialize-query-params';
+import { describe, it, vi, test } from 'vitest';
 
 test('SSR initial query param', () => {
   const Component = () => {
