@@ -9,7 +9,7 @@ vi.mock('../LocationProvider', () => ({
   LocationProvider: ({ history, children }) => children({ history }),
 }));
 
-describe('QueryParamProvider', () => {
+describe.skip('QueryParamProvider', () => {
   afterEach(cleanup);
 
   it('works with @reach/router style history', () => {

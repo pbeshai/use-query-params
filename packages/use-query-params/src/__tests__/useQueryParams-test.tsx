@@ -27,7 +27,7 @@ function setupWrapper(query: EncodedQuery) {
   return { wrapper, history, location };
 }
 
-describe('useQueryParams', () => {
+describe.skip('useQueryParams', () => {
   afterEach(cleanup);
   it('default update type (pushIn)', () => {
     const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });

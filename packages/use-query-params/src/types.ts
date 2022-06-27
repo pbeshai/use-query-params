@@ -1,4 +1,9 @@
-import { QueryParamConfigMap, DecodedValueMap } from 'serialize-query-params';
+import React = require('react');
+import {
+  QueryParamConfigMap,
+  DecodedValueMap,
+  EncodedQuery,
+} from 'serialize-query-params';
 
 /**
  * Different methods for updating the URL:
@@ -41,3 +46,32 @@ export interface HistoryLocation {
   /** The location object */
   location: Location;
 }
+
+// -- new --
+export interface PartialLocation {
+  readonly search: string;
+  readonly state?: any;
+}
+
+export interface QueryParamAdapter {
+  getCurrentLocation: () => PartialLocation;
+  replace: (location: PartialLocation) => void;
+  push: (location: PartialLocation) => void;
+}
+
+export type QueryParamAdapterComponent = ({
+  children,
+}: {
+  children: (adapter: QueryParamAdapter) => React.ReactElement | null;
+}) => React.ReactElement | null;
+
+export interface QueryParamOptions {
+  parseParams?: (searchString: string) => EncodedQuery;
+  stringifyParams?: (encodedParams: EncodedQuery) => string;
+}
+
+type RequiredOptions = 'parseParams' | 'stringifyParams';
+export type QueryParamOptionsWithRequired = Required<
+  Pick<QueryParamOptions, RequiredOptions>
+> &
+  Omit<QueryParamOptions, RequiredOptions>;

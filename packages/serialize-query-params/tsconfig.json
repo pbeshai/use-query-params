@@ -18,6 +18,7 @@
     "lib": ["es5", "dom"]
   },
   "exclude": [
+    "vitest.config.ts",
     "node_modules",
     "lib",
     "esm",

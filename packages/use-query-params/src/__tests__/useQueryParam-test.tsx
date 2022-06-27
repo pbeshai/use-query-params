@@ -1,47 +1,47 @@
 import * as React from 'react';
 import { cleanup, renderHook } from '@testing-library/react-hooks';
+import { stringify } from 'query-string';
 import {
+  DateParam,
   EncodedQuery,
+  JsonParam,
   NumberParam,
   NumericArrayParam,
-  DateParam,
-  JsonParam,
 } from 'serialize-query-params';
+import { describe, it } from 'vitest';
 import { QueryParamProvider, useQueryParam } from '../index';
-import { calledPushQuery, makeMockHistory, makeMockLocation } from './helpers';
-import { describe, it, vi, test } from 'vitest';
+import { QueryParamAdapter } from '../types';
+import { calledPushQuery, makeMockAdapter } from './helpers';
 
 // helper to setup tests
 function setupWrapper(query: EncodedQuery) {
-  const location = makeMockLocation(query);
-  const history = makeMockHistory(location);
+  const Adapter = makeMockAdapter({ search: stringify(query) });
+  const adapter = (Adapter as any).adapter as QueryParamAdapter;
   const wrapper = ({ children }: any) => (
-    <QueryParamProvider
-      history={history}
-      location={{ ...location }} // generate a new location each time to reproduce #46
-    >
-      {children}
-    </QueryParamProvider>
+    <QueryParamProvider Adapter={Adapter}>{children}</QueryParamProvider>
   );
 
-  return { wrapper, history, location };
+  return { wrapper, adapter };
 }
 
 describe('useQueryParam', () => {
   afterEach(cleanup);
 
   it('default param type (string, pushIn)', () => {
-    const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
+    const { wrapper, adapter } = setupWrapper({
+      foo: '123',
+      bar: 'xxx',
+    });
     const { result } = renderHook(() => useQueryParam('foo'), { wrapper });
     const [decodedValue, setter] = result.current;
 
     expect(decodedValue).toBe('123');
     setter('zzz');
-    expect(calledPushQuery(history, 0)).toEqual({ foo: 'zzz', bar: 'xxx' });
+    expect(calledPushQuery(adapter, 0)).toEqual({ foo: 'zzz', bar: 'xxx' });
   });
 
   it('specific param type and update type', () => {
-    const { wrapper, history } = setupWrapper({ foo: '123', bar: 'xxx' });
+    const { wrapper, adapter } = setupWrapper({ foo: '123', bar: 'xxx' });
     const { result } = renderHook(() => useQueryParam('foo', NumberParam), {
       wrapper,
     });
@@ -49,11 +49,11 @@ describe('useQueryParam', () => {
 
     expect(decodedValue).toBe(123);
     setter(999, 'push');
-    expect(calledPushQuery(history, 0)).toEqual({ foo: '999' });
+    expect(calledPushQuery(adapter, 0)).toEqual({ foo: '999' });
   });
 
   it("doesn't decode more than necessary", () => {
-    const { wrapper, location } = setupWrapper({
+    const { wrapper, adapter } = setupWrapper({
       foo: ['1', '2', '3'],
     });
     const { result, rerender } = renderHook(
@@ -82,7 +82,9 @@ describe('useQueryParam', () => {
     expect(decodedValue3).toBe(decodedValue4);
 
     // if another parameter changes, this one shouldn't be affected
-    location.search = `${location.search}&zzz=123`;
+    (adapter.getCurrentLocation() as any).search = `${
+      adapter.getCurrentLocation().search
+    }&zzz=123`;
     rerender();
     const [decodedValue5] = result.current;
     expect(decodedValue5).toBe(decodedValue3);
@@ -142,7 +144,7 @@ describe('useQueryParam', () => {
   });
 
   it('works with functional updates', () => {
-    const { wrapper, history, location } = setupWrapper({
+    const { wrapper, adapter } = setupWrapper({
       foo: '123',
       bar: 'xxx',
     });
@@ -156,21 +158,21 @@ describe('useQueryParam', () => {
 
     expect(decodedValue).toBe(123);
     setter((latestValue) => latestValue! + 100, 'push');
-    expect(calledPushQuery(history, 0)).toEqual({ foo: '223' });
+    expect(calledPushQuery(adapter, 0)).toEqual({ foo: '223' });
 
     setter((latestValue) => latestValue! + 110, 'push');
-    expect(calledPushQuery(history, 1)).toEqual({ foo: '333' });
+    expect(calledPushQuery(adapter, 1)).toEqual({ foo: '333' });
 
     // use a stale setter
-    location.search = '?foo=500';
+    (adapter.getCurrentLocation() as any).search = '?foo=500';
     rerender();
     setter((latestValue) => latestValue! + 100, 'push');
-    expect(calledPushQuery(history, 2)).toEqual({ foo: '600' });
+    expect(calledPushQuery(adapter, 2)).toEqual({ foo: '600' });
   });
 
   it('works with functional JsonParam updates', () => {
     type ParamType = { a: number; b: string };
-    const { wrapper, history } = setupWrapper({
+    const { wrapper, adapter } = setupWrapper({
       foo: '{"a":1,"b":"abc"}',
       bar: 'xxx',
     });
@@ -184,10 +186,10 @@ describe('useQueryParam', () => {
       (latestValue: ParamType) => ({ ...latestValue, a: latestValue.a + 1 }),
       'push'
     );
-    expect(calledPushQuery(history, 0)).toEqual({ foo: '{"a":2,"b":"abc"}' });
+    expect(calledPushQuery(adapter, 0)).toEqual({ foo: '{"a":2,"b":"abc"}' });
 
     setter((latestValue: ParamType) => ({ ...latestValue, b: 'yyy' }), 'push');
-    expect(calledPushQuery(history, 1)).toEqual({ foo: '{"a":2,"b":"yyy"}' });
+    expect(calledPushQuery(adapter, 1)).toEqual({ foo: '{"a":2,"b":"yyy"}' });
   });
 
   it('properly detects new values when equals is overridden', () => {
