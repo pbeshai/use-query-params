@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as qs from 'query-string';
 import { renderHook, cleanup } from '@testing-library/react-hooks';
 import {
   NumberParam,
@@ -15,16 +16,19 @@ import {
   useQueryParams,
   QueryParamProvider,
   QueryParamAdapter,
+  QueryParamOptions,
 } from '../index';
 import { calledPushQuery, makeMockAdapter } from './helpers';
 import { stringifyParams } from '../stringifyParams';
 
 // helper to setup tests
-function setupWrapper(query: EncodedQuery) {
+function setupWrapper(query: EncodedQuery, options?: QueryParamOptions) {
   const Adapter = makeMockAdapter({ search: stringifyParams(query) });
   const adapter = (Adapter as any).adapter as QueryParamAdapter;
   const wrapper = ({ children }: any) => (
-    <QueryParamProvider Adapter={Adapter}>{children}</QueryParamProvider>
+    <QueryParamProvider Adapter={Adapter} options={options}>
+      {children}
+    </QueryParamProvider>
   );
 
   return { wrapper, adapter };
@@ -169,7 +173,10 @@ describe('useQueryParams', () => {
   });
 
   it('allows the config to change over time', () => {
-    const { wrapper, adapter } = setupWrapper({ foo: '123', bar: 'xxx' });
+    const { wrapper, adapter } = setupWrapper(
+      { foo: '123', bar: 'xxx' },
+      { parseParams: qs.parse, stringifyParams: qs.stringify }
+    );
     const { result, rerender } = renderHook(
       ({ config }) => useQueryParams(config),
       {
