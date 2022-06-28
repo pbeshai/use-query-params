@@ -11,7 +11,7 @@ import { useMergedOptions } from './options';
 import { useQueryParamContext } from './QueryParamProvider';
 import shallowEqual from './shallowEqual';
 import { QueryParamOptions, SetQuery, UrlUpdateType } from './types';
-import { createLocationWithChanges } from './updateUrlQuery';
+import { updateLocation, updateInLocation } from 'serialize-query-params';
 
 type ChangesType<DecodedValueMapType> =
   | Partial<DecodedValueMapType>
@@ -158,11 +158,10 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       }
 
       // update the location and URL
-      const newLocation = createLocationWithChanges(
-        encodedChanges,
-        currentLocation,
-        updateType
-      );
+      const newLocation = (updateType === 'push' || updateType === 'replace'
+        ? updateLocation
+        : updateInLocation)(encodedChanges, currentLocation as Location);
+
       if (updateType?.startsWith('replace')) {
         adapter.replace(newLocation);
       } else {
@@ -184,7 +183,6 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     setPrev(decodedValues);
   }
 
-  // no longer Partial
   return [decodedValuesToUse, setQuery];
 };
 

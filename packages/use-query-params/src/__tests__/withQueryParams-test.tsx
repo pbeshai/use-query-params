@@ -1,30 +1,33 @@
-import * as React from 'react';
-import { render, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { describe, it, vi, test } from 'vitest';
+import { cleanup, render } from '@testing-library/react';
+import * as React from 'react';
+import { describe, it } from 'vitest';
 
 import {
-  NumberParam,
-  StringParam,
   DecodedValueMap,
   EncodedQuery,
+  NumberParam,
+  StringParam,
 } from 'serialize-query-params';
-import { SetQuery, withQueryParams, QueryParamProvider } from '../index';
-import { makeMockHistory, makeMockLocation, calledPushQuery } from './helpers';
+import {
+  QueryParamAdapter,
+  QueryParamProvider,
+  SetQuery,
+  withQueryParams,
+} from '../index';
+import { stringifyParams } from '../stringifyParams';
+import { calledPushQuery, makeMockAdapter } from './helpers';
 
 // helper to setup tests
 function setupWrapper(query: EncodedQuery) {
-  const location = makeMockLocation(query);
-  const history = makeMockHistory(location);
+  const Adapter = makeMockAdapter({ search: stringifyParams(query) });
+  const adapter = (Adapter as any).adapter as QueryParamAdapter;
   const wrapper = ({ children }: any) => (
-    <QueryParamProvider history={history} location={location}>
-      {children}
-    </QueryParamProvider>
+    <QueryParamProvider Adapter={Adapter}>{children}</QueryParamProvider>
   );
 
-  return { wrapper, history, location };
+  return { wrapper, adapter };
 }
-
 const queryConfig = { foo: NumberParam, bar: StringParam };
 
 interface Props {
@@ -46,11 +49,11 @@ const MockComponent: React.FC<Props> = ({ query, setQuery, other }) => {
 
 const MockWithHoc = withQueryParams(queryConfig, MockComponent);
 
-describe.skip('withQueryParams', () => {
+describe('withQueryParams', () => {
   afterEach(cleanup);
 
   it('works', () => {
-    const { wrapper, history } = setupWrapper({
+    const { wrapper, adapter } = setupWrapper({
       foo: '123',
       bar: 'xxx',
     });
@@ -65,6 +68,6 @@ describe.skip('withQueryParams', () => {
     // @ts-ignore
     expect(getByText(/bar = xxx/)).toBeInTheDocument();
     getByText(/change foo/).click();
-    expect(calledPushQuery(history, 0)).toEqual({ foo: '99', bar: 'xxx' });
+    expect(calledPushQuery(adapter, 0)).toEqual({ foo: '99', bar: 'xxx' });
   });
 });

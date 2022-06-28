@@ -1,4 +1,3 @@
-import { describe, it, vi, test } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 import { parse } from 'query-string';
@@ -6,17 +5,13 @@ import * as React from 'react';
 import { Router, Switch } from 'react-router';
 import { Link, Route } from 'react-router-dom';
 import {
+  DateParam,
   decodeQueryParams,
   withDefault,
-  DateParam,
 } from 'serialize-query-params';
-import {
-  NumberParam,
-  QueryParamProvider,
-  useQueryParam,
-  useQueryParams,
-} from '../index';
+import { describe, test, vi } from 'vitest';
 import { ReactRouter5Adapter } from '../adapters/react-router-5';
+import { NumberParam, QueryParamProvider, useQueryParam } from '../index';
 
 function renderWithRouter(ui: React.ReactNode, initialRoute: string) {
   const history = createMemoryHistory({ initialEntries: [initialRoute] });

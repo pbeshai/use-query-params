@@ -1,10 +1,6 @@
-import { useMemo, useRef, useEffect, useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { QueryParamConfig, StringParam } from 'serialize-query-params';
-import { memoParseParams } from './memoParseParams';
-import { useMergedOptions } from './options';
-import { useQueryParamContext } from './QueryParamProvider';
 import { QueryParamOptions, UrlUpdateType } from './types';
-import { createLocationWithChanges } from './updateUrlQuery';
 import useQueryParams from './useQueryParams';
 
 type NewValueType<D> = D | ((latestValue: D) => D);
