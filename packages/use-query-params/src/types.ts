@@ -1,8 +1,4 @@
-import {
-  QueryParamConfigMap,
-  DecodedValueMap,
-  EncodedQuery,
-} from 'serialize-query-params';
+import { QueryParamConfigMap, DecodedValueMap } from 'serialize-query-params';
 
 /**
  * Different methods for updating the URL:
@@ -44,15 +40,3 @@ export type QueryParamAdapterComponent = ({
 }: {
   children: (adapter: QueryParamAdapter) => React.ReactElement | null;
 }) => React.ReactElement | null;
-
-export interface QueryParamOptions {
-  parseParams?: (searchString: string) => EncodedQuery;
-  stringifyParams?: (encodedParams: EncodedQuery) => string;
-  updateType?: UrlUpdateType;
-}
-
-type RequiredOptions = 'parseParams' | 'stringifyParams';
-export type QueryParamOptionsWithRequired = Required<
-  Pick<QueryParamOptions, RequiredOptions>
-> &
-  Omit<QueryParamOptions, RequiredOptions>;

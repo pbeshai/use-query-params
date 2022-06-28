@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { QueryParamConfig, StringParam } from 'serialize-query-params';
-import { QueryParamOptions, UrlUpdateType } from './types';
+import { UrlUpdateType } from './types';
+import { QueryParamOptions } from './options';
 import useQueryParams from './useQueryParams';
 
 type NewValueType<D> = D | ((latestValue: D) => D);
@@ -28,10 +29,10 @@ export const useQueryParam = <TypeToEncode, TypeFromDecode = TypeToEncode>(
   TypeFromDecode,
   (newValue: NewValueType<TypeToEncode>, updateType?: UrlUpdateType) => void
 ] => {
-  const paramConfigMap = useMemo(() => ({ [name]: paramConfig }), [
-    name,
-    paramConfig,
-  ]);
+  const paramConfigMap = useMemo(
+    () => ({ [name]: paramConfig }),
+    [name, paramConfig]
+  );
   const [query, setQuery] = useQueryParams(paramConfigMap, options);
   const decodedValue = query[name];
   const setValue = useCallback(
