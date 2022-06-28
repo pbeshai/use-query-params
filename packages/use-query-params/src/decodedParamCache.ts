@@ -26,14 +26,14 @@ export class DecodedParamCache {
     });
   }
 
-  has(param: string, stringifiedValue: EncodedValue, decode: Function) {
+  has(param: string, stringifiedValue: EncodedValue, decode?: Function) {
     if (!this.paramsMap.has(param)) return false;
     const cachedParam = this.paramsMap.get(param);
     if (!cachedParam) return false;
 
     return (
       cachedParam.stringified === stringifiedValue &&
-      cachedParam.decode === decode
+      (decode == null || cachedParam.decode === decode)
     );
   }
 
