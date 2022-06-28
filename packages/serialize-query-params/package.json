@@ -14,9 +14,9 @@
     "clean": "rimraf dist",
     "dev": "NODE_ENV=development tsc -w",
     "prepublishOnly": "npm run test && npm run clean && npm run build",
-    "test": "jest",
-    "test-watch": "jest --watch",
-    "test-coverage": "jest --coverage"
+    "test": "vitest",
+    "test-watch": "vitest watch",
+    "test-coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
