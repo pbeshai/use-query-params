@@ -12,13 +12,18 @@ import {
 import { describe, test, vi } from 'vitest';
 import { ReactRouter5Adapter } from '../adapters/react-router-5';
 import { NumberParam, QueryParamProvider, useQueryParam } from '../index';
+import { QueryParamOptions } from '../types';
 
-function renderWithRouter(ui: React.ReactNode, initialRoute: string) {
+function renderWithRouter(
+  ui: React.ReactNode,
+  initialRoute: string,
+  options?: QueryParamOptions
+) {
   const history = createMemoryHistory({ initialEntries: [initialRoute] });
   return {
     ...render(
       <Router history={history}>
-        <QueryParamProvider Adapter={ReactRouter5Adapter}>
+        <QueryParamProvider Adapter={ReactRouter5Adapter} options={options}>
           {ui}
         </QueryParamProvider>
       </Router>
@@ -28,8 +33,8 @@ function renderWithRouter(ui: React.ReactNode, initialRoute: string) {
 }
 
 // An example counter component to be tested
-const QueryParamExample = () => {
-  const [x = 0, setX] = useQueryParam('x', NumberParam);
+const QueryParamExample = ({ options }: { options?: QueryParamOptions }) => {
+  const [x = 0, setX] = useQueryParam('x', NumberParam, options);
 
   return (
     <div>
@@ -223,5 +228,41 @@ describe('components', () => {
       )
     ).toThrow('useQueryParams must be used within a QueryParamProvider');
     errMock.mockRestore();
+  });
+
+  describe('options', () => {
+    it('updateType - hook option', () => {
+      const { queryByText, getByText, history } = renderWithRouter(
+        <QueryParamExample options={{ updateType: 'replace' }} />,
+        '?x=3&y=z',
+        { updateType: 'push' }
+      );
+      const replaceSpy = vi.spyOn(history, 'replace');
+      const pushSpy = vi.spyOn(history, 'push');
+
+      expect(queryByText(/x is 3/)).toBeTruthy();
+      getByText(/Change/).click();
+      expect(queryByText(/x is 4/)).toBeTruthy();
+      expect(history.location.search).toBe('?x=4');
+      expect(replaceSpy).toHaveBeenCalledTimes(1);
+      expect(pushSpy).toHaveBeenCalledTimes(0);
+    });
+
+    it.only('updateType - provider option', () => {
+      const { queryByText, getByText, history } = renderWithRouter(
+        <QueryParamExample />,
+        '?x=3&y=z',
+        { updateType: 'push' }
+      );
+      const replaceSpy = vi.spyOn(history, 'replace');
+      const pushSpy = vi.spyOn(history, 'push');
+
+      expect(queryByText(/x is 3/)).toBeTruthy();
+      getByText(/Change/).click();
+      expect(queryByText(/x is 4/)).toBeTruthy();
+      expect(history.location.search).toBe('?x=4');
+      expect(replaceSpy).toHaveBeenCalledTimes(0);
+      expect(pushSpy).toHaveBeenCalledTimes(1);
+    });
   });
 });

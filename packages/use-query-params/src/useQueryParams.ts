@@ -117,10 +117,12 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   const { adapter, options: contextOptions } = useQueryParamContext();
   const [stableGetLatest] = useState(makeStableGetLatestDecodedValues);
   const mergedOptions = useMergedOptions(contextOptions, options);
-  const { parseParams, stringifyParams } = mergedOptions;
 
   // what is the current stringified value?
-  const parsedParams = memoParseParams(parseParams, adapter.location.search);
+  const parsedParams = memoParseParams(
+    mergedOptions.parseParams,
+    adapter.location.search
+  );
 
   // run decode on each key, collect
   const decodedValues = stableGetLatest(
@@ -145,8 +147,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   const callbackDependencies = {
     adapter,
     paramConfigMap,
-    parseParams,
-    stringifyParams,
+    options: mergedOptions,
   } as const;
   const callbackDependenciesRef =
     useRef<typeof callbackDependencies>(callbackDependencies);
@@ -157,10 +158,9 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     callbackDependenciesRef.current = {
       adapter,
       paramConfigMap,
-      parseParams,
-      stringifyParams,
+      options: mergedOptions,
     };
-  }, [adapter, paramConfigMap, parseParams, stringifyParams]);
+  }, [adapter, paramConfigMap, mergedOptions]);
 
   // create callback
   const setQuery = useMemo(() => {
@@ -169,8 +169,10 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       updateType?: UrlUpdateType
     ) => {
       // read from a ref so we don't generate new setters each time any change
-      const { adapter, paramConfigMap, parseParams, stringifyParams } =
+      const { adapter, paramConfigMap, options } =
         callbackDependenciesRef.current!;
+      const { parseParams, stringifyParams } = options;
+      if (updateType == null) updateType = options.updateType;
 
       let encodedChanges;
       const currentLocation = adapter.location;
