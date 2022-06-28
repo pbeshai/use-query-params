@@ -10,7 +10,7 @@ import {
 } from './types';
 
 /**
- * Shape of the LocationProviderContext, which the hooks consume to read and
+ * Shape of the QueryParamContext, which the hooks consume to read and
  * update the URL state.
  */
 type QueryParamContextValue = {

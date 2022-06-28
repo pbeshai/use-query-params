@@ -100,6 +100,17 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     decodedParamCache
   );
 
+  // clear out unused values in cache
+  // use string for relatively stable effect dependency
+  const paramKeyString = Object.keys(paramConfigMap).join('\0');
+  useEffect(() => {
+    const paramNames = paramKeyString.split('\0');
+    decodedParamCache.registerParams(paramNames);
+    return () => {
+      decodedParamCache.unregisterParams(paramNames);
+    };
+  }, [paramKeyString]);
+
   // create a setter for updating multiple query params at once
   // use a ref for callback dependencies so we don't generate a new one unnecessarily
   const callbackDependencies = {

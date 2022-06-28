@@ -218,7 +218,7 @@ describe('useQueryParam', () => {
     expect(decodedValue3).toBe(decodedValue2);
   });
 
-  it.skip('reuses decoded value', () => {
+  it('reuses decoded value', () => {
     const { wrapper } = setupWrapper({
       foo: '1',
     });

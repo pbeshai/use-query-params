@@ -341,7 +341,7 @@ describe('useQueryParams', () => {
     expect(decodedValue3.foo).toBe(decodedValue2.foo);
   });
 
-  describe.skip('should call custom paramConfig.decode properly', () => {
+  describe('should call custom paramConfig.decode properly', () => {
     it('when custom paramConfig decode undefined as non-undefined value, should not call decode function when irrelevant update happens', () => {
       const { wrapper } = setupWrapper({ bar: '1' });
       const customQueryParam = {
@@ -367,6 +367,7 @@ describe('useQueryParams', () => {
 
       setter({ bar: '2' });
       rerender();
+      expect(decodeSpy).toHaveBeenCalledTimes(1);
       setter({ bar: '3' });
       rerender();
       expect(decodeSpy).toHaveBeenCalledTimes(1);
@@ -393,9 +394,11 @@ describe('useQueryParams', () => {
 
       setter({ bar: '2' });
       rerender();
+      // twice per call since we useState inside the hook :(
+      expect(decodeSpy).toHaveBeenCalledTimes(3);
       setter({ bar: '3' });
       rerender();
-      expect(decodeSpy).toHaveBeenCalledTimes(3);
+      expect(decodeSpy).toHaveBeenCalledTimes(5);
     });
   });
 });
