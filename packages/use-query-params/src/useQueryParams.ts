@@ -1,16 +1,17 @@
-import * as React from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   DecodedValueMap,
   EncodedQuery,
   encodeQueryParams,
   QueryParamConfigMap,
-  EncodedValueMap,
 } from 'serialize-query-params';
-import { getSSRSafeSearchString, useUpdateRefIfShallowNew } from './helpers';
-import { useLocationContext } from './LocationProvider';
-import { memoizeParseParams } from './memoizeParseParams';
+import { DecodedParamCache, decodedParamCache } from './decodedParamCache';
+import { memoParseParams } from './memoParseParams';
+import { useMergedOptions } from './options';
+import { useQueryParamContext } from './QueryParamProvider';
 import shallowEqual from './shallowEqual';
-import { SetQuery, UrlUpdateType } from './types';
+import { QueryParamOptions, SetQuery, UrlUpdateType } from './types';
+import { createLocationWithChanges } from './updateUrlQuery';
 
 type ChangesType<DecodedValueMapType> =
   | Partial<DecodedValueMapType>
@@ -21,96 +22,42 @@ type ChangesType<DecodedValueMapType> =
  * Abstracted into its own function to allow re-use in a functional setter (#26)
  */
 function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
-  location: Location,
+  parsedParams: EncodedQuery,
   paramConfigMap: QPCMap,
-  paramConfigMapRef: React.MutableRefObject<QPCMap>,
-  parsedQueryRef: React.MutableRefObject<EncodedQuery>,
-  encodedValuesCacheRef: React.MutableRefObject<
-    Partial<EncodedValueMap<QPCMap>> | undefined
-  >,
-  decodedValuesCacheRef: React.MutableRefObject<
-    Partial<DecodedValueMap<QPCMap>>
-  >
-): {
-  encodedValues: Partial<EncodedValueMap<QPCMap>>;
-  decodedValues: Partial<DecodedValueMap<QPCMap>>;
-} {
-  // check if we have a new param config
-  const hasNewParamConfigMap = !shallowEqual(
-    paramConfigMapRef.current,
-    paramConfigMap
-  );
-
-  // read in the parsed query
-  const parsedQuery = sharedMemoizedQueryParser(
-    getSSRSafeSearchString(location) // get the latest location object
-  );
-
-  // check if new encoded values are around (new parsed query).
-  // can use triple equals since we already cache this value
-  const hasNewParsedQuery = parsedQueryRef.current !== parsedQuery;
-
-  // if nothing has changed, use existing.. so long as we have existing.
-  if (
-    !hasNewParsedQuery &&
-    !hasNewParamConfigMap &&
-    encodedValuesCacheRef.current !== undefined
-  ) {
-    return {
-      encodedValues: encodedValuesCacheRef.current,
-      decodedValues: decodedValuesCacheRef.current,
-    };
-  }
-
-  const encodedValuesCache: Partial<EncodedValueMap<QPCMap>> =
-    encodedValuesCacheRef.current || {};
-  const decodedValuesCache: Partial<DecodedValueMap<QPCMap>> =
-    decodedValuesCacheRef.current || {};
-  const encodedValues: Partial<EncodedValueMap<QPCMap>> = {};
+  decodedParamCache: DecodedParamCache
+) {
+  const decodedValues: Partial<DecodedValueMap<QPCMap>> = {};
 
   // we have new encoded values, so let's get new decoded values.
   // recompute new values but only for those that changed
   const paramNames = Object.keys(paramConfigMap);
-  const decodedValues: Partial<DecodedValueMap<QPCMap>> = {};
   for (const paramName of paramNames) {
     // do we have a new encoded value?
     const paramConfig = paramConfigMap[paramName];
-    const hasNewEncodedValue = !shallowEqual(
-      encodedValuesCache[paramName],
-      parsedQuery[paramName]
-    );
+    const encodedValue = parsedParams[paramName];
 
     // if we have a new encoded value, re-decode. otherwise reuse cache
-    let encodedValue;
     let decodedValue;
-    if (
-      hasNewEncodedValue ||
-      (encodedValuesCache[paramName] === undefined &&
-        decodedValuesCache[paramName] === undefined)
-    ) {
-      encodedValue = parsedQuery[paramName];
-      decodedValue = paramConfig.decode(encodedValue);
+    if (decodedParamCache.has(paramName, encodedValue, paramConfig.decode)) {
+      decodedValue = decodedParamCache.get(paramName);
     } else {
-      encodedValue = encodedValuesCache[paramName];
-      decodedValue = decodedValuesCache[paramName];
+      decodedValue = paramConfig.decode(encodedValue);
+      // do not cache undefined values
+      if (decodedValue !== undefined) {
+        decodedParamCache.set(
+          paramName,
+          encodedValue,
+          decodedValue,
+          paramConfig.decode
+        );
+      }
     }
 
-    encodedValues[paramName as keyof QPCMap] = encodedValue;
     decodedValues[paramName as keyof QPCMap] = decodedValue;
   }
 
-  // keep referential equality for decoded valus if we didn't actually change anything
-  const hasNewDecodedValues = !shallowEqual(
-    decodedValuesCacheRef.current,
-    decodedValues,
-    paramConfigMap
-  );
-
   return {
-    encodedValues,
-    decodedValues: hasNewDecodedValues
-      ? decodedValues
-      : decodedValuesCacheRef.current,
+    decodedValues: decodedValues as DecodedValueMap<QPCMap>,
   };
 }
 
@@ -119,95 +66,112 @@ function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
  * return an object with the decoded values and a setter for updating them.
  */
 export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
-  paramConfigMap: QPCMap
+  paramConfigMap: QPCMap,
+  options?: QueryParamOptions
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
-  const { location, getLocation, setLocation } = useLocationContext();
+  const { adapter, options: contextOptions } = useQueryParamContext();
+  const mergedOptions = useMergedOptions(contextOptions, options);
+  const { parseParams } = mergedOptions;
 
-  // read in the raw query
-  const parsedQuery = sharedMemoizedQueryParser(
-    getSSRSafeSearchString(location)
+  // what is the current stringified value?
+  const parsedParams = memoParseParams(
+    parseParams,
+    adapter.getCurrentLocation().search
   );
 
-  // make caches
-  const paramConfigMapRef = React.useRef(paramConfigMap);
-  const parsedQueryRef = React.useRef(parsedQuery);
-  const encodedValuesCacheRef = React.useRef<
-    Partial<EncodedValueMap<QPCMap>> | undefined
-  >(undefined); // undefined for initial check
-  const decodedValuesCacheRef = React.useRef<Partial<DecodedValueMap<QPCMap>>>(
-    {}
-  );
-
-  // memoize paramConfigMap to make the API nicer for consumers.
-  // otherwise we'd have to useQueryParams(useMemo(() => { foo: NumberParam }, []))
-  paramConfigMap = shallowEqual(paramConfigMap, paramConfigMapRef.current)
-    ? paramConfigMapRef.current
-    : paramConfigMap;
-
-  // decode all the values if we have changes
-  const { encodedValues, decodedValues } = getLatestDecodedValues(
-    location,
+  // run decode on each key, collect
+  const { decodedValues } = getLatestDecodedValues(
+    parsedParams,
     paramConfigMap,
-    paramConfigMapRef,
-    parsedQueryRef,
-    encodedValuesCacheRef,
-    decodedValuesCacheRef
-  );
-
-  // update cached values in useEffects
-  useUpdateRefIfShallowNew(parsedQueryRef, parsedQuery);
-  useUpdateRefIfShallowNew(paramConfigMapRef, paramConfigMap);
-  useUpdateRefIfShallowNew(encodedValuesCacheRef, encodedValues);
-
-  useUpdateRefIfShallowNew(decodedValuesCacheRef, decodedValues, (a, b) =>
-    shallowEqual(a, b, paramConfigMap)
+    decodedParamCache
   );
 
   // create a setter for updating multiple query params at once
-  const setQueryDeps = {
+  // use a ref for callback dependencies so we don't generate a new one unnecessarily
+  const callbackDependencies = {
+    adapter,
     paramConfigMap,
-    setLocation,
-    getLocation,
-  };
-  const setQueryDepsRef = React.useRef(setQueryDeps);
-  setQueryDepsRef.current = setQueryDeps;
-  const setQuery = React.useCallback(
-    (
+    parseParams,
+  } as const;
+  const callbackDependenciesRef = useRef<typeof callbackDependencies>(
+    callbackDependencies
+  );
+  if (callbackDependenciesRef.current == null) {
+    callbackDependenciesRef.current = callbackDependencies;
+  }
+  useEffect(() => {
+    callbackDependenciesRef.current = {
+      adapter,
+      paramConfigMap,
+      parseParams,
+    };
+  }, [adapter, paramConfigMap, parseParams]);
+
+  // create callback
+  const setQuery = useMemo(() => {
+    return (
       changes: ChangesType<DecodedValueMap<QPCMap>>,
       updateType?: UrlUpdateType
     ) => {
-      const deps = setQueryDepsRef.current;
+      // read from a ref so we don't generate new setters each time any change
+      const {
+        adapter,
+        paramConfigMap,
+        parseParams,
+      } = callbackDependenciesRef.current!;
 
-      let encodedChanges: EncodedQuery;
+      let encodedChanges;
+      const currentLocation = adapter.getCurrentLocation();
+
+      // functional updates here get the latest values
       if (typeof changes === 'function') {
-        // get latest decoded value to pass as a fresh arg to the setter fn
-        const { decodedValues: latestValues } = getLatestDecodedValues(
-          deps.getLocation(),
-          deps.paramConfigMap,
-          paramConfigMapRef,
-          parsedQueryRef,
-          encodedValuesCacheRef,
-          decodedValuesCacheRef
+        const parsedParams = memoParseParams(
+          parseParams,
+          currentLocation.search
         );
-        decodedValuesCacheRef.current = latestValues; // keep cache in sync
-
+        const { decodedValues: latestValues } = getLatestDecodedValues(
+          parsedParams,
+          paramConfigMap,
+          decodedParamCache
+        );
         encodedChanges = encodeQueryParams(
-          deps.paramConfigMap,
+          paramConfigMap,
           (changes as Function)(latestValues)
         );
       } else {
-        // encode as strings for the URL
-        encodedChanges = encodeQueryParams(deps.paramConfigMap, changes);
+        // simple update here
+        encodedChanges = encodeQueryParams(paramConfigMap, changes);
       }
 
-      // update the URL
-      deps.setLocation(encodedChanges, updateType);
-    },
-    []
-  );
+      // update the location and URL
+      const newLocation = createLocationWithChanges(
+        encodedChanges,
+        currentLocation,
+        updateType
+      );
+      if (updateType?.startsWith('replace')) {
+        adapter.replace(newLocation);
+      } else {
+        adapter.push(newLocation);
+      }
+    };
+  }, []);
+
+  // check if shallow equal to previous, and if so use previous
+  // see: https://beta-reactjs-org-git-you-might-not-fbopensource.vercel.app/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  // for why we use state here...
+  // not sure what's worse: doing this prev check and incurring two renders in the calling component
+  // or returning a shallow equals decodedValues when nothing has changed.
+  const [prevDecodedValues, setPrev] = useState(decodedValues);
+  let decodedValuesToUse = decodedValues;
+  if (shallowEqual(decodedValues, prevDecodedValues)) {
+    decodedValuesToUse = prevDecodedValues;
+  } else {
+    setPrev(decodedValues);
+  }
 
   // no longer Partial
-  return [decodedValues as DecodedValueMap<QPCMap>, setQuery];
+  return [decodedValuesToUse, setQuery];
 };
 
 export default useQueryParams;

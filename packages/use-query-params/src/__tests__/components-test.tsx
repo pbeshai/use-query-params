@@ -10,14 +10,22 @@ import {
   withDefault,
   DateParam,
 } from 'serialize-query-params';
-import { NumberParam, QueryParamProvider, useQueryParam } from '../index';
+import {
+  NumberParam,
+  QueryParamProvider,
+  useQueryParam,
+  useQueryParams,
+} from '../index';
+import { ReactRouter5Adapter } from '../adapters/react-router-5';
 
 function renderWithRouter(ui: React.ReactNode, initialRoute: string) {
   const history = createMemoryHistory({ initialEntries: [initialRoute] });
   return {
     ...render(
       <Router history={history}>
-        <QueryParamProvider ReactRouterRoute={Route}>{ui}</QueryParamProvider>
+        <QueryParamProvider Adapter={ReactRouter5Adapter}>
+          {ui}
+        </QueryParamProvider>
       </Router>
     ),
     history,
@@ -27,6 +35,7 @@ function renderWithRouter(ui: React.ReactNode, initialRoute: string) {
 // An example counter component to be tested
 const QueryParamExample = () => {
   const [x = 0, setX] = useQueryParam('x', NumberParam);
+
   return (
     <div>
       <h1>{`x is ${x}`}</h1>
@@ -36,7 +45,7 @@ const QueryParamExample = () => {
 };
 
 afterEach(cleanup);
-describe.skip('components', () => {
+describe('components', () => {
   test('query param behaviour example', async () => {
     const { queryByText, getByText } = renderWithRouter(
       <QueryParamExample />,

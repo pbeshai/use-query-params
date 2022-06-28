@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { cleanup, renderHook } from '@testing-library/react-hooks';
-import { stringify } from 'query-string';
 import {
   DateParam,
   EncodedQuery,
@@ -12,10 +11,11 @@ import { describe, it } from 'vitest';
 import { QueryParamProvider, useQueryParam } from '../index';
 import { QueryParamAdapter } from '../types';
 import { calledPushQuery, makeMockAdapter } from './helpers';
+import { stringifyParams } from '../stringifyParams';
 
 // helper to setup tests
 function setupWrapper(query: EncodedQuery) {
-  const Adapter = makeMockAdapter({ search: stringify(query) });
+  const Adapter = makeMockAdapter({ search: stringifyParams(query) });
   const adapter = (Adapter as any).adapter as QueryParamAdapter;
   const wrapper = ({ children }: any) => (
     <QueryParamProvider Adapter={Adapter}>{children}</QueryParamProvider>
