@@ -261,6 +261,19 @@ describe('components', () => {
     errMock.mockRestore();
   });
 
+  test('#192 - not re-encoding paths', async () => {
+    const { queryByText, getByText, history } = renderWithRouter(
+      <QueryParamExample />,
+      '/foo[0]?x=3'
+    );
+
+    expect(queryByText(/x is 3/)).toBeTruthy();
+    getByText(/Change/).click();
+    expect(queryByText(/x is 4/)).toBeTruthy();
+    expect(history.location.search).toBe('?x=4');
+    expect(history.location.pathname).toBe('/foo[0]');
+  });
+
   describe('options', () => {
     it('updateType', () => {
       const { queryByText, getByText, history, rerender } = renderWithRouter(
