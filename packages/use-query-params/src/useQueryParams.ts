@@ -88,10 +88,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   const { parseParams } = mergedOptions;
 
   // what is the current stringified value?
-  const parsedParams = memoParseParams(
-    parseParams,
-    adapter.getCurrentLocation().search
-  );
+  const parsedParams = memoParseParams(parseParams, adapter.location.search);
 
   // run decode on each key, collect
   const { decodedValues } = getLatestDecodedValues(
@@ -146,7 +143,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       } = callbackDependenciesRef.current!;
 
       let encodedChanges;
-      const currentLocation = adapter.getCurrentLocation();
+      const currentLocation = adapter.location;
 
       // functional updates here get the latest values
       if (typeof changes === 'function') {
