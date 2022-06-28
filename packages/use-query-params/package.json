@@ -64,7 +64,6 @@
     "react-test-renderer": "^17.0.2"
   },
   "peerDependencies": {
-    "query-string": ">=5.1.1",
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
   },
