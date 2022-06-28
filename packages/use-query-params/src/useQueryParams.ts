@@ -42,6 +42,20 @@ function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
       decodedValue = decodedParamCache.get(paramName);
     } else {
       decodedValue = paramConfig.decode(encodedValue);
+
+      // check if we had a cached value for this encoded value but a different encoder
+      // (sometimes people inline decode functions, e.g. withDefault...)
+      // AND we had a different equals check than ===
+      if (
+        paramConfig.equals &&
+        decodedParamCache.has(paramName, encodedValue)
+      ) {
+        const oldDecodedValue = decodedParamCache.get(paramName);
+        if (paramConfig.equals(decodedValue, oldDecodedValue)) {
+          decodedValue = oldDecodedValue;
+        }
+      }
+
       // do not cache undefined values
       if (decodedValue !== undefined) {
         decodedParamCache.set(
