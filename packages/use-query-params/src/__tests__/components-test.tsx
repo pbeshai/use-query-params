@@ -14,7 +14,12 @@ import {
 } from 'serialize-query-params';
 import { describe, test, vi } from 'vitest';
 import { ReactRouter5Adapter } from '../adapters/react-router-5';
-import { NumberParam, QueryParamProvider, useQueryParam } from '../index';
+import {
+  NumberParam,
+  QueryParamProvider,
+  useQueryParam,
+  useQueryParams,
+} from '../index';
 import { QueryParamOptions } from '../options';
 
 function renderWithRouter(
@@ -353,6 +358,60 @@ describe('components', () => {
         keepEmptyString: true,
       });
       expect(queryByText(/x is ""/)).toBeTruthy();
+    });
+
+    it('parse/stringify with hash', () => {
+      const TestComponent = () => {
+        const [query, setQuery] = useQueryParams({
+          f: NumberParam,
+          g: StringParam,
+          h: NumberParam,
+        });
+
+        return (
+          <div>
+            {JSON.stringify(query)}
+            <button onClick={() => setQuery({ f: 2, g: 'b', h: 7 })}>
+              Change
+            </button>
+          </div>
+        );
+      };
+
+      const { queryByText, history, getByText } = renderWithRouter(
+        <TestComponent />,
+        '?store=0x1a8',
+        {
+          parseParams: (searchString: string) => {
+            const parsed = qs.parse(searchString);
+            const { store } = parsed;
+            let f, g, h;
+            if (store) {
+              f = store[2];
+              g = store[3];
+              h = store[4];
+            }
+
+            return {
+              f,
+              g,
+              h,
+            };
+          },
+          stringifyParams: (encodedParams) => {
+            const { f, g, h } = encodedParams;
+            const store = `0x${f}${g}${h}`;
+
+            return qs.stringify({ store });
+          },
+        }
+      );
+
+      expect(queryByText(/{"f":1,"g":"a","h":8}/)).toBeTruthy();
+      expect(history.location.search).toBe('?store=0x1a8');
+      getByText(/Change/).click();
+      expect(queryByText(/{"f":2,"g":"b","h":7}/)).toBeTruthy();
+      expect(history.location.search).toBe('?store=0x2b7');
     });
   });
 });
