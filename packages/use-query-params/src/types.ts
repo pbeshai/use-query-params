@@ -48,6 +48,7 @@ export type QueryParamAdapterComponent = ({
 export interface QueryParamOptions {
   parseParams?: (searchString: string) => EncodedQuery;
   stringifyParams?: (encodedParams: EncodedQuery) => string;
+  updateType?: UrlUpdateType;
 }
 
 type RequiredOptions = 'parseParams' | 'stringifyParams';

@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "types": ["vitest/globals"],
     "target": "ES2020",
     "module": "ES2020",
     "moduleResolution": "node",
@@ -16,6 +17,11 @@
     "noImplicitAny": true,
     "noFallthroughCasesInSwitch": true,
     "outDir": "lib",
+    "typeRoots": [
+      "./node_modules/@types",
+      "./@types",
+      "../node_modules/@types"
+    ],
   },
   "exclude": [
     "vitest.config.ts",
@@ -23,13 +29,6 @@
     "lib",
     "esm",
     "dist",
-    "**/__tests__",
-    "*-test.js",
-    "*-test.jsx",
-    "*-test.ts",
-    "*-test.tsx",
-    "*.test.ts",
-    "*.test.tsx",
     "examples",
     "docs"
   ]
