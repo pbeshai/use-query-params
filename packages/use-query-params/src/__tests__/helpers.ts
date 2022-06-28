@@ -32,31 +32,6 @@ export function makeMockAdapter(
   return Adapter;
 }
 
-// if passed a location, will mutate it so we can see what changes are being made
-export function makeMockHistory(location: any = {}) {
-  return {
-    replace: vi
-      .fn()
-      .mockImplementation((newLocation) =>
-        Object.assign(location, newLocation)
-      ),
-    push: vi
-      .fn()
-      .mockImplementation((newLocation) =>
-        Object.assign(location, newLocation)
-      ),
-    location,
-  };
-}
-
-// helper to get the query params from the updated location
-export function calledReplaceQuery(
-  history: ReturnType<typeof makeMockHistory>,
-  index: number = 0
-) {
-  return parseQueryString(history.replace.mock.calls[index][0].search);
-}
-
 // helper to get the query params from the updated location
 export function calledPushQuery(adapter: QueryParamAdapter, index: number = 0) {
   return parseQueryString(adapter.push.mock.calls[index][0].search);

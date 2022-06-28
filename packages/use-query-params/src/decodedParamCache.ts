@@ -8,8 +8,11 @@ type CachedParam = {
 
 export class DecodedParamCache {
   private paramsMap: Map<string, CachedParam>;
+  private registeredParams: Map<string, number>;
+
   constructor() {
     this.paramsMap = new Map();
+    this.registeredParams = new Map();
   }
 
   set(
@@ -39,6 +42,32 @@ export class DecodedParamCache {
   get(param: string) {
     if (this.paramsMap.has(param)) return this.paramsMap.get(param)?.decoded;
     return undefined;
+  }
+
+  registerParams(paramNames: string[]) {
+    for (const param of paramNames) {
+      const currValue = this.registeredParams.get(param) || 0;
+      this.registeredParams.set(param, currValue + 1);
+    }
+  }
+
+  unregisterParams(paramNames: string[]) {
+    for (const param of paramNames) {
+      const value = (this.registeredParams.get(param) || 0) - 1;
+      if (value <= 0) {
+        this.registeredParams.delete(param);
+        if (this.paramsMap.has(param)) {
+          this.paramsMap.delete(param);
+        }
+      } else {
+        this.registeredParams.set(param, value);
+      }
+    }
+  }
+
+  clear() {
+    this.paramsMap.clear();
+    this.registeredParams.clear();
   }
 }
 
