@@ -402,10 +402,10 @@ describe('useQueryParams', () => {
       setter({ bar: '2' });
       rerender();
       // twice per call since we useState inside the hook :(
-      expect(decodeSpy).toHaveBeenCalledTimes(3);
+      expect(decodeSpy).toHaveBeenCalledTimes(2);
       setter({ bar: '3' });
       rerender();
-      expect(decodeSpy).toHaveBeenCalledTimes(5);
+      expect(decodeSpy).toHaveBeenCalledTimes(3);
     });
   });
 });

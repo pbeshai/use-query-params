@@ -73,9 +73,37 @@ function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
     decodedValues[paramName as keyof QPCMap] = decodedValue;
   }
 
-  return {
-    decodedValues: decodedValues as DecodedValueMap<QPCMap>,
-  };
+  return decodedValues as DecodedValueMap<QPCMap>;
+}
+
+/**
+ * Wrap get latest so we use the same exact object if the current
+ * values are shallow equal to the previous.
+ */
+function makeStableGetLatestDecodedValues() {
+  let prevDecodedValues: DecodedValueMap<any> | undefined;
+
+  function stableGetLatest<QPCMap extends QueryParamConfigMap>(
+    parsedParams: EncodedQuery,
+    paramConfigMap: QPCMap,
+    decodedParamCache: DecodedParamCache
+  ) {
+    const decodedValues = getLatestDecodedValues(
+      parsedParams,
+      paramConfigMap,
+      decodedParamCache
+    );
+    if (
+      prevDecodedValues != null &&
+      shallowEqual(prevDecodedValues, decodedValues)
+    ) {
+      return prevDecodedValues;
+    }
+    prevDecodedValues = decodedValues;
+    return decodedValues;
+  }
+
+  return stableGetLatest;
 }
 
 /**
@@ -87,6 +115,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   options?: QueryParamOptions
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
   const { adapter, options: contextOptions } = useQueryParamContext();
+  const [stableGetLatest] = useState(makeStableGetLatestDecodedValues);
   const mergedOptions = useMergedOptions(contextOptions, options);
   const { parseParams, stringifyParams } = mergedOptions;
 
@@ -94,7 +123,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   const parsedParams = memoParseParams(parseParams, adapter.location.search);
 
   // run decode on each key, collect
-  const { decodedValues } = getLatestDecodedValues(
+  const decodedValues = stableGetLatest(
     parsedParams,
     paramConfigMap,
     decodedParamCache
@@ -119,9 +148,8 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     parseParams,
     stringifyParams,
   } as const;
-  const callbackDependenciesRef = useRef<typeof callbackDependencies>(
-    callbackDependencies
-  );
+  const callbackDependenciesRef =
+    useRef<typeof callbackDependencies>(callbackDependencies);
   if (callbackDependenciesRef.current == null) {
     callbackDependenciesRef.current = callbackDependencies;
   }
@@ -141,12 +169,8 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       updateType?: UrlUpdateType
     ) => {
       // read from a ref so we don't generate new setters each time any change
-      const {
-        adapter,
-        paramConfigMap,
-        parseParams,
-        stringifyParams,
-      } = callbackDependenciesRef.current!;
+      const { adapter, paramConfigMap, parseParams, stringifyParams } =
+        callbackDependenciesRef.current!;
 
       let encodedChanges;
       const currentLocation = adapter.location;
@@ -154,7 +178,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
 
       // functional updates here get the latest values
       if (typeof changes === 'function') {
-        const { decodedValues: latestValues } = getLatestDecodedValues(
+        const latestValues = getLatestDecodedValues(
           parsedParams,
           paramConfigMap,
           decodedParamCache
@@ -194,20 +218,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     };
   }, []);
 
-  // check if shallow equal to previous, and if so use previous
-  // see: https://beta-reactjs-org-git-you-might-not-fbopensource.vercel.app/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
-  // for why we use state here...
-  // not sure what's worse: doing this prev check and incurring two renders in the calling component
-  // or returning a shallow equals decodedValues when nothing has changed.
-  const [prevDecodedValues, setPrev] = useState(decodedValues);
-  let decodedValuesToUse = decodedValues;
-  if (shallowEqual(decodedValues, prevDecodedValues)) {
-    decodedValuesToUse = prevDecodedValues;
-  } else {
-    setPrev(decodedValues);
-  }
-
-  return [decodedValuesToUse, setQuery];
+  return [decodedValues, setQuery];
 };
 
 export default useQueryParams;
