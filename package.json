@@ -23,6 +23,8 @@
   },
   "scripts": {
     "build": "lerna run build --scope \"*-query-params\" --stream",
+    "build:uqp": "lerna run build --scope \"use-query-params\"",
+    "clean:uqp": "lerna run clean --scope \"use-query-params\"",
     "test": "npm-run-all \"test:uqp -- --run\"  \"test:sqp -- --run\"",
     "test:uqp": "vitest --root ./packages/use-query-params/",
     "test:sqp": "vitest --root ./packages/serialize-query-params/",

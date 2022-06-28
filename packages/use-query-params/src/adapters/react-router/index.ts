@@ -1,5 +1,10 @@
+// @ts-ignore
+import { useNavigate, useLocation } from 'react-router';
 import { QueryParamAdapter, QueryParamAdapterComponent } from '../../types';
 
+/**
+ * Query Param Adapter for react-router v6
+ */
 export const ReactRouterAdapter: QueryParamAdapterComponent = ({
   children,
 }) => {

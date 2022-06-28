@@ -1,52 +1,38 @@
-/**
- * Subset of a @reach/router history object. We only
- * care about the navigate function.
- */
-interface ReachHistory {
-  navigate: (
-    to: string,
-    options?: {
-      state?: any;
-      replace?: boolean;
-    }
-  ) => void;
-  location: Location;
-}
+// @ts-ignore
+import { globalHistory } from '@reach/router';
+import { useState } from 'react';
+import { PartialLocation, QueryParamAdapterComponent } from '../../types';
 
-// we use a lazy caching solution to prevent #46 from happening
-let cachedReachHistory: ReachHistory | undefined;
-let cachedAdaptedReachHistory: PushReplaceHistory | undefined;
-/**
- * Adapts @reach/router history to work with our
- * { replace, push } interface.
- *
- * @param history globalHistory from @reach/router
- */
-function adaptReachHistory(history: ReachHistory): PushReplaceHistory {
-  if (history === cachedReachHistory && cachedAdaptedReachHistory != null) {
-    return cachedAdaptedReachHistory;
-  }
+function makeAdapter() {
+  const adapter = {
+    replace(location: PartialLocation) {
+      globalHistory.navigate(location.search, {
+        replace: true,
+        state: location.state,
+      });
+    },
+    push(location: PartialLocation) {
+      globalHistory.navigate(location.search, {
+        replace: false,
+        state: location.state,
+      });
+    },
 
-  const adaptedReachHistory = {
-    replace(location: Location) {
-      history.navigate(
-        `${location.protocol}//${location.host}${location.pathname}${location.search}`,
-        { replace: true }
-      );
-    },
-    push(location: Location) {
-      history.navigate(
-        `${location.protocol}//${location.host}${location.pathname}${location.search}`,
-        { replace: false }
-      );
-    },
     get location() {
-      return history.location;
+      return globalHistory.location;
     },
   };
 
-  cachedReachHistory = history;
-  cachedAdaptedReachHistory = adaptedReachHistory;
-
-  return adaptedReachHistory;
+  return adapter;
 }
+
+/**
+ * Adapts @reach/router history to work with our
+ * { replace, push } interface.
+ */
+export const ReachAdapter: QueryParamAdapterComponent = ({ children }) => {
+  // we use a lazy caching solution to prevent #46 from happening
+  const [adapter] = useState(makeAdapter);
+
+  return children(adapter);
+};
