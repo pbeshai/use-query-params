@@ -13,7 +13,9 @@ export const ReactRouterAdapter: QueryParamAdapterComponent = ({
     push(location) {
       navigate(location, { replace: false, state: location.state });
     },
-    getCurrentLocation: () => location,
+    get location() {
+      return location;
+    },
   };
 
   return children(adapter);

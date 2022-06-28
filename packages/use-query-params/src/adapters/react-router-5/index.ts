@@ -14,7 +14,9 @@ export const ReactRouter5Adapter: QueryParamAdapterComponent = ({
     push(location) {
       history.replace(location.search, location.state);
     },
-    getCurrentLocation: () => location,
+    get location() {
+      return location;
+    },
   };
 
   return children(adapter);

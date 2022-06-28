@@ -82,9 +82,7 @@ describe('useQueryParam', () => {
     expect(decodedValue3).toBe(decodedValue4);
 
     // if another parameter changes, this one shouldn't be affected
-    (adapter.getCurrentLocation() as any).search = `${
-      adapter.getCurrentLocation().search
-    }&zzz=123`;
+    (adapter.location as any).search = `${adapter.location.search}&zzz=123`;
     rerender();
     const [decodedValue5] = result.current;
     expect(decodedValue5).toBe(decodedValue3);
@@ -164,7 +162,7 @@ describe('useQueryParam', () => {
     expect(calledPushQuery(adapter, 1)).toEqual({ foo: '333' });
 
     // use a stale setter
-    (adapter.getCurrentLocation() as any).search = '?foo=500';
+    (adapter.location as any).search = '?foo=500';
     rerender();
     setter((latestValue) => latestValue! + 100, 'push');
     expect(calledPushQuery(adapter, 2)).toEqual({ foo: '600' });

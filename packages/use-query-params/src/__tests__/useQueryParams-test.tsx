@@ -283,7 +283,7 @@ describe('useQueryParams', () => {
     });
 
     // use a stale setter
-    (adapter.getCurrentLocation() as any).search = '?foo=500';
+    (adapter.location as any).search = '?foo=500';
     rerender();
     setter((latestQuery: any) => ({ foo: latestQuery.foo + 100 }), 'push');
     expect(calledPushQuery(adapter, 2)).toEqual({ foo: '600' });

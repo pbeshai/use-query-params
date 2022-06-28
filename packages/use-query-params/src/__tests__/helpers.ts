@@ -10,7 +10,7 @@ import {
 export function makeMockAdapter(
   currentLocation: PartialLocation
 ): QueryParamAdapterComponent {
-  const adapter = {
+  const adapter: QueryParamAdapter = {
     replace: vi
       .fn()
       .mockImplementation((newLocation) =>
@@ -21,7 +21,7 @@ export function makeMockAdapter(
       .mockImplementation((newLocation) =>
         Object.assign(currentLocation, newLocation)
       ),
-    getCurrentLocation() {
+    get location() {
       return currentLocation;
     },
   };

@@ -15,16 +15,6 @@ import {
 export type UrlUpdateType = 'replace' | 'replaceIn' | 'push' | 'pushIn';
 
 /**
- * Adapted history object that provides a consistent interface
- * for pushing or replacing updates to a URL.
- */
-export interface PushReplaceHistory {
-  push: (location: Location) => void;
-  replace: (location: Location) => void;
-  location?: Location; // make it optional so we can be backwards compatible (added in 1.1.2)
-}
-
-/**
  * The setter function signature mapping
  */
 export type SetQuery<QPCMap extends QueryParamConfigMap> = (
@@ -36,27 +26,18 @@ export type SetQuery<QPCMap extends QueryParamConfigMap> = (
   updateType?: UrlUpdateType
 ) => void;
 
-export interface HistoryLocation {
-  /**
-   * History that meets the { replace, push } interface.
-   * May be missing when run server-side.
-   */
-  history?: PushReplaceHistory;
-  /** The location object */
-  location: Location;
-}
-
-// -- new --
 export interface PartialLocation {
   readonly search: string;
   readonly state?: any;
 }
 
 export interface QueryParamAdapter {
-  getCurrentLocation: () => PartialLocation;
+  location: PartialLocation;
   replace: (location: PartialLocation) => void;
   push: (location: PartialLocation) => void;
 }
+// for backwards compat
+export type PushReplaceHistory = QueryParamAdapter;
 
 export type QueryParamAdapterComponent = ({
   children,
