@@ -1,10 +1,11 @@
-import { useMemo, useRef, useEffect } from 'react';
+import { useMemo, useRef, useEffect, useCallback } from 'react';
 import { QueryParamConfig, StringParam } from 'serialize-query-params';
 import { memoParseParams } from './memoParseParams';
 import { useMergedOptions } from './options';
 import { useQueryParamContext } from './QueryParamProvider';
 import { QueryParamOptions, UrlUpdateType } from './types';
 import { createLocationWithChanges } from './updateUrlQuery';
+import useQueryParams from './useQueryParams';
 
 type NewValueType<D> = D | ((latestValue: D) => D);
 
@@ -31,96 +32,24 @@ export const useQueryParam = <TypeToEncode, TypeFromDecode = TypeToEncode>(
   TypeFromDecode,
   (newValue: NewValueType<TypeToEncode>, updateType?: UrlUpdateType) => void
 ] => {
-  const { adapter, options: contextOptions } = useQueryParamContext();
-  const mergedOptions = useMergedOptions(contextOptions, options);
-  const { parseParams } = mergedOptions;
-
-  // what is the current stringified value?
-  const parsedParams = memoParseParams(
-    parseParams,
-    adapter.getCurrentLocation().search
-  );
-  const stringifiedValue = parsedParams[name];
-
-  // decode the stringified value, caching the result
-  const decodeParam = paramConfig.decode;
-  const decodedValue = useMemo(() => decodeParam(stringifiedValue), [
-    decodeParam,
-    stringifiedValue,
+  const paramConfigMap = useMemo(() => ({ [name]: paramConfig }), [
+    name,
+    paramConfig,
   ]);
-
-  // use a ref for callback dependencies so we don't generate a new one unnecessarily
-  const callbackDependenciesRef = useRef<{
-    adapter: typeof adapter;
-    name: typeof name;
-    paramConfig: typeof paramConfig;
-    parseParams: typeof parseParams;
-  }>();
-  if (callbackDependenciesRef.current == null) {
-    callbackDependenciesRef.current = {
-      adapter,
-      name,
-      paramConfig,
-      parseParams,
-    };
-  }
-  useEffect(() => {
-    callbackDependenciesRef.current = {
-      adapter,
-      name,
-      paramConfig,
-      parseParams,
-    };
-  }, [adapter, name, paramConfig, parseParams]);
-
-  // create callback
-  const setValue = useMemo(() => {
-    return (
-      newValue: NewValueType<TypeToEncode>,
-      updateType?: UrlUpdateType
-    ) => {
-      // read from a ref so we don't generate new setters each time any change
-      const {
-        adapter,
-        name,
-        paramConfig,
-        parseParams,
-      } = callbackDependenciesRef.current!;
-
-      let encodedValue;
-      const currentLocation = adapter.getCurrentLocation();
-
-      // functional updates here get the latest values
+  const [query, setQuery] = useQueryParams(paramConfigMap, options);
+  const decodedValue = query[name];
+  const setValue = useCallback(
+    (newValue: NewValueType<TypeToEncode>, updateType?: UrlUpdateType) => {
       if (typeof newValue === 'function') {
-        const parsedParams = memoParseParams(
-          parseParams,
-          currentLocation.search
-        );
-        const stringifiedValue = parsedParams[name];
-        const latestDecodedValue = paramConfig.decode(stringifiedValue);
-
-        encodedValue = paramConfig.encode(
-          (newValue as Function)(latestDecodedValue)
-        );
-      } else {
-        // simple update here
-        encodedValue = paramConfig.encode(newValue);
+        return setQuery((latestValues) => {
+          const newValueFromLatest = (newValue as Function)(latestValues[name]);
+          return { [name]: newValueFromLatest };
+        }, updateType);
       }
-
-      // update the location and URL
-      const changes = { [name]: encodedValue };
-      const newLocation = createLocationWithChanges(
-        changes,
-        currentLocation,
-        updateType
-      );
-      if (updateType?.startsWith('replace')) {
-        adapter.replace(newLocation);
-      } else {
-        adapter.push(newLocation);
-      }
-    };
-  }, []);
+      return setQuery({ [name]: newValue } as any, updateType);
+    },
+    [name, setQuery]
+  );
 
   return [decodedValue, setValue];
 };
