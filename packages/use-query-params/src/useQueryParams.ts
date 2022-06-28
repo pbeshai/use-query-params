@@ -10,9 +10,12 @@ import { memoParseParams } from './memoParseParams';
 import { useMergedOptions } from './options';
 import { useQueryParamContext } from './QueryParamProvider';
 import shallowEqual from './shallowEqual';
-import { QueryParamOptions, SetQuery, UrlUpdateType } from './types';
-import { updateLocation, updateInLocation } from 'serialize-query-params';
-
+import {
+  PartialLocation,
+  QueryParamOptions,
+  SetQuery,
+  UrlUpdateType,
+} from './types';
 type ChangesType<DecodedValueMapType> =
   | Partial<DecodedValueMapType>
   | ((latestValues: DecodedValueMapType) => Partial<DecodedValueMapType>);
@@ -85,7 +88,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
 ): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
   const { adapter, options: contextOptions } = useQueryParamContext();
   const mergedOptions = useMergedOptions(contextOptions, options);
-  const { parseParams } = mergedOptions;
+  const { parseParams, stringifyParams } = mergedOptions;
 
   // what is the current stringified value?
   const parsedParams = memoParseParams(parseParams, adapter.location.search);
@@ -114,6 +117,7 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     adapter,
     paramConfigMap,
     parseParams,
+    stringifyParams,
   } as const;
   const callbackDependenciesRef = useRef<typeof callbackDependencies>(
     callbackDependencies
@@ -126,8 +130,9 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       adapter,
       paramConfigMap,
       parseParams,
+      stringifyParams,
     };
-  }, [adapter, paramConfigMap, parseParams]);
+  }, [adapter, paramConfigMap, parseParams, stringifyParams]);
 
   // create callback
   const setQuery = useMemo(() => {
@@ -140,17 +145,15 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
         adapter,
         paramConfigMap,
         parseParams,
+        stringifyParams,
       } = callbackDependenciesRef.current!;
 
       let encodedChanges;
       const currentLocation = adapter.location;
+      const parsedParams = memoParseParams(parseParams, currentLocation.search);
 
       // functional updates here get the latest values
       if (typeof changes === 'function') {
-        const parsedParams = memoParseParams(
-          parseParams,
-          currentLocation.search
-        );
         const { decodedValues: latestValues } = getLatestDecodedValues(
           parsedParams,
           paramConfigMap,
@@ -166,9 +169,22 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
       }
 
       // update the location and URL
-      const newLocation = (updateType === 'push' || updateType === 'replace'
-        ? updateLocation
-        : updateInLocation)(encodedChanges, currentLocation as Location);
+      let newLocation: PartialLocation;
+      if (updateType === 'push' || updateType === 'replace') {
+        newLocation = {
+          search: stringifyParams(encodedChanges),
+          state: currentLocation.state,
+        };
+      } else {
+        newLocation = {
+          search: stringifyParams({ ...parsedParams, ...encodedChanges }),
+          state: currentLocation.state,
+        };
+      }
+
+      if (newLocation.search?.length && newLocation.search[0] !== '?') {
+        (newLocation as any).search = `?${newLocation.search}`;
+      }
 
       if (updateType?.startsWith('replace')) {
         adapter.replace(newLocation);
