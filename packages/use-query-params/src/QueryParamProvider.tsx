@@ -1,13 +1,11 @@
 import * as React from 'react';
-import { mergeOptions } from './options';
-import { parseParams } from './parseParams';
-import { stringifyParams } from './stringifyParams';
 import {
-  QueryParamAdapter,
-  QueryParamAdapterComponent,
+  mergeOptions,
+  defaultOptions,
   QueryParamOptions,
   QueryParamOptionsWithRequired,
-} from './types';
+} from './options';
+import { QueryParamAdapter, QueryParamAdapterComponent } from './types';
 
 /**
  * Shape of the QueryParamContext, which the hooks consume to read and
@@ -16,11 +14,6 @@ import {
 type QueryParamContextValue = {
   adapter: QueryParamAdapter;
   options: QueryParamOptionsWithRequired;
-};
-
-const defaultOptions: QueryParamOptionsWithRequired = {
-  parseParams: parseParams,
-  stringifyParams: stringifyParams,
 };
 
 const providerlessContextValue: QueryParamContextValue = {
@@ -66,9 +59,8 @@ function QueryParamProviderInner({
   options?: QueryParamOptions;
 }) {
   // allow merging in parent options
-  const { adapter: parentAdapter, options: parentOptions } = React.useContext(
-    QueryParamContext
-  );
+  const { adapter: parentAdapter, options: parentOptions } =
+    React.useContext(QueryParamContext);
 
   const value = React.useMemo(() => {
     return {

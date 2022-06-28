@@ -10,3 +10,4 @@ export {
 } from './withQueryParams';
 export { QueryParams, QueryParamsProps, QueryRenderProps } from './QueryParams';
 export { QueryParamProvider } from './QueryParamProvider';
+export { QueryParamOptions, QueryParamOptionsWithRequired } from './options';

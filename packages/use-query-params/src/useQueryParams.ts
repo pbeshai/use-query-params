@@ -7,15 +7,10 @@ import {
 } from 'serialize-query-params';
 import { DecodedParamCache, decodedParamCache } from './decodedParamCache';
 import { memoParseParams } from './memoParseParams';
-import { useMergedOptions } from './options';
+import { QueryParamOptions, useMergedOptions } from './options';
 import { useQueryParamContext } from './QueryParamProvider';
 import shallowEqual from './shallowEqual';
-import {
-  PartialLocation,
-  QueryParamOptions,
-  SetQuery,
-  UrlUpdateType,
-} from './types';
+import { PartialLocation, SetQuery, UrlUpdateType } from './types';
 type ChangesType<DecodedValueMapType> =
   | Partial<DecodedValueMapType>
   | ((latestValues: DecodedValueMapType) => Partial<DecodedValueMapType>);
@@ -27,7 +22,8 @@ type ChangesType<DecodedValueMapType> =
 function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
   parsedParams: EncodedQuery,
   paramConfigMap: QPCMap,
-  decodedParamCache: DecodedParamCache
+  decodedParamCache: DecodedParamCache,
+  options: QueryParamOptions = {}
 ) {
   const decodedValues: Partial<DecodedValueMap<QPCMap>> = {};
 
@@ -70,6 +66,12 @@ function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
       }
     }
 
+    if (decodedValue === null && !options.keepNull) {
+      decodedValue = undefined;
+    } else if (decodedValue === '' && !options.keepEmptyString) {
+      decodedValue = undefined;
+    }
+
     decodedValues[paramName as keyof QPCMap] = decodedValue;
   }
 
@@ -86,12 +88,14 @@ function makeStableGetLatestDecodedValues() {
   function stableGetLatest<QPCMap extends QueryParamConfigMap>(
     parsedParams: EncodedQuery,
     paramConfigMap: QPCMap,
-    decodedParamCache: DecodedParamCache
+    decodedParamCache: DecodedParamCache,
+    options: QueryParamOptions
   ) {
     const decodedValues = getLatestDecodedValues(
       parsedParams,
       paramConfigMap,
-      decodedParamCache
+      decodedParamCache,
+      options
     );
     if (
       prevDecodedValues != null &&
@@ -128,7 +132,8 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
   const decodedValues = stableGetLatest(
     parsedParams,
     paramConfigMap,
-    decodedParamCache
+    decodedParamCache,
+    mergedOptions
   );
 
   // clear out unused values in cache
@@ -183,7 +188,8 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
         const latestValues = getLatestDecodedValues(
           parsedParams,
           paramConfigMap,
-          decodedParamCache
+          decodedParamCache,
+          options
         );
         encodedChanges = encodeQueryParams(
           paramConfigMap,

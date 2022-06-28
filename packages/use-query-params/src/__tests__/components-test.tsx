@@ -1,4 +1,5 @@
 import { cleanup, render, screen } from '@testing-library/react';
+import * as qs from 'query-string';
 import { createMemoryHistory } from 'history';
 import { parse } from 'query-string';
 import * as React from 'react';
@@ -7,12 +8,14 @@ import { Link, Route } from 'react-router-dom';
 import {
   DateParam,
   decodeQueryParams,
+  QueryParamConfig,
+  StringParam,
   withDefault,
 } from 'serialize-query-params';
 import { describe, test, vi } from 'vitest';
 import { ReactRouter5Adapter } from '../adapters/react-router-5';
 import { NumberParam, QueryParamProvider, useQueryParam } from '../index';
-import { QueryParamOptions } from '../types';
+import { QueryParamOptions } from '../options';
 
 function renderWithRouter(
   ui: React.ReactNode,
@@ -20,25 +23,53 @@ function renderWithRouter(
   options?: QueryParamOptions
 ) {
   const history = createMemoryHistory({ initialEntries: [initialRoute] });
-  return {
-    ...render(
+  const results = render(
+    <Router history={history}>
+      <QueryParamProvider Adapter={ReactRouter5Adapter} options={options}>
+        {ui}
+      </QueryParamProvider>
+    </Router>
+  );
+  const rerender = (ui: React.ReactNode, newOptions = options) =>
+    results.rerender(
       <Router history={history}>
-        <QueryParamProvider Adapter={ReactRouter5Adapter} options={options}>
+        <QueryParamProvider Adapter={ReactRouter5Adapter} options={newOptions}>
           {ui}
         </QueryParamProvider>
       </Router>
-    ),
+    );
+  return {
+    ...results,
+    rerender,
     history,
   };
 }
 
 // An example counter component to be tested
-const QueryParamExample = ({ options }: { options?: QueryParamOptions }) => {
-  const [x = 0, setX] = useQueryParam('x', NumberParam, options);
+const QueryParamExample = ({
+  options,
+  paramType = NumberParam,
+}: {
+  options?: QueryParamOptions;
+  paramType?: QueryParamConfig<any>;
+}) => {
+  let [x, setX] = useQueryParam('x', paramType, options);
+  const isUndefined = x === undefined;
+  const isNull = x === null;
+  const isEmptyString = x === '';
+  if (x == null) x = 0;
 
   return (
     <div>
-      <h1>{`x is ${x}`}</h1>
+      <h1>{`x is ${x}${
+        isUndefined
+          ? ' undefined'
+          : isNull
+          ? ' null'
+          : isEmptyString
+          ? '""'
+          : ''
+      }`}</h1>
       <button onClick={() => setX(x! + 1)}>Change</button>
     </div>
   );
@@ -231,8 +262,8 @@ describe('components', () => {
   });
 
   describe('options', () => {
-    it('updateType - hook option', () => {
-      const { queryByText, getByText, history } = renderWithRouter(
+    it('updateType', () => {
+      const { queryByText, getByText, history, rerender } = renderWithRouter(
         <QueryParamExample options={{ updateType: 'replace' }} />,
         '?x=3&y=z',
         { updateType: 'push' }
@@ -246,23 +277,69 @@ describe('components', () => {
       expect(history.location.search).toBe('?x=4');
       expect(replaceSpy).toHaveBeenCalledTimes(1);
       expect(pushSpy).toHaveBeenCalledTimes(0);
+
+      rerender(<QueryParamExample />, { updateType: 'push' });
+
+      expect(queryByText(/x is 4/)).toBeTruthy();
+      getByText(/Change/).click();
+      expect(queryByText(/x is 5/)).toBeTruthy();
+      expect(history.location.search).toBe('?x=5');
+      expect(replaceSpy).toHaveBeenCalledTimes(1);
+      expect(pushSpy).toHaveBeenCalledTimes(1);
     });
 
-    it.only('updateType - provider option', () => {
-      const { queryByText, getByText, history } = renderWithRouter(
-        <QueryParamExample />,
-        '?x=3&y=z',
-        { updateType: 'push' }
+    it('keepNull', () => {
+      const { queryByText, rerender } = renderWithRouter(
+        <QueryParamExample options={{ keepNull: true }} />,
+        '?x',
+        {
+          parseParams: qs.parse,
+          stringifyParams: qs.stringify,
+        }
       );
-      const replaceSpy = vi.spyOn(history, 'replace');
-      const pushSpy = vi.spyOn(history, 'push');
 
-      expect(queryByText(/x is 3/)).toBeTruthy();
-      getByText(/Change/).click();
-      expect(queryByText(/x is 4/)).toBeTruthy();
-      expect(history.location.search).toBe('?x=4');
-      expect(replaceSpy).toHaveBeenCalledTimes(0);
-      expect(pushSpy).toHaveBeenCalledTimes(1);
+      expect(queryByText(/x is 0 null/)).toBeTruthy();
+
+      rerender(<QueryParamExample options={{ keepNull: false }} />);
+      expect(queryByText(/x is 0 undefined/)).toBeTruthy();
+
+      rerender(<QueryParamExample />);
+      expect(queryByText(/x is 0 undefined/)).toBeTruthy();
+
+      rerender(<QueryParamExample />, { keepNull: true });
+      expect(queryByText(/x is 0 null/)).toBeTruthy();
+    });
+
+    it('keepEmptyString', () => {
+      const { queryByText, rerender } = renderWithRouter(
+        <QueryParamExample
+          options={{ keepEmptyString: true }}
+          paramType={StringParam}
+        />,
+        '?x=',
+        {
+          parseParams: qs.parse,
+          stringifyParams: qs.stringify,
+        }
+      );
+
+      expect(queryByText(/x is ""/)).toBeTruthy();
+
+      rerender(
+        <QueryParamExample
+          paramType={StringParam}
+          options={{ keepEmptyString: false }}
+        />
+      );
+      expect(queryByText(/x is 0 undefined/)).toBeTruthy();
+
+      rerender(<QueryParamExample paramType={StringParam} />);
+      expect(queryByText(/x is 0 undefined/)).toBeTruthy();
+
+      rerender(<QueryParamExample paramType={StringParam} />, {
+        keepEmptyString: true,
+      });
+      expect(queryByText(/x is ""/)).toBeTruthy();
     });
   });
 });

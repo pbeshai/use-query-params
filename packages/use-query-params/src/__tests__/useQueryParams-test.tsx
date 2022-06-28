@@ -350,7 +350,7 @@ describe('useQueryParams', () => {
 
   describe('should call custom paramConfig.decode properly', () => {
     it('when custom paramConfig decode undefined as non-undefined value, should not call decode function when irrelevant update happens', () => {
-      const { wrapper } = setupWrapper({ bar: '1' });
+      const { wrapper } = setupWrapper({ bar: '1' }, { keepNull: true });
       const customQueryParam = {
         encode: (str: string | undefined | null) => str,
         decode: (str: string | (string | null)[] | undefined | null) => {
