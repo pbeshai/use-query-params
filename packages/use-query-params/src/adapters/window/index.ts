@@ -4,10 +4,10 @@ import { PartialLocation, QueryParamAdapterComponent } from '../../types';
 function makeAdapter() {
   const adapter = {
     replace(location: PartialLocation) {
-      history.replaceState(location.state, '', location.search);
+      window.history.replaceState(location.state, '', location.search);
     },
     push(location: PartialLocation) {
-      history.pushState(location.state, '', location.search);
+      window.history.pushState(location.state, '', location.search);
     },
     get location() {
       return window.location;
@@ -20,8 +20,6 @@ function makeAdapter() {
 /**
  * Adapts standard DOM window history to work with our
  * { replace, push } interface.
- *
- * @param history Standard history provided by DOM
  */
 export const WindowHistoryAdapter: QueryParamAdapterComponent = ({
   children,
