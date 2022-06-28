@@ -2,12 +2,13 @@
  * @jest-environment node
  */
 import * as React from 'react';
-import { useQueryParam } from '../useQueryParam';
 import { renderToString } from 'react-dom/server';
-import QueryParamProvider from '../QueryParamProvider';
-import { makeMockLocation } from './helpers';
 import { StringParam } from 'serialize-query-params';
-import { describe, it, vi, test } from 'vitest';
+import { test } from 'vitest';
+import QueryParamProvider from '../QueryParamProvider';
+import { stringifyParams } from '../stringifyParams';
+import { useQueryParam } from '../useQueryParam';
+import { makeMockAdapter } from './helpers';
 
 test.skip('SSR initial query param', () => {
   const Component = () => {
@@ -16,10 +17,11 @@ test.skip('SSR initial query param', () => {
     return <div>{foo}</div>;
   };
 
-  const location = makeMockLocation({ foo: 'bar' });
+  const query = { foo: 'bar' };
+  const Adapter = makeMockAdapter({ search: stringifyParams(query) });
 
   const result = renderToString(
-    <QueryParamProvider location={location}>
+    <QueryParamProvider Adapter={Adapter}>
       <Component />
     </QueryParamProvider>
   );
