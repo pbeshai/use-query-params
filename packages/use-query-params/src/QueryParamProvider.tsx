@@ -1,17 +1,13 @@
 import * as React from 'react';
-import { EncodedQuery, ExtendedStringifyOptions } from 'serialize-query-params';
 import { mergeOptions } from './options';
 import { parseParams } from './parseParams';
 import { stringifyParams } from './stringifyParams';
 import {
-  HistoryLocation,
   QueryParamAdapter,
   QueryParamAdapterComponent,
   QueryParamOptions,
   QueryParamOptionsWithRequired,
 } from './types';
-import { UrlUpdateType } from './types';
-import { createLocationWithChanges, updateUrlQuery } from './updateUrlQuery';
 
 /**
  * Shape of the LocationProviderContext, which the hooks consume to read and

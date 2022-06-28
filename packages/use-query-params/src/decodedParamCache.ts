@@ -1,4 +1,3 @@
-/** tuple comprising [stringified value, decoded value] */
 type EncodedValue = string | (string | null)[] | null | undefined;
 
 type CachedParam = {

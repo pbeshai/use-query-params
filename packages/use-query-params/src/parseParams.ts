@@ -7,7 +7,7 @@ export function parseParams(searchString: string): EncodedQuery {
   const params = new URLSearchParams(searchString);
   const parsed: EncodedQuery = {};
   for (let [key, value] of params) {
-    if (parsed.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(parsed, key)) {
       if (Array.isArray(parsed[key])) {
         (parsed[key] as string[]).push(value);
       } else {

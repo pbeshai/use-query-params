@@ -1,28 +1,32 @@
-import * as React from 'react';
-import { describe, it, vi, test } from 'vitest';
-import { render, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
+import { cleanup, render } from '@testing-library/react';
+import * as React from 'react';
+import { describe, it } from 'vitest';
 
 import {
-  NumberParam,
-  StringParam,
   DecodedValueMap,
   EncodedQuery,
+  NumberParam,
+  StringParam,
 } from 'serialize-query-params';
-import { SetQuery, QueryParams, QueryParamProvider } from '../index';
-import { makeMockHistory, makeMockLocation, calledPushQuery } from './helpers';
+import {
+  QueryParamAdapter,
+  QueryParamProvider,
+  QueryParams,
+  SetQuery,
+} from '../index';
+import { stringifyParams } from '../stringifyParams';
+import { calledPushQuery, makeMockAdapter } from './helpers';
 
 // helper to setup tests
 function setupWrapper(query: EncodedQuery) {
-  const location = makeMockLocation(query);
-  const history = makeMockHistory(location);
+  const Adapter = makeMockAdapter({ search: stringifyParams(query) });
+  const adapter = (Adapter as any).adapter as QueryParamAdapter;
   const wrapper = ({ children }: any) => (
-    <QueryParamProvider history={history} location={location}>
-      {children}
-    </QueryParamProvider>
+    <QueryParamProvider Adapter={Adapter}>{children}</QueryParamProvider>
   );
 
-  return { wrapper, history, location };
+  return { wrapper, adapter };
 }
 
 const queryConfig = { foo: NumberParam, bar: StringParam };
@@ -44,11 +48,11 @@ const MockComponent: React.FC<Props> = ({ query, setQuery, other }) => {
   );
 };
 
-describe.skip('QueryParams', () => {
+describe('QueryParams', () => {
   afterEach(cleanup);
 
   it('works', () => {
-    const { wrapper, history } = setupWrapper({
+    const { wrapper, adapter } = setupWrapper({
       foo: '123',
       bar: 'xxx',
     });
@@ -70,6 +74,6 @@ describe.skip('QueryParams', () => {
     // @ts-ignore
     expect(getByText(/bar = xxx/)).toBeInTheDocument();
     getByText(/change foo/).click();
-    expect(calledPushQuery(history, 0)).toEqual({ foo: '99', bar: 'xxx' });
+    expect(calledPushQuery(adapter, 0)).toEqual({ foo: '99', bar: 'xxx' });
   });
 });
