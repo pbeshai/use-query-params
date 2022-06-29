@@ -415,4 +415,47 @@ describe('components', () => {
       expect(history.location.search).toBe('?store=0x2b7');
     });
   });
+
+  it('multiple nested providers', () => {
+    const TestComponent = () => {
+      const [query, setQuery] = useQueryParams();
+
+      return (
+        <div>
+          {JSON.stringify(query)}
+          <button onClick={() => setQuery({ f: 2, g: 'b', h: 7 })}>
+            Change
+          </button>
+        </div>
+      );
+    };
+    const { queryByText, getByText } = renderWithRouter(
+      <div>
+        <QueryParamProvider
+          options={{
+            params: {
+              h: NumberParam,
+            },
+          }}
+        >
+          <div>
+            <TestComponent />
+          </div>
+        </QueryParamProvider>
+      </div>,
+      '?f=1&g=a&h=8',
+      {
+        parseParams: qs.parse,
+        stringifyParams: qs.stringify,
+        params: {
+          f: NumberParam,
+          g: StringParam,
+        },
+      }
+    );
+
+    expect(queryByText(/{"f":1,"g":"a","h":8}/)).toBeTruthy();
+    getByText(/Change/).click();
+    expect(queryByText(/{"f":2,"g":"b","h":7}/)).toBeTruthy();
+  });
 });

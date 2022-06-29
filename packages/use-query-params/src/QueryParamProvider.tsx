@@ -45,7 +45,8 @@ export function useQueryParamContext() {
 interface QueryParamProviderProps {
   /** Main app goes here */
   children: React.ReactNode;
-  Adapter: QueryParamAdapterComponent;
+  /** required for the root provider but not for nested ones */
+  Adapter?: QueryParamAdapterComponent;
   options?: QueryParamOptions;
 }
 
