@@ -11,6 +11,7 @@ export const defaultOptions: QueryParamOptionsWithRequired = {
   keepEmptyString: false,
   includeKnownParams: undefined,
   includeAllParams: false,
+  removeDefaultsFromUrl: false,
 };
 
 export interface QueryParamOptions {
@@ -22,6 +23,9 @@ export interface QueryParamOptions {
   includeKnownParams?: boolean;
   includeAllParams?: boolean;
   params?: QueryParamConfigMap;
+
+  /** when a value equals its default, do not encode it in the URL when updating */
+  removeDefaultsFromUrl?: boolean;
 }
 
 type RequiredOptions = 'parseParams' | 'stringifyParams';

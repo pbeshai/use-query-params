@@ -18,6 +18,7 @@ import {
 import { memoParseParams } from './memoParseParams';
 import { mergeOptions, QueryParamOptions } from './options';
 import { useQueryParamContext } from './QueryParamProvider';
+import { removeDefaults } from './removeDefaults';
 import {
   PartialLocation,
   QueryParamConfigMapWithInherit,
@@ -164,6 +165,10 @@ export function useQueryParams(
         options.params
       );
 
+      // update changes prior to encoding to handle removing defaults
+      // getting latest values when functional update
+      let changesToUse: Partial<DecodedValueMap<any>>;
+
       // functional updates here get the latest values
       if (typeof changes === 'function') {
         const latestValues = getLatestDecodedValues(
@@ -172,13 +177,18 @@ export function useQueryParams(
           decodedParamCache,
           options
         );
-        encodedChanges = encodeQueryParams(
-          paramConfigMap,
-          (changes as Function)(latestValues)
-        );
+
+        changesToUse = (changes as Function)(latestValues);
       } else {
         // simple update here
-        encodedChanges = encodeQueryParams(paramConfigMap, changes);
+        changesToUse = changes;
+      }
+
+      encodedChanges = encodeQueryParams(paramConfigMap, changesToUse);
+
+      // remove defaults
+      if (options.removeDefaultsFromUrl) {
+        removeDefaults(encodedChanges, paramConfigMap);
       }
 
       // update the location and URL

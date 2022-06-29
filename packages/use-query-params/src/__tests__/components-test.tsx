@@ -413,6 +413,37 @@ describe('components', () => {
       expect(queryByText(/{"f":2,"g":"b","h":7}/)).toBeTruthy();
       expect(history.location.search).toBe('?store=0x2b7');
     });
+
+    it('removeDefaultsFromUrl', () => {
+      const { queryByText, getByText, history, rerender } = renderWithRouter(
+        <QueryParamExample
+          options={{ removeDefaultsFromUrl: true }}
+          paramType={{ ...NumberParam, default: 3 }}
+        />,
+        '?x=3'
+      );
+      expect(history.location.search).toBe('?x=3');
+      const pushSpy = vi.spyOn(history, 'push');
+      expect(queryByText(/x is 3/)).toBeTruthy();
+      getByText(/Change/).click();
+      expect(history.location.search).toBe('?x=4');
+      expect(queryByText(/x is 4/)).toBeTruthy();
+      expect(pushSpy).toHaveBeenCalledTimes(1);
+
+      rerender(
+        <QueryParamExample
+          options={{ removeDefaultsFromUrl: true }}
+          paramType={{ ...NumberParam, default: 5 }}
+        />
+      );
+
+      expect(history.location.search).toBe('?x=4');
+      expect(queryByText(/x is 4/)).toBeTruthy();
+      getByText(/Change/).click();
+      expect(history.location.search).toBe('');
+      expect(queryByText(/x is 5/)).toBeTruthy();
+      expect(pushSpy).toHaveBeenCalledTimes(2);
+    });
   });
 
   it('multiple nested providers', () => {
