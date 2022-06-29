@@ -433,53 +433,6 @@ describe('useQueryParams', () => {
       expect(decodedValue2).toEqual({ x: 99, z: false });
     });
 
-    it('works with useQueryParams("x")', () => {
-      const { wrapper } = setupWrapper(
-        { x: '99', y: '123', z: '1' },
-        {
-          params: {
-            x: NumberParam,
-            z: BooleanParam,
-          },
-        }
-      );
-      const { result, rerender } = renderHook(() => useQueryParams('x'), {
-        wrapper,
-      });
-
-      const [decodedValue, setter] = result.current;
-      expect(decodedValue).toEqual(99);
-      setter(5);
-      rerender();
-      const [decodedValue2] = result.current;
-      expect(decodedValue2).toEqual(5);
-    });
-
-    it('works with useQueryParams("x", StringParam) override', () => {
-      const { wrapper } = setupWrapper(
-        { x: '99', y: '123', z: '1' },
-        {
-          params: {
-            x: NumberParam,
-            z: BooleanParam,
-          },
-        }
-      );
-      const { result, rerender } = renderHook(
-        () => useQueryParams('x', StringParam),
-        {
-          wrapper,
-        }
-      );
-
-      const [decodedValue, setter] = result.current;
-      expect(decodedValue).toEqual('99');
-      setter('5');
-      rerender();
-      const [decodedValue2] = result.current;
-      expect(decodedValue2).toEqual('5');
-    });
-
     it('works with useQueryParams(["x", "z"])', () => {
       const { wrapper } = setupWrapper(
         { x: '99', y: '123', z: '1' },

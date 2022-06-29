@@ -123,34 +123,19 @@ function makeStableGetLatestDecodedValues() {
 }
 
 function parseArguments(
-  arg1: string | string[] | QueryParamConfigMapWithInherit | undefined,
-  arg2: QueryParamConfig<any> | QueryParamOptions | undefined,
-  arg3: QueryParamOptions | undefined
+  arg1: string[] | QueryParamConfigMapWithInherit | undefined,
+  arg2: QueryParamConfig<any> | QueryParamOptions | undefined
 ): {
   paramConfigMap: QueryParamConfigMapWithInherit;
   options: QueryParamOptions | undefined;
-  singleParamName: string | undefined;
 } {
   let paramConfigMap: QueryParamConfigMapWithInherit;
   let options: QueryParamOptions | undefined;
-  let singleParamName: string | undefined;
 
   if (arg1 === undefined) {
     // useQueryParams()
     paramConfigMap = {};
     options = arg2 as QueryParamOptions | undefined;
-  } else if (typeof arg1 === 'string') {
-    // mark this as historic useQueryParam mode
-    singleParamName = arg1;
-    if (arg2 === undefined) {
-      // useQueryParams('geo')
-      paramConfigMap = { [arg1]: 'inherit' };
-    } else {
-      // useQueryParams('geo', NumberParam)
-      // useQueryParams('geo', NumberParam, options)
-      paramConfigMap = { [arg1]: arg2 as QueryParamConfig<any> };
-      options = arg3;
-    }
   } else if (Array.isArray(arg1)) {
     // useQueryParams(['geo', 'other'])
     // useQueryParams(['geo', 'other'], options)
@@ -165,7 +150,7 @@ function parseArguments(
     options = arg2 as QueryParamOptions | undefined;
   }
 
-  return { paramConfigMap, options, singleParamName };
+  return { paramConfigMap, options };
 }
 
 function processInheritedParams(
@@ -228,16 +213,9 @@ type ExpandInherits<QPCMap extends QueryParamConfigMapWithInherit> = {
  * Given a query parameter configuration (mapping query param name to { encode, decode }),
  * return an object with the decoded values and a setter for updating them.
  */
-export function useQueryParams(): UseQueryParamsResult<any>;
 export function useQueryParams<
-  TypeToEncode = any,
-  TypeFromDecode = TypeToEncode
->(name: string): UseQueryParamsSingleResult<TypeToEncode, TypeFromDecode>;
-export function useQueryParams<TypeToEncode, TypeFromDecode = TypeToEncode>(
-  name: string,
-  paramConfig?: QueryParamConfig<TypeToEncode, TypeFromDecode>,
-  options?: QueryParamOptions
-): UseQueryParamsSingleResult<TypeToEncode, TypeFromDecode>;
+  QPCMap extends QueryParamConfigMap = QueryParamConfigMap
+>(): UseQueryParamsResult<QPCMap>;
 export function useQueryParams<QPCMap extends QueryParamConfigMapWithInherit>(
   names: string[],
   options?: QueryParamOptions
@@ -251,19 +229,17 @@ export function useQueryParams<
 ): UseQueryParamsResult<OutputQPCMap>;
 
 export function useQueryParams(
-  arg1?: string | string[] | QueryParamConfigMapWithInherit,
-  arg2?: QueryParamConfig<any> | QueryParamOptions,
-  arg3?: QueryParamOptions
+  arg1?: string[] | QueryParamConfigMapWithInherit,
+  arg2?: QueryParamConfig<any> | QueryParamOptions
 ): UseQueryParamsResult<any> | UseQueryParamsSingleResult<any> {
   const { adapter, options: contextOptions } = useQueryParamContext();
   const [stableGetLatest] = useState(makeStableGetLatestDecodedValues);
 
   // intepret the overloaded arguments
-  const {
-    paramConfigMap: paramConfigMapWithInherit,
-    options,
-    singleParamName,
-  } = parseArguments(arg1, arg2, arg3);
+  const { paramConfigMap: paramConfigMapWithInherit, options } = parseArguments(
+    arg1,
+    arg2
+  );
 
   const mergedOptions = useMergedOptions(contextOptions, options);
 
@@ -376,34 +352,8 @@ export function useQueryParams(
       }
     };
 
-    // for historic useQueryParam('foo', Param) style args
-    // where the setter just takes a single value instead of an object
-    if (singleParamName != null) {
-      const setValue = (
-        newValue: NewValueType<any>,
-        updateType?: UrlUpdateType
-      ) => {
-        if (typeof newValue === 'function') {
-          return setQuery((latestValues) => {
-            const newValueFromLatest = (newValue as Function)(
-              latestValues[singleParamName]
-            );
-            return { [singleParamName]: newValueFromLatest } as any;
-          }, updateType);
-        }
-        return setQuery({ [singleParamName]: newValue } as any, updateType);
-      };
-
-      return setValue;
-    }
-
     return setQuery;
-  }, [singleParamName]);
-
-  // for historic useQueryParam('foo', Param) style args
-  if (singleParamName) {
-    return [decodedValues[singleParamName], setQuery];
-  }
+  }, []);
 
   return [decodedValues, setQuery];
 }
