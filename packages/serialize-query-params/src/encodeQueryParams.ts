@@ -18,11 +18,6 @@ export function encodeQueryParams<QPCMap extends QueryParamConfigMap>(
     const decodedValue = query[paramName];
 
     if (!paramConfigMap[paramName]) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(
-          `Encoding parameter ${paramName} as string since it was not configured.`
-        );
-      }
       // NOTE: we could just not encode it, but it is probably convenient to have
       // it be included by default as a string type.
       (encodedQuery as any)[paramName] =
