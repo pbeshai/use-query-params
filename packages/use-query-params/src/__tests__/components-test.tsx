@@ -11,15 +11,11 @@ import {
   QueryParamConfig,
   StringParam,
   withDefault,
+  NumberParam,
 } from 'serialize-query-params';
 import { describe, test, vi } from 'vitest';
 import { ReactRouter5Adapter } from '../adapters/react-router-5';
-import {
-  NumberParam,
-  QueryParamProvider,
-  useQueryParam,
-  useQueryParams,
-} from '../index';
+import { QueryParamProvider, useQueryParam, useQueryParams } from '../index';
 import { QueryParamOptions } from '../options';
 
 function renderWithRouter(

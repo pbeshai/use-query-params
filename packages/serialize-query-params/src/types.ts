@@ -31,6 +31,15 @@ export interface QueryParamConfig<D, D2 = D> {
    * types.
    */
   default?: D2;
+
+  /**
+   * optionally provide a different name when in the URL for other tooling
+
+   * @note not typically used by serialize-query-params, but use-query-params
+   * does and it would be annoying for there to be two slightly different
+   * types.
+   */
+  urlName?: D2;
 }
 
 /**

@@ -371,6 +371,46 @@ describe('useQueryParams', () => {
     });
   });
 
+  it('supports alternative urlName config', () => {
+    const { wrapper, adapter } = setupWrapper({ q: 'my search' });
+    const { result, rerender } = renderHook(
+      () => useQueryParams({ searchQuery: { ...StringParam, urlName: 'q' } }),
+      {
+        wrapper,
+      }
+    );
+    const [decodedQuery, setter] = result.current;
+
+    expect(decodedQuery).toEqual({ searchQuery: 'my search' });
+    setter({ searchQuery: 'yours' });
+    expect(calledPushQuery(adapter, 0)).toEqual({
+      q: 'yours',
+    });
+    rerender();
+    const [decodedQuery2] = result.current;
+    expect(decodedQuery2).toEqual({ searchQuery: 'yours' });
+  });
+
+  it('supports inherited urlName config', () => {
+    const { wrapper, adapter } = setupWrapper(
+      { q: 'my search' },
+      { params: { searchQuery: { ...StringParam, urlName: 'q' } } }
+    );
+    const { result, rerender } = renderHook(() => useQueryParams(), {
+      wrapper,
+    });
+    const [decodedQuery, setter] = result.current;
+
+    expect(decodedQuery).toEqual({ searchQuery: 'my search' });
+    setter({ searchQuery: 'yours' });
+    expect(calledPushQuery(adapter, 0)).toEqual({
+      q: 'yours',
+    });
+    rerender();
+    const [decodedQuery2] = result.current;
+    expect(decodedQuery2).toEqual({ searchQuery: 'yours' });
+  });
+
   describe('default values', () => {
     it('replaces undefined with default value', () => {
       const { wrapper } = setupWrapper({});

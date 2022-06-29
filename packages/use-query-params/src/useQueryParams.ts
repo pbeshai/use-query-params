@@ -25,6 +25,7 @@ import {
   SetQuery,
   UrlUpdateType,
 } from './types';
+import { applyUrlNames, serializeUrlNameMap } from './urlName';
 
 // for multiple param config
 type ChangesType<DecodedValueMapType> =
@@ -78,17 +79,19 @@ export function useQueryParams(
     return mergeOptions(contextOptions, options);
   }, [contextOptions, options]);
 
-  // what is the current stringified value?
-  const parsedParams = memoParseParams(
-    mergedOptions.parseParams,
-    adapter.location.search
-  );
-
   // interpret params that were configured up the chain
   let paramConfigMap = processInheritedParams(
     paramConfigMapWithInherit,
     mergedOptions
   );
+
+  // what is the current stringified value?
+  const parsedParams = memoParseParams(
+    mergedOptions.parseParams,
+    adapter.location.search,
+    serializeUrlNameMap(paramConfigMap) // note we serialize for memo purposes
+  );
+
   // do we want to include all params from the URL even if not configured?
   if (mergedOptions.includeAllParams) {
     paramConfigMap = expandWithInheritedParams(
@@ -190,6 +193,9 @@ export function useQueryParams(
       if (options.removeDefaultsFromUrl) {
         removeDefaults(encodedChanges, paramConfigMap);
       }
+
+      // interpret urlNames
+      encodedChanges = applyUrlNames(encodedChanges, paramConfigMap);
 
       // update the location and URL
       let newLocation: PartialLocation;
