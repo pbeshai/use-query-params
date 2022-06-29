@@ -349,6 +349,28 @@ describe('useQueryParams', () => {
     expect(decodedValue3.foo).toBe(decodedValue2.foo);
   });
 
+  it('allows updating params that werent directly configured', () => {
+    const { wrapper, adapter } = setupWrapper({
+      known: 'foo',
+      unknown: 'bar',
+    });
+    const { result } = renderHook(
+      () => useQueryParams({ known: StringParam }),
+      {
+        wrapper,
+      }
+    );
+
+    const [decodedValue, setter] = result.current;
+    expect(decodedValue).toEqual({ known: 'foo' });
+    setter({ unknown: 'zzz', nothing: 'xx' } as any);
+    expect(calledPushQuery(adapter, 0)).toEqual({
+      known: 'foo',
+      unknown: 'zzz',
+      nothing: 'xx',
+    });
+  });
+
   describe('should call custom paramConfig.decode properly', () => {
     it('when custom paramConfig decode undefined as non-undefined value, should not call decode function when irrelevant update happens', () => {
       const { wrapper } = setupWrapper({ bar: '1' }, { keepNull: true });
@@ -555,6 +577,36 @@ describe('useQueryParams', () => {
       rerender();
       const [decodedValue2] = result.current;
       expect(decodedValue2).toEqual({ y: 'X', z: false });
+    });
+
+    it('allows updating params that have been configured only in a provider', () => {
+      const { wrapper, adapter } = setupWrapper(
+        {
+          known: 'foo',
+          unknown: 'bar',
+        },
+        {
+          params: {
+            inherited: BooleanParam,
+          },
+        }
+      );
+      const { result } = renderHook(
+        () => useQueryParams({ known: StringParam }),
+        {
+          wrapper,
+        }
+      );
+
+      const [decodedValue, setter] = result.current;
+      expect(decodedValue).toEqual({ known: 'foo' });
+      setter({ unknown: 'zzz', nothing: 'xx', inherited: true } as any);
+      expect(calledPushQuery(adapter, 0)).toEqual({
+        known: 'foo',
+        unknown: 'zzz',
+        nothing: 'xx',
+        inherited: '1',
+      });
     });
   });
 });
