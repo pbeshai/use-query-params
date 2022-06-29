@@ -9,6 +9,7 @@ import {
   NumericArrayParam,
   DateParam,
   JsonParam,
+  BooleanParam,
 } from 'serialize-query-params';
 import { describe, it, vi } from 'vitest';
 
@@ -406,6 +407,201 @@ describe('useQueryParams', () => {
       setter({ bar: '3' });
       rerender();
       expect(decodeSpy).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  describe('inherited params', () => {
+    it('works with useQueryParams()', () => {
+      const { wrapper } = setupWrapper(
+        { x: '99', y: '123', z: '1' },
+        {
+          params: {
+            x: NumberParam,
+            z: BooleanParam,
+          },
+        }
+      );
+      const { result, rerender } = renderHook(() => useQueryParams(), {
+        wrapper,
+      });
+
+      const [decodedValue, setter] = result.current;
+      expect(decodedValue).toEqual({ x: 99, z: true });
+      setter({ z: false });
+      rerender();
+      const [decodedValue2] = result.current;
+      expect(decodedValue2).toEqual({ x: 99, z: false });
+    });
+
+    it('works with useQueryParams("x")', () => {
+      const { wrapper } = setupWrapper(
+        { x: '99', y: '123', z: '1' },
+        {
+          params: {
+            x: NumberParam,
+            z: BooleanParam,
+          },
+        }
+      );
+      const { result, rerender } = renderHook(() => useQueryParams('x'), {
+        wrapper,
+      });
+
+      const [decodedValue, setter] = result.current;
+      expect(decodedValue).toEqual(99);
+      setter(5);
+      rerender();
+      const [decodedValue2] = result.current;
+      expect(decodedValue2).toEqual(5);
+    });
+
+    it('works with useQueryParams("x", StringParam) override', () => {
+      const { wrapper } = setupWrapper(
+        { x: '99', y: '123', z: '1' },
+        {
+          params: {
+            x: NumberParam,
+            z: BooleanParam,
+          },
+        }
+      );
+      const { result, rerender } = renderHook(
+        () => useQueryParams('x', StringParam),
+        {
+          wrapper,
+        }
+      );
+
+      const [decodedValue, setter] = result.current;
+      expect(decodedValue).toEqual('99');
+      setter('5');
+      rerender();
+      const [decodedValue2] = result.current;
+      expect(decodedValue2).toEqual('5');
+    });
+
+    it('works with useQueryParams(["x", "z"])', () => {
+      const { wrapper } = setupWrapper(
+        { x: '99', y: '123', z: '1' },
+        {
+          params: {
+            x: NumberParam,
+            z: BooleanParam,
+          },
+        }
+      );
+      const { result, rerender } = renderHook(
+        () =>
+          useQueryParams<{ x: typeof NumberParam; z: typeof BooleanParam }>([
+            'x',
+            'z',
+          ]),
+        {
+          wrapper,
+        }
+      );
+
+      const [decodedValue, setter] = result.current;
+      expect(decodedValue).toEqual({ x: 99, z: true });
+      setter({ z: false });
+      rerender();
+      const [decodedValue2] = result.current;
+      expect(decodedValue2).toEqual({ x: 99, z: false });
+    });
+
+    it('does not auto include with useQueryParams({ y })', () => {
+      const { wrapper } = setupWrapper(
+        { x: '99', y: '123', z: '1' },
+        {
+          params: {
+            x: NumberParam,
+            z: BooleanParam,
+          },
+        }
+      );
+      const { result, rerender } = renderHook(
+        () => useQueryParams({ y: StringParam }),
+        {
+          wrapper,
+        }
+      );
+
+      const [decodedValue, setter] = result.current;
+      expect(decodedValue).toEqual({ y: '123' });
+      setter({ y: 'X' });
+      rerender();
+      const [decodedValue2] = result.current;
+      expect(decodedValue2).toEqual({ y: 'X' });
+    });
+
+    it('works when explicitly included with useQueryParams({ y })', () => {
+      const { wrapper } = setupWrapper(
+        { x: '99', y: '123', z: '1' },
+        {
+          params: {
+            x: NumberParam,
+            z: BooleanParam,
+          },
+        }
+      );
+      const { result, rerender } = renderHook(
+        () =>
+          useQueryParams<
+            {
+              y: typeof StringParam;
+            },
+            {
+              x: typeof NumberParam;
+              y: typeof StringParam;
+              z: typeof BooleanParam;
+            }
+          >({ y: StringParam }, { includeKnownParams: true }),
+        {
+          wrapper,
+        }
+      );
+
+      const [decodedValue, setter] = result.current;
+      expect(decodedValue).toEqual({ x: 99, y: '123', z: true });
+      setter({ z: false, y: 'X' });
+      rerender();
+      const [decodedValue2] = result.current;
+      expect(decodedValue2).toEqual({ x: 99, y: 'X', z: false });
+    });
+
+    it('works when explicitly included via string with useQueryParams({ y })', () => {
+      const { wrapper } = setupWrapper(
+        { x: '99', y: '123', z: '1' },
+        {
+          params: {
+            x: NumberParam,
+            z: BooleanParam,
+          },
+        }
+      );
+      const { result, rerender } = renderHook(
+        () =>
+          useQueryParams<
+            {
+              y: typeof StringParam;
+              z: 'inherit';
+            },
+            {
+              y: typeof StringParam;
+              z: typeof BooleanParam;
+            }
+          >({ y: StringParam, z: 'inherit' }),
+        {
+          wrapper,
+        }
+      );
+
+      const [decodedValue, setter] = result.current;
+      expect(decodedValue).toEqual({ y: '123', z: true });
+      setter({ z: false, y: 'X' });
+      rerender();
+      const [decodedValue2] = result.current;
+      expect(decodedValue2).toEqual({ y: 'X', z: false });
     });
   });
 });

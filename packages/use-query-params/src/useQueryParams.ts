@@ -3,14 +3,26 @@ import {
   DecodedValueMap,
   EncodedQuery,
   encodeQueryParams,
+  QueryParamConfig,
   QueryParamConfigMap,
+  StringParam,
 } from 'serialize-query-params';
 import { DecodedParamCache, decodedParamCache } from './decodedParamCache';
 import { memoParseParams } from './memoParseParams';
 import { QueryParamOptions, useMergedOptions } from './options';
 import { useQueryParamContext } from './QueryParamProvider';
 import shallowEqual from './shallowEqual';
-import { PartialLocation, SetQuery, UrlUpdateType } from './types';
+import {
+  PartialLocation,
+  QueryParamConfigMapWithInherit,
+  SetQuery,
+  UrlUpdateType,
+} from './types';
+
+// for single param config
+type NewValueType<D> = D | ((latestValue: D) => D);
+
+// for multiple param config
 type ChangesType<DecodedValueMapType> =
   | Partial<DecodedValueMapType>
   | ((latestValues: DecodedValueMapType) => Partial<DecodedValueMapType>);
@@ -110,17 +122,156 @@ function makeStableGetLatestDecodedValues() {
   return stableGetLatest;
 }
 
+function parseArguments(
+  arg1: string | string[] | QueryParamConfigMapWithInherit | undefined,
+  arg2: QueryParamConfig<any> | QueryParamOptions | undefined,
+  arg3: QueryParamOptions | undefined
+): {
+  paramConfigMap: QueryParamConfigMapWithInherit;
+  options: QueryParamOptions | undefined;
+  singleParamName: string | undefined;
+} {
+  let paramConfigMap: QueryParamConfigMapWithInherit;
+  let options: QueryParamOptions | undefined;
+  let singleParamName: string | undefined;
+
+  if (arg1 === undefined) {
+    // useQueryParams()
+    paramConfigMap = {};
+    options = arg2 as QueryParamOptions | undefined;
+  } else if (typeof arg1 === 'string') {
+    // mark this as historic useQueryParam mode
+    singleParamName = arg1;
+    if (arg2 === undefined) {
+      // useQueryParams('geo')
+      paramConfigMap = { [arg1]: 'inherit' };
+    } else {
+      // useQueryParams('geo', NumberParam)
+      // useQueryParams('geo', NumberParam, options)
+      paramConfigMap = { [arg1]: arg2 as QueryParamConfig<any> };
+      options = arg3;
+    }
+  } else if (Array.isArray(arg1)) {
+    // useQueryParams(['geo', 'other'])
+    // useQueryParams(['geo', 'other'], options)
+    paramConfigMap = Object.fromEntries(
+      arg1.map((key) => [key, 'inherit' as const])
+    );
+    options = arg2 as QueryParamOptions | undefined;
+  } else {
+    // useQueryParams({ geo: NumberParam })
+    // useQueryParams({ geo: NumberParam }, options)
+    paramConfigMap = arg1;
+    options = arg2 as QueryParamOptions | undefined;
+  }
+
+  return { paramConfigMap, options, singleParamName };
+}
+
+function processInheritedParams(
+  paramConfigMapWithInherit: QueryParamConfigMapWithInherit,
+  options: QueryParamOptions
+): QueryParamConfigMap {
+  const paramConfigMap: QueryParamConfigMap = {};
+  let hasInherit = false;
+
+  const hookKeys = Object.keys(paramConfigMapWithInherit);
+  let paramKeys = hookKeys;
+
+  // include known params if asked for explicitly, or no params were configured and we didn't
+  // explicitly say not to
+  const includeKnownParams =
+    options.includeKnownParams ||
+    (options.includeKnownParams !== false && hookKeys.length === 0);
+
+  if (includeKnownParams) {
+    const knownKeys = Object.keys(options.params ?? {});
+    paramKeys.push(...knownKeys);
+  }
+
+  for (const key of paramKeys) {
+    const param = paramConfigMapWithInherit[key];
+    if (param != null && typeof param === 'object') {
+      paramConfigMap[key] = param;
+      continue;
+    }
+
+    hasInherit = true;
+
+    // default is StringParam
+    paramConfigMap[key] = options.params?.[key] ?? StringParam;
+  }
+
+  if (!hasInherit) return paramConfigMapWithInherit as QueryParamConfigMap;
+
+  return paramConfigMap;
+}
+
+type UseQueryParamsResult<QPCMap extends QueryParamConfigMap> = [
+  DecodedValueMap<QPCMap>,
+  SetQuery<QPCMap>
+];
+type UseQueryParamsSingleResult<TypeToEncode, TypeFromDecode = TypeToEncode> = [
+  TypeFromDecode,
+  (newValue: NewValueType<TypeToEncode>, updateType?: UrlUpdateType) => void
+];
+
+type ExpandInherits<QPCMap extends QueryParamConfigMapWithInherit> = {
+  [ParamName in keyof QPCMap]: QPCMap[ParamName] extends string
+    ? typeof StringParam
+    : QPCMap[ParamName] extends QueryParamConfig<any>
+    ? QPCMap[ParamName]
+    : never;
+};
+
 /**
  * Given a query parameter configuration (mapping query param name to { encode, decode }),
  * return an object with the decoded values and a setter for updating them.
  */
-export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
+export function useQueryParams(): UseQueryParamsResult<any>;
+export function useQueryParams<
+  TypeToEncode = any,
+  TypeFromDecode = TypeToEncode
+>(name: string): UseQueryParamsSingleResult<TypeToEncode, TypeFromDecode>;
+export function useQueryParams<TypeToEncode, TypeFromDecode = TypeToEncode>(
+  name: string,
+  paramConfig?: QueryParamConfig<TypeToEncode, TypeFromDecode>,
+  options?: QueryParamOptions
+): UseQueryParamsSingleResult<TypeToEncode, TypeFromDecode>;
+export function useQueryParams<QPCMap extends QueryParamConfigMapWithInherit>(
+  names: string[],
+  options?: QueryParamOptions
+): UseQueryParamsResult<ExpandInherits<QPCMap>>;
+export function useQueryParams<
+  QPCMap extends QueryParamConfigMapWithInherit,
+  OutputQPCMap extends QueryParamConfigMap = ExpandInherits<QPCMap>
+>(
   paramConfigMap: QPCMap,
   options?: QueryParamOptions
-): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>] => {
+): UseQueryParamsResult<OutputQPCMap>;
+
+export function useQueryParams(
+  arg1?: string | string[] | QueryParamConfigMapWithInherit,
+  arg2?: QueryParamConfig<any> | QueryParamOptions,
+  arg3?: QueryParamOptions
+): UseQueryParamsResult<any> | UseQueryParamsSingleResult<any> {
   const { adapter, options: contextOptions } = useQueryParamContext();
   const [stableGetLatest] = useState(makeStableGetLatestDecodedValues);
+
+  // intepret the overloaded arguments
+  const {
+    paramConfigMap: paramConfigMapWithInherit,
+    options,
+    singleParamName,
+  } = parseArguments(arg1, arg2, arg3);
+
   const mergedOptions = useMergedOptions(contextOptions, options);
+
+  // interpret params that were configured up the chain
+  const paramConfigMap = processInheritedParams(
+    paramConfigMapWithInherit,
+    mergedOptions
+  );
 
   // what is the current stringified value?
   const parsedParams = memoParseParams(
@@ -167,10 +318,10 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
     };
   }, [adapter, paramConfigMap, mergedOptions]);
 
-  // create callback
+  // create callback with stable identity
   const setQuery = useMemo(() => {
-    return (
-      changes: ChangesType<DecodedValueMap<QPCMap>>,
+    const setQuery = (
+      changes: ChangesType<DecodedValueMap<any>>,
       updateType?: UrlUpdateType
     ) => {
       // read from a ref so we don't generate new setters each time any change
@@ -224,9 +375,37 @@ export const useQueryParams = <QPCMap extends QueryParamConfigMap>(
         adapter.push(newLocation);
       }
     };
-  }, []);
+
+    // for historic useQueryParam('foo', Param) style args
+    // where the setter just takes a single value instead of an object
+    if (singleParamName != null) {
+      const setValue = (
+        newValue: NewValueType<any>,
+        updateType?: UrlUpdateType
+      ) => {
+        if (typeof newValue === 'function') {
+          return setQuery((latestValues) => {
+            const newValueFromLatest = (newValue as Function)(
+              latestValues[singleParamName]
+            );
+            return { [singleParamName]: newValueFromLatest } as any;
+          }, updateType);
+        }
+        return setQuery({ [singleParamName]: newValue } as any, updateType);
+      };
+
+      return setValue;
+    }
+
+    return setQuery;
+  }, [singleParamName]);
+
+  // for historic useQueryParam('foo', Param) style args
+  if (singleParamName) {
+    return [decodedValues[singleParamName], setQuery];
+  }
 
   return [decodedValues, setQuery];
-};
+}
 
 export default useQueryParams;

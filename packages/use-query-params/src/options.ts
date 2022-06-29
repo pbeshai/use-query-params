@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { EncodedQuery } from 'serialize-query-params';
+import { EncodedQuery, QueryParamConfigMap } from 'serialize-query-params';
 import { parseParams } from './parseParams';
 import { stringifyParams } from './stringifyParams';
 import { UrlUpdateType } from './types';
@@ -12,8 +12,14 @@ export function mergeOptions(
     currOptions = {};
   }
 
-  // merge parent (TODO: deep merge e.g. expanding "params")
-  return { ...parentOptions, ...currOptions };
+  const merged = { ...parentOptions, ...currOptions };
+
+  // deep merge param objects
+  if (currOptions.params && parentOptions.params) {
+    merged.params = { ...parentOptions.params, ...currOptions.params };
+  }
+
+  return merged;
 }
 
 export function useMergedOptions(
@@ -31,6 +37,8 @@ export const defaultOptions: QueryParamOptionsWithRequired = {
   updateType: 'pushIn',
   keepNull: false,
   keepEmptyString: false,
+  includeKnownParams: undefined,
+  includeAllParams: false,
 };
 
 export interface QueryParamOptions {
@@ -39,6 +47,9 @@ export interface QueryParamOptions {
   updateType?: UrlUpdateType;
   keepNull?: boolean;
   keepEmptyString?: boolean;
+  includeKnownParams?: boolean;
+  includeAllParams?: boolean;
+  params?: QueryParamConfigMap;
 }
 
 type RequiredOptions = 'parseParams' | 'stringifyParams';

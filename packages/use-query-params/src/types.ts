@@ -1,4 +1,8 @@
-import { QueryParamConfigMap, DecodedValueMap } from 'serialize-query-params';
+import {
+  QueryParamConfigMap,
+  DecodedValueMap,
+  QueryParamConfig,
+} from 'serialize-query-params';
 
 /**
  * Different methods for updating the URL:
@@ -40,3 +44,8 @@ export type QueryParamAdapterComponent = ({
 }: {
   children: (adapter: QueryParamAdapter) => React.ReactElement | null;
 }) => React.ReactElement | null;
+
+export type QueryParamConfigMapWithInherit = Record<
+  string,
+  QueryParamConfig<any, any> | string
+>;
