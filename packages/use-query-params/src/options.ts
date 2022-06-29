@@ -1,35 +1,7 @@
-import { useMemo } from 'react';
 import { EncodedQuery, QueryParamConfigMap } from 'serialize-query-params';
 import { parseParams } from './parseParams';
 import { stringifyParams } from './stringifyParams';
 import { UrlUpdateType } from './types';
-
-export function mergeOptions(
-  parentOptions: QueryParamOptionsWithRequired,
-  currOptions: QueryParamOptions | null | undefined
-): QueryParamOptionsWithRequired {
-  if (currOptions == null) {
-    currOptions = {};
-  }
-
-  const merged = { ...parentOptions, ...currOptions };
-
-  // deep merge param objects
-  if (currOptions.params && parentOptions.params) {
-    merged.params = { ...parentOptions.params, ...currOptions.params };
-  }
-
-  return merged;
-}
-
-export function useMergedOptions(
-  parentOptions: QueryParamOptionsWithRequired,
-  currOptions: QueryParamOptions | null | undefined
-): QueryParamOptionsWithRequired {
-  return useMemo(() => {
-    return mergeOptions(parentOptions, currOptions);
-  }, [parentOptions, currOptions]);
-}
 
 export const defaultOptions: QueryParamOptionsWithRequired = {
   parseParams: parseParams,
@@ -57,3 +29,21 @@ export type QueryParamOptionsWithRequired = Required<
   Pick<QueryParamOptions, RequiredOptions>
 > &
   Omit<QueryParamOptions, RequiredOptions>;
+
+export function mergeOptions(
+  parentOptions: QueryParamOptionsWithRequired,
+  currOptions: QueryParamOptions | null | undefined
+): QueryParamOptionsWithRequired {
+  if (currOptions == null) {
+    currOptions = {};
+  }
+
+  const merged = { ...parentOptions, ...currOptions };
+
+  // deep merge param objects
+  if (currOptions.params && parentOptions.params) {
+    merged.params = { ...parentOptions.params, ...currOptions.params };
+  }
+
+  return merged;
+}

@@ -1,4 +1,8 @@
-import { QueryParamConfigMap, StringParam } from 'serialize-query-params';
+import {
+  QueryParamConfig,
+  QueryParamConfigMap,
+  StringParam,
+} from 'serialize-query-params';
 import { QueryParamOptions } from './options';
 import { QueryParamConfigMapWithInherit } from './types';
 
@@ -44,7 +48,8 @@ export function processInheritedParams(
 export function expandWithInheritedParams(
   baseParamConfigMap: QueryParamConfigMap,
   paramKeys: string[],
-  inheritedParams: QueryParamOptions['params'] | undefined
+  inheritedParams: QueryParamOptions['params'] | undefined,
+  defaultParam?: QueryParamConfig<any> | undefined
 ) {
   if (!inheritedParams || !paramKeys.length) return baseParamConfigMap;
 
@@ -52,7 +57,7 @@ export function expandWithInheritedParams(
   let hasInherit = false;
   for (const paramKey of paramKeys) {
     if (!Object.prototype.hasOwnProperty.call(paramConfigMap, paramKey)) {
-      paramConfigMap[paramKey] = inheritedParams[paramKey];
+      paramConfigMap[paramKey] = inheritedParams[paramKey] ?? defaultParam;
       hasInherit = true;
     }
   }

@@ -609,4 +609,113 @@ describe('useQueryParams', () => {
       });
     });
   });
+
+  it('works with includeAllParams', () => {
+    const { wrapper, adapter } = setupWrapper(
+      {
+        known: 'foo',
+        unknown: '99',
+        inherited2: '5',
+      },
+      {
+        params: {
+          inherited: BooleanParam,
+          inherited2: NumberParam,
+        },
+        includeAllParams: true,
+      }
+    );
+    const { result, rerender } = renderHook(
+      () => useQueryParams({ known: StringParam }),
+      {
+        wrapper,
+      }
+    );
+
+    const [decodedQuery, setter] = result.current;
+    expect(decodedQuery).toEqual({
+      known: 'foo',
+      unknown: '99',
+      inherited2: 5,
+    });
+    setter({ unknown: 'zzz', inherited: true } as any);
+    expect(calledPushQuery(adapter, 0)).toEqual({
+      known: 'foo',
+      unknown: 'zzz',
+      inherited: '1',
+      inherited2: '5',
+    });
+
+    rerender();
+    const [decodedQuery2, setter2] = result.current;
+    expect(decodedQuery2).toEqual({
+      known: 'foo',
+      unknown: 'zzz',
+      inherited: true,
+      inherited2: 5,
+    });
+    setter2({ nothing: 'A', unknown: 'ooo' } as any);
+    rerender();
+    const [decodedQuery3] = result.current;
+    expect(decodedQuery3).toEqual({
+      known: 'foo',
+      unknown: 'ooo',
+      inherited: true,
+      inherited2: 5,
+      nothing: 'A',
+    });
+  });
+
+  it('works with includeAllParams on useQueryParams()', () => {
+    const queryParamConfig = {
+      inherited: BooleanParam,
+      inherited2: NumberParam,
+    };
+
+    const { wrapper, adapter } = setupWrapper(
+      {
+        unknown: '99',
+        inherited2: '5',
+      },
+      {
+        params: queryParamConfig,
+        includeAllParams: true,
+      }
+    );
+    const { result, rerender } = renderHook(
+      () => useQueryParams<typeof queryParamConfig>(),
+      {
+        wrapper,
+      }
+    );
+
+    const [decodedQuery, setter] = result.current;
+    expect(decodedQuery).toEqual({
+      unknown: '99',
+      inherited2: 5,
+    });
+    setter({ unknown: 'zzz', inherited: true } as any);
+    expect(calledPushQuery(adapter, 0)).toEqual({
+      unknown: 'zzz',
+      inherited: '1',
+      inherited2: '5',
+    });
+
+    rerender();
+    const [decodedQuery2, setter2] = result.current;
+    expect(decodedQuery2).toEqual({
+      unknown: 'zzz',
+      inherited: true,
+      inherited2: 5,
+    });
+    setter2({ nothing: 'A', unknown: 'ooo' } as any);
+    rerender();
+    const [decodedQuery3] = result.current;
+    expect(decodedQuery3).toEqual({
+      unknown: 'ooo',
+      inherited: true,
+      inherited2: 5,
+      nothing: 'A',
+    });
+  });
 });
