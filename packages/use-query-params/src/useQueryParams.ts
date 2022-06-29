@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   DecodedValueMap,
-  encodeQueryParams,
   QueryParamConfig,
   QueryParamConfigMap,
   StringParam,
@@ -11,21 +10,20 @@ import {
   expandWithInheritedParams,
   processInheritedParams,
 } from './inheritedParams';
-import {
-  getLatestDecodedValues,
-  makeStableGetLatestDecodedValues,
-} from './latestValues';
+import { makeStableGetLatestDecodedValues } from './latestValues';
 import { memoParseParams } from './memoParseParams';
 import { mergeOptions, QueryParamOptions } from './options';
 import { useQueryParamContext } from './QueryParamProvider';
-import { removeDefaults } from './removeDefaults';
 import {
-  PartialLocation,
   QueryParamConfigMapWithInherit,
   SetQuery,
   UrlUpdateType,
 } from './types';
-import { applyUrlNames, serializeUrlNameMap } from './urlName';
+import {
+  getUpdatedSearchString,
+  updateSearchString,
+} from './updateSearchString';
+import { serializeUrlNameMap } from './urlName';
 
 // for multiple param config
 type ChangesType<DecodedValueMapType> =
@@ -148,78 +146,18 @@ export function useQueryParams(
       updateType?: UrlUpdateType
     ) => {
       // read from a ref so we don't generate new setters each time any change
-      const {
-        adapter,
-        paramConfigMap: baseParamConfigMap,
-        options,
-      } = callbackDependenciesRef.current!;
-      const { parseParams, stringifyParams } = options;
+      const { adapter, paramConfigMap, options } =
+        callbackDependenciesRef.current!;
       if (updateType == null) updateType = options.updateType;
 
-      let encodedChanges;
-      const currentLocation = adapter.location;
-      const parsedParams = memoParseParams(parseParams, currentLocation.search);
-
-      // see if we have unconfigured params in the changes that we can
-      // inherit to expand our config map instead of just using strings
-      const paramConfigMap = expandWithInheritedParams(
-        baseParamConfigMap,
-        Object.keys(changes),
-        options.params
-      );
-
-      // update changes prior to encoding to handle removing defaults
-      // getting latest values when functional update
-      let changesToUse: Partial<DecodedValueMap<any>>;
-
-      // functional updates here get the latest values
-      if (typeof changes === 'function') {
-        const latestValues = getLatestDecodedValues(
-          parsedParams,
-          paramConfigMap,
-          decodedParamCache,
-          options
-        );
-
-        changesToUse = (changes as Function)(latestValues);
-      } else {
-        // simple update here
-        changesToUse = changes;
-      }
-
-      encodedChanges = encodeQueryParams(paramConfigMap, changesToUse);
-
-      // remove defaults
-      if (options.removeDefaultsFromUrl) {
-        removeDefaults(encodedChanges, paramConfigMap);
-      }
-
-      // interpret urlNames
-      encodedChanges = applyUrlNames(encodedChanges, paramConfigMap);
-
-      // update the location and URL
-      let newLocation: PartialLocation;
-      if (updateType === 'push' || updateType === 'replace') {
-        newLocation = {
-          search: stringifyParams(encodedChanges),
-          state: currentLocation.state,
-        };
-      } else {
-        newLocation = {
-          search: stringifyParams({ ...parsedParams, ...encodedChanges }),
-          state: currentLocation.state,
-        };
-      }
-
-      if (newLocation.search?.length && newLocation.search[0] !== '?') {
-        (newLocation as any).search = `?${newLocation.search}`;
-      }
-
-      if (updateType?.startsWith('replace')) {
-        adapter.replace(newLocation);
-      } else {
-        adapter.push(newLocation);
-      }
+      const searchString = getUpdatedSearchString({
+        changes,
+        updateType,
+        adapter,
+        paramConfigMap,
+        options,
+      });
+      updateSearchString({ searchString, adapter, updateType, navigate: true });
     };
 
     return setQuery;
