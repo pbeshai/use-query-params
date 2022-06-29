@@ -6,7 +6,6 @@ import * as React from 'react';
 import { Router, Switch } from 'react-router';
 import { Link, Route } from 'react-router-dom';
 import {
-  BooleanParam,
   DateParam,
   decodeQueryParams,
   QueryParamConfig,

@@ -192,6 +192,26 @@ function processInheritedParams(
   return paramConfigMap;
 }
 
+function expandWithInheritedParams(
+  baseParamConfigMap: QueryParamConfigMap,
+  paramKeys: string[],
+  inheritedParams: QueryParamOptions['params'] | undefined
+) {
+  if (!inheritedParams || !paramKeys.length) return baseParamConfigMap;
+
+  let paramConfigMap = { ...baseParamConfigMap };
+  let hasInherit = false;
+  for (const paramKey of paramKeys) {
+    if (!Object.prototype.hasOwnProperty.call(paramConfigMap, paramKey)) {
+      paramConfigMap[paramKey] = inheritedParams[paramKey];
+      hasInherit = true;
+    }
+  }
+
+  if (!hasInherit) return baseParamConfigMap;
+  return paramConfigMap;
+}
+
 type UseQueryParamsResult<QPCMap extends QueryParamConfigMap> = [
   DecodedValueMap<QPCMap>,
   SetQuery<QPCMap>
@@ -301,14 +321,24 @@ export function useQueryParams(
       updateType?: UrlUpdateType
     ) => {
       // read from a ref so we don't generate new setters each time any change
-      const { adapter, paramConfigMap, options } =
-        callbackDependenciesRef.current!;
+      const {
+        adapter,
+        paramConfigMap: baseParamConfigMap,
+        options,
+      } = callbackDependenciesRef.current!;
       const { parseParams, stringifyParams } = options;
       if (updateType == null) updateType = options.updateType;
 
       let encodedChanges;
       const currentLocation = adapter.location;
       const parsedParams = memoParseParams(parseParams, currentLocation.search);
+
+      // see if we have unconfigured params we can inherit to expand our config map
+      const paramConfigMap = expandWithInheritedParams(
+        baseParamConfigMap,
+        Object.keys(changes),
+        options.params
+      );
 
       // functional updates here get the latest values
       if (typeof changes === 'function') {
