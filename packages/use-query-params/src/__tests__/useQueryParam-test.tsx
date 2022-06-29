@@ -1,24 +1,28 @@
 import * as React from 'react';
 import { cleanup, renderHook } from '@testing-library/react-hooks';
 import {
+  StringParam,
   DateParam,
   EncodedQuery,
   JsonParam,
   NumberParam,
   NumericArrayParam,
+  BooleanParam,
 } from 'serialize-query-params';
 import { describe, it } from 'vitest';
-import { QueryParamProvider, useQueryParam } from '../index';
+import { QueryParamProvider, useQueryParam, QueryParamOptions } from '../index';
 import { QueryParamAdapter } from '../types';
 import { calledPushQuery, makeMockAdapter } from './helpers';
 import { stringifyParams } from '../stringifyParams';
 
 // helper to setup tests
-function setupWrapper(query: EncodedQuery) {
+function setupWrapper(query: EncodedQuery, options?: QueryParamOptions) {
   const Adapter = makeMockAdapter({ search: stringifyParams(query) });
   const adapter = (Adapter as any).adapter as QueryParamAdapter;
   const wrapper = ({ children }: any) => (
-    <QueryParamProvider Adapter={Adapter}>{children}</QueryParamProvider>
+    <QueryParamProvider Adapter={Adapter} options={options}>
+      {children}
+    </QueryParamProvider>
   );
 
   return { wrapper, adapter };
@@ -230,5 +234,54 @@ describe('useQueryParam', () => {
     const [[foo1], [foo2]] = result.current;
     expect([foo1, foo2]).toEqual([[1], [1]]);
     expect(foo1).toBe(foo2);
+  });
+
+  describe('inherited params', () => {
+    it('works with useQueryParam("x")', () => {
+      const { wrapper } = setupWrapper(
+        { x: '99', y: '123', z: '1' },
+        {
+          params: {
+            x: NumberParam,
+            z: BooleanParam,
+          },
+        }
+      );
+      const { result, rerender } = renderHook(() => useQueryParam('x'), {
+        wrapper,
+      });
+
+      const [decodedValue, setter] = result.current;
+      expect(decodedValue).toEqual(99);
+      setter(5);
+      rerender();
+      const [decodedValue2] = result.current;
+      expect(decodedValue2).toEqual(5);
+    });
+
+    it('works with useQueryParam("x", StringParam) override', () => {
+      const { wrapper } = setupWrapper(
+        { x: '99', y: '123', z: '1' },
+        {
+          params: {
+            x: NumberParam,
+            z: BooleanParam,
+          },
+        }
+      );
+      const { result, rerender } = renderHook(
+        () => useQueryParam('x', StringParam),
+        {
+          wrapper,
+        }
+      );
+
+      const [decodedValue, setter] = result.current;
+      expect(decodedValue).toEqual('99');
+      setter('5');
+      rerender();
+      const [decodedValue2] = result.current;
+      expect(decodedValue2).toEqual('5');
+    });
   });
 });
