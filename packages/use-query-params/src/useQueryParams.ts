@@ -16,7 +16,7 @@ import {
   makeStableGetLatestDecodedValues,
 } from './latestValues';
 import { memoParseParams } from './memoParseParams';
-import { QueryParamOptions, useMergedOptions } from './options';
+import { mergeOptions, QueryParamOptions } from './options';
 import { useQueryParamContext } from './QueryParamProvider';
 import {
   PartialLocation,
@@ -73,19 +73,30 @@ export function useQueryParams(
     arg2
   );
 
-  const mergedOptions = useMergedOptions(contextOptions, options);
-
-  // interpret params that were configured up the chain
-  const paramConfigMap = processInheritedParams(
-    paramConfigMapWithInherit,
-    mergedOptions
-  );
+  const mergedOptions = useMemo(() => {
+    return mergeOptions(contextOptions, options);
+  }, [contextOptions, options]);
 
   // what is the current stringified value?
   const parsedParams = memoParseParams(
     mergedOptions.parseParams,
     adapter.location.search
   );
+
+  // interpret params that were configured up the chain
+  let paramConfigMap = processInheritedParams(
+    paramConfigMapWithInherit,
+    mergedOptions
+  );
+  // do we want to include all params from the URL even if not configured?
+  if (mergedOptions.includeAllParams) {
+    paramConfigMap = expandWithInheritedParams(
+      paramConfigMap,
+      Object.keys(parsedParams),
+      mergedOptions.params,
+      StringParam
+    );
+  }
 
   // run decode on each key, collect
   const decodedValues = stableGetLatest(
@@ -145,7 +156,8 @@ export function useQueryParams(
       const currentLocation = adapter.location;
       const parsedParams = memoParseParams(parseParams, currentLocation.search);
 
-      // see if we have unconfigured params we can inherit to expand our config map
+      // see if we have unconfigured params in the changes that we can
+      // inherit to expand our config map instead of just using strings
       const paramConfigMap = expandWithInheritedParams(
         baseParamConfigMap,
         Object.keys(changes),
