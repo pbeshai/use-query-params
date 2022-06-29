@@ -371,6 +371,74 @@ describe('useQueryParams', () => {
     });
   });
 
+  describe('default values', () => {
+    it('replaces undefined with default value', () => {
+      const { wrapper } = setupWrapper({});
+      const { result, rerender } = renderHook(
+        () => useQueryParams({ foo: { ...StringParam, default: 'boop' } }),
+        {
+          wrapper,
+        }
+      );
+      const [decodedQuery, setter] = result.current;
+
+      expect(decodedQuery).toEqual({ foo: 'boop' });
+      setter({ foo: null });
+      rerender();
+      const [decodedQuery2, setter2] = result.current;
+      expect(decodedQuery2).toEqual({ foo: 'boop' });
+      setter2({ foo: 'beep' });
+      rerender();
+      const [decodedQuery3] = result.current;
+      expect(decodedQuery3).toEqual({ foo: 'beep' });
+    });
+
+    it('replaces undefined with default value but keeps null', () => {
+      const { wrapper } = setupWrapper({});
+      const { result, rerender } = renderHook(
+        () =>
+          useQueryParams(
+            { foo: { ...StringParam, default: 'boop' } },
+            {
+              keepNull: true,
+              parseParams: qs.parse,
+              stringifyParams: qs.stringify,
+            }
+          ),
+        {
+          wrapper,
+        }
+      );
+      const [decodedQuery, setter] = result.current;
+
+      expect(decodedQuery).toEqual({ foo: 'boop' });
+      setter({ foo: null });
+      rerender();
+      const [decodedQuery2] = result.current;
+      expect(decodedQuery2).toEqual({ foo: null });
+    });
+
+    it('supports a changing default value', () => {
+      const { wrapper } = setupWrapper({});
+      const { result, rerender } = renderHook(
+        ({ defaultValue }: { defaultValue: string }) =>
+          useQueryParams({ foo: { ...StringParam, default: defaultValue } }),
+        {
+          wrapper,
+          initialProps: {
+            defaultValue: 'boop',
+          },
+        }
+      );
+      const [decodedQuery] = result.current;
+
+      expect(decodedQuery).toEqual({ foo: 'boop' });
+      rerender({ defaultValue: 'zing' });
+      const [decodedQuery2] = result.current;
+      expect(decodedQuery2).toEqual({ foo: 'zing' });
+    });
+  });
+
   describe('should call custom paramConfig.decode properly', () => {
     it('when custom paramConfig decode undefined as non-undefined value, should not call decode function when irrelevant update happens', () => {
       const { wrapper } = setupWrapper({ bar: '1' }, { keepNull: true });
