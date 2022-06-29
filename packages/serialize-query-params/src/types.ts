@@ -22,6 +22,15 @@ export interface QueryParamConfig<D, D2 = D> {
 
   /** Checks if two values are equal (otherwise typically shallowEqual will be used) */
   equals?: (valueA: D | D2, valueB: D | D2) => boolean;
+
+  /**
+   * optionally provide a default value for other tooling
+
+   * @note not typically used by serialize-query-params, but use-query-params
+   * does and it would be annoying for there to be two slightly different
+   * types.
+   */
+  default?: D2;
 }
 
 /**

@@ -64,6 +64,10 @@ export function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
       decodedValue = undefined;
     }
 
+    if (decodedValue === undefined && paramConfig.default !== undefined) {
+      decodedValue = paramConfig.default;
+    }
+
     decodedValues[paramName as keyof QPCMap] = decodedValue;
   }
 
