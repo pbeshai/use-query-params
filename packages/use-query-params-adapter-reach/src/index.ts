@@ -1,7 +1,7 @@
 // @ts-ignore
 import { globalHistory } from '@reach/router';
 import { useState } from 'react';
-import { PartialLocation, QueryParamAdapterComponent } from '../../types';
+import { PartialLocation, QueryParamAdapterComponent } from 'use-query-params';
 
 function makeAdapter() {
   const adapter = {

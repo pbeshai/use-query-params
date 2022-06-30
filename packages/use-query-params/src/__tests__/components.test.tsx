@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import * as qs from 'query-string';
 import { createMemoryHistory } from 'history';
 import { parse } from 'query-string';
@@ -14,9 +14,38 @@ import {
   NumberParam,
 } from 'serialize-query-params';
 import { describe, test, vi } from 'vitest';
-import { ReactRouter5Adapter } from '../adapters/react-router-5';
-import { QueryParamProvider, useQueryParam, useQueryParams } from '../index';
+import {
+  QueryParamProvider,
+  useQueryParam,
+  useQueryParams,
+  QueryParamAdapterComponent,
+  QueryParamAdapter,
+} from '../index';
 import { QueryParamOptions } from '../options';
+import { useHistory, useLocation } from 'react-router';
+
+// inline this for convenience around build process...
+/**
+ * Query Param Adapter for react-router v5
+ */
+const ReactRouter5Adapter: QueryParamAdapterComponent = ({ children }) => {
+  const location = useLocation();
+  const history = useHistory();
+
+  const adapter: QueryParamAdapter = {
+    replace(location) {
+      history.replace(location.search, location.state);
+    },
+    push(location) {
+      history.push(location.search, location.state);
+    },
+    get location() {
+      return location;
+    },
+  };
+
+  return children(adapter);
+};
 
 function renderWithRouter(
   ui: React.ReactNode,
@@ -483,5 +512,131 @@ describe('components', () => {
     expect(queryByText(/{"f":1,"g":"a","h":8}/)).toBeTruthy();
     getByText(/Change/).click();
     expect(queryByText(/{"f":2,"g":"b","h":7}/)).toBeTruthy();
+  });
+
+  it('multiple updates in same callback work (batching) with useQueryParam', async () => {
+    let numRenders = 0;
+    const TestComponent = () => {
+      const [foo, setFoo] = useQueryParam('foo');
+      const [bar, setBar] = useQueryParam('bar');
+      const [baz, setBaz] = useQueryParam('baz');
+
+      numRenders += 1;
+
+      return (
+        <div>
+          {JSON.stringify({ foo, bar, baz })}
+          <button
+            onClick={() => {
+              setFoo('foo2');
+              setBar('bar2');
+              setBaz('baz2');
+            }}
+          >
+            Change
+          </button>
+        </div>
+      );
+    };
+    const { queryByText, getByText } = renderWithRouter(
+      <TestComponent />,
+      '?foo=foo1&bar=bar1&baz=baz1',
+      { enableBatching: true }
+    );
+
+    expect(numRenders).toBe(1);
+    expect(
+      queryByText(/{"foo":"foo1","bar":"bar1","baz":"baz1"}/)
+    ).toBeTruthy();
+    getByText(/Change/).click();
+    await waitFor(() =>
+      expect(
+        queryByText(/{"foo":"foo2","bar":"bar2","baz":"baz2"}/)
+      ).toBeTruthy()
+    );
+    expect(numRenders).toBe(2);
+  });
+
+  it('multiple updates in same callback work (batching) with useQueryParams', async () => {
+    let numRenders = 0;
+    const TestComponent = () => {
+      const [{ foo }, setFoo] = useQueryParams({ foo: StringParam });
+      const [{ bar }, setBar] = useQueryParams({ bar: StringParam });
+      const [{ baz }, setBaz] = useQueryParams({ baz: StringParam });
+
+      numRenders += 1;
+      return (
+        <div>
+          {JSON.stringify({ foo, bar, baz })}
+          <button
+            onClick={() => {
+              setFoo({ foo: 'foo2' });
+              setBar({ bar: 'bar2' });
+              setBaz({ baz: 'baz2' });
+            }}
+          >
+            Change
+          </button>
+        </div>
+      );
+    };
+    const { queryByText, getByText } = renderWithRouter(
+      <TestComponent />,
+      '?foo=foo1&bar=bar1&baz=baz1',
+      { enableBatching: true }
+    );
+
+    expect(
+      queryByText(/{"foo":"foo1","bar":"bar1","baz":"baz1"}/)
+    ).toBeTruthy();
+    getByText(/Change/).click();
+    await waitFor(() =>
+      expect(
+        queryByText(/{"foo":"foo2","bar":"bar2","baz":"baz2"}/)
+      ).toBeTruthy()
+    );
+    expect(numRenders).toBe(2);
+  });
+
+  it('disabling batching works', async () => {
+    let numRenders = 0;
+    const TestComponent = () => {
+      const [foo, setFoo] = useQueryParam('foo');
+      const [bar, setBar] = useQueryParam('bar');
+      const [baz, setBaz] = useQueryParam('baz');
+
+      numRenders += 1;
+
+      return (
+        <div>
+          {JSON.stringify({ foo, bar, baz })}
+          <button
+            onClick={() => {
+              setFoo('foo2');
+              setBar('bar2');
+              setBaz('baz2'); // the above get clobbered if batching is off
+            }}
+          >
+            Change
+          </button>
+        </div>
+      );
+    };
+    const { queryByText, getByText } = renderWithRouter(
+      <TestComponent />,
+      '?foo=foo1&bar=bar1&baz=baz1',
+      { enableBatching: false }
+    );
+
+    expect(numRenders).toBe(1);
+    expect(
+      queryByText(/{"foo":"foo1","bar":"bar1","baz":"baz1"}/)
+    ).toBeTruthy();
+    getByText(/Change/).click();
+    await waitFor(() =>
+      expect(
+        queryByText(/{"foo":"foo1","bar":"bar1","baz":"baz2"}/)
+      ).toBeTruthy()
+    );
   });
 });

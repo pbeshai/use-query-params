@@ -44,7 +44,7 @@ export {
   createEnumArrayParam,
 } from './params';
 
-export {
+export type {
   EncodedQuery,
   QueryParamConfig,
   QueryParamConfigMap,
@@ -55,8 +55,9 @@ export {
 export {
   updateLocation,
   updateInLocation,
-  ExtendedStringifyOptions,
   transformSearchStringJsonSafe,
 } from './updateLocation';
+export type { ExtendedStringifyOptions } from './updateLocation';
+
 export { encodeQueryParams } from './encodeQueryParams';
 export { decodeQueryParams } from './decodeQueryParams';
