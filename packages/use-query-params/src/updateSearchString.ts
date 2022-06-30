@@ -20,12 +20,12 @@ type ChangesType<DecodedValueMapType> =
 export function getUpdatedSearchString({
   changes,
   updateType,
-  adapter,
+  currentSearchString,
   paramConfigMap: baseParamConfigMap,
   options,
 }: {
   changes: ChangesType<DecodedValueMap<any>>;
-  adapter: QueryParamAdapter;
+  currentSearchString: string;
   paramConfigMap: QueryParamConfigMap;
   options: QueryParamOptionsWithRequired;
   updateType?: UrlUpdateType;
@@ -34,8 +34,7 @@ export function getUpdatedSearchString({
   if (updateType == null) updateType = options.updateType;
 
   let encodedChanges;
-  const currentLocation = adapter.location;
-  const parsedParams = memoParseParams(parseParams, currentLocation.search);
+  const parsedParams = memoParseParams(parseParams, currentSearchString);
 
   // see if we have unconfigured params in the changes that we can
   // inherit to expand our config map instead of just using strings
@@ -113,5 +112,45 @@ export function updateSearchString({
     } else {
       adapter.push(newLocation);
     }
+  }
+}
+
+type UpdateArgs = Parameters<typeof getUpdatedSearchString>[0] & {
+  adapter: QueryParamAdapter;
+};
+
+const immediateTask = (task: Function) => task();
+const timeoutTask = (task: Function) => setTimeout(() => task(), 0);
+// alternative could be native `queueMicrotask`
+
+const updateQueue: UpdateArgs[] = [];
+export function queueUpdate(
+  args: UpdateArgs,
+  { immediate }: { immediate?: boolean } = {}
+) {
+  updateQueue.push(args);
+  let scheduleTask = immediate ? immediateTask : timeoutTask;
+
+  if (updateQueue.length === 1) {
+    scheduleTask(() => {
+      const updates = updateQueue.slice();
+      updateQueue.length = 0;
+
+      let searchString: string | undefined;
+      for (let i = 0; i < updates.length; ++i) {
+        const modifiedUpdate: UpdateArgs =
+          i === 0
+            ? updates[i]
+            : { ...updates[i], currentSearchString: searchString! };
+        searchString = getUpdatedSearchString(modifiedUpdate);
+      }
+
+      updateSearchString({
+        searchString: searchString ?? '',
+        adapter: updates[updates.length - 1].adapter,
+        navigate: true,
+        updateType: updates[updates.length - 1].updateType,
+      });
+    });
   }
 }

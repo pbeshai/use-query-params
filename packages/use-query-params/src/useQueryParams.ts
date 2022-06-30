@@ -19,10 +19,7 @@ import {
   SetQuery,
   UrlUpdateType,
 } from './types';
-import {
-  getUpdatedSearchString,
-  updateSearchString,
-} from './updateSearchString';
+import { queueUpdate } from './updateSearchString';
 import { serializeUrlNameMap } from './urlName';
 
 // for multiple param config
@@ -150,14 +147,17 @@ export function useQueryParams(
         callbackDependenciesRef.current!;
       if (updateType == null) updateType = options.updateType;
 
-      const searchString = getUpdatedSearchString({
-        changes,
-        updateType,
-        adapter,
-        paramConfigMap,
-        options,
-      });
-      updateSearchString({ searchString, adapter, updateType, navigate: true });
+      queueUpdate(
+        {
+          changes,
+          updateType,
+          currentSearchString: adapter.location.search,
+          paramConfigMap,
+          options,
+          adapter,
+        },
+        { immediate: !options.enableBatching }
+      );
     };
 
     return setQuery;

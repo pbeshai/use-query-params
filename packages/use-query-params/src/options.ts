@@ -12,6 +12,7 @@ export const defaultOptions: QueryParamOptionsWithRequired = {
   includeKnownParams: undefined,
   includeAllParams: false,
   removeDefaultsFromUrl: false,
+  enableBatching: false,
 };
 
 export interface QueryParamOptions {
@@ -26,6 +27,7 @@ export interface QueryParamOptions {
 
   /** when a value equals its default, do not encode it in the URL when updating */
   removeDefaultsFromUrl?: boolean;
+  enableBatching?: boolean;
 }
 
 type RequiredOptions = 'parseParams' | 'stringifyParams';
