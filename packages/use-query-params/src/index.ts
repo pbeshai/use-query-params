@@ -3,11 +3,13 @@ export * from './types';
 
 export { useQueryParam } from './useQueryParam';
 export { useQueryParams } from './useQueryParams';
-export {
-  withQueryParams,
-  withQueryParamsMapped,
-  InjectedQueryProps,
-} from './withQueryParams';
-export { QueryParams, QueryParamsProps, QueryRenderProps } from './QueryParams';
+export { withQueryParams, withQueryParamsMapped } from './withQueryParams';
+export type { InjectedQueryProps } from './withQueryParams';
+
+export { QueryParams } from './QueryParams';
+export type { QueryParamsProps, QueryRenderProps } from './QueryParams';
 export { QueryParamProvider } from './QueryParamProvider';
-export { QueryParamOptions, QueryParamOptionsWithRequired } from './options';
+export type {
+  QueryParamOptions,
+  QueryParamOptionsWithRequired,
+} from './options';
