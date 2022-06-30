@@ -1,5 +1,6 @@
 {
   "name": "use-query-params-adapter-reach",
+  "private": true,
   "version": "0.0.1",
   "description": "Reach router adapter for use-query-params.",
   "main": "./dist/index.cjs.js",
@@ -29,8 +30,8 @@
     "@reach/router": "^1.2.1",
     "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0"
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "peerDependencies": {
     "react": ">=16.8.0",

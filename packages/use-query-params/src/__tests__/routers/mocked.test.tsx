@@ -60,9 +60,9 @@ const TestRouter = ({
     </TestRouterContext.Provider>
   );
 };
-// inline this for convenience around build process...
+
 /**
- * Query Param Adapter for react-router v5
+ * Query Param Adapter for mocked router
  */
 const TestAdapter: QueryParamAdapterComponent = ({ children }) => {
   const history = React.useContext(TestRouterContext);
