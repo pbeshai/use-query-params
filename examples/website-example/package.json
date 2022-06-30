@@ -27,7 +27,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "copy-build": "rsync -vaHE --delete ./build/ ../../docs/",
-    "preinstall": "npm link ../../packages/use-query-params/node_modules/react && npm link ../../packages/use-query-params/node_modules/react-router && npm link ../../packages/use-query-params/node_modules/react-router-dom"
+    "linkdeps": "npm link ../../packages/use-query-params/node_modules/react && npm link ../../packages/use-query-params/node_modules/react-router && npm link ../../packages/use-query-params/node_modules/react-router-dom"
   },
   "eslintConfig": {
     "extends": "react-app"

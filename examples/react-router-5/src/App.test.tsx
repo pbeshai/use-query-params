@@ -1,23 +1,26 @@
-import * as React from "react";
-import { render, cleanup } from "@testing-library/react";
-import { createMemoryHistory } from "history";
-import { Router } from "react-router";
-import { Route } from "react-router-dom";
-import { parse } from "query-string";
-import { decodeQueryParams } from "serialize-query-params";
+import * as React from 'react';
+import { render, cleanup } from '@testing-library/react';
+import { createMemoryHistory } from 'history';
+import { Router } from 'react-router';
+import { Route } from 'react-router-dom';
+import { parse } from 'query-string';
+import { decodeQueryParams } from 'serialize-query-params';
 
 import {
   useQueryParam,
   NumberParam,
   QueryParamProvider,
-} from "use-query-params";
+} from 'use-query-params';
+import { ReactRouter5Adapter } from 'use-query-params/adapters/react-router-5';
 
 function renderWithRouter(ui: React.ReactNode, initialRoute: string) {
   const history = createMemoryHistory({ initialEntries: [initialRoute] });
   return {
     ...render(
       <Router history={history}>
-        <QueryParamProvider ReactRouterRoute={Route}>{ui}</QueryParamProvider>
+        <QueryParamProvider Adapter={ReactRouter5Adapter}>
+          {ui}
+        </QueryParamProvider>
       </Router>
     ),
     history,
@@ -26,21 +29,21 @@ function renderWithRouter(ui: React.ReactNode, initialRoute: string) {
 
 // An example counter component to be tested
 const QueryParamExample = () => {
-  const [x = 0, setX] = useQueryParam("x", NumberParam);
+  const [x = 0, setX] = useQueryParam('x', NumberParam);
   return (
     <div>
       <h1>{`x is ${x}`}</h1>
-      <button onClick={() => setX(x + 1)}>Change</button>
+      <button onClick={() => setX(x! + 1)}>Change</button>
     </div>
   );
 };
 
 afterEach(cleanup);
 
-test("query param behaviour example", async () => {
+test('query param behaviour example', async () => {
   const { queryByText, getByText } = renderWithRouter(
     <QueryParamExample />,
-    "?x=3"
+    '?x=3'
   );
 
   expect(queryByText(/x is 3/)).toBeTruthy();
@@ -48,10 +51,10 @@ test("query param behaviour example", async () => {
   expect(queryByText(/x is 4/)).toBeTruthy();
 });
 
-test("query param location example", async () => {
+test('query param location example', async () => {
   const { getByText, history } = renderWithRouter(
     <QueryParamExample />,
-    "?x=3"
+    '?x=3'
   );
   getByText(/Change/).click();
   expect(

@@ -23,7 +23,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jest-environment-jsdom-sixteen",
     "eject": "react-scripts eject",
-    "preinstall": "npm link ../../packages/use-query-params/node_modules/react"
+    "linkdeps": "npm link ../../packages/use-query-params/node_modules/react"
   },
   "eslintConfig": {
     "extends": "react-app"

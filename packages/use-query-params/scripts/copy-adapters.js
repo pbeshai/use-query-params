@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const packagesDir = path.resolve(__dirname, '../../');
-const outputDir = path.resolve(__dirname, '../dist/adapters');
+const outputDir = path.resolve(__dirname, '../adapters');
 console.log(packagesDir);
 
 if (!fs.existsSync(outputDir)) {
@@ -33,6 +33,7 @@ for (const adapterDir of adapterDirs) {
 
   const buildFiles = fs.readdirSync(adapterBuildDir);
   for (const buildFile of buildFiles) {
+    // don't include source map since we dont include the src
     if (buildFile !== 'package.json') {
       fs.copyFileSync(
         path.resolve(adapterBuildDir, buildFile),
