@@ -1,0 +1,58 @@
+{
+  "name": "use-query-params-adapter-react-router-5",
+  "version": "0.0.1",
+  "description": "React-router 5 adapter for use-query-params.",
+  "main": "./dist/index.cjs.js",
+  "typings": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "package-bundler --copyPackageJson --rewritePackageJson --tsconfigPath ./tsconfig.build.json",
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run test && npm run clean && npm run build",
+    "lint": "eslint --ext js,ts,tsx src",
+    "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
+    "test": "vitest",
+    "test-watch": "vitest watch",
+    "test-coverage": "vitest run --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pbeshai/use-query-params.git"
+  },
+  "author": "Peter Beshai <peter.beshai@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "react-router": "^5.3.3",
+    "lint-staged": "^10.5.4",
+    "prettier": "^2.2.1",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
+    "react-router": ">=5"
+  },
+  "dependencies": {
+    "use-query-params": "*"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/*.{js,jsx,ts,tsx,md}": [
+      "prettier --write",
+      "git add"
+    ],
+    "src/*.{js,ts,tsx}": [
+      "eslint --fix",
+      "git add"
+    ]
+  }
+}

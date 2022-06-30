@@ -1,35 +1,13 @@
 {
+  "extends": "../../tsconfig.json",
+  "include": ["src", "types"],
+  "exclude": ["**/*.stories.*"],
   "compilerOptions": {
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "types": ["vitest/globals"],
-    "target": "ES2020",
-    "module": "ES2020",
-    "moduleResolution": "node",
-    "jsx": "react",
-    "declaration": true,
-    "pretty": true,
-    "rootDir": "src",
-    "sourceMap": false,
-    "strict": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noImplicitReturns": true,
-    "noImplicitAny": true,
-    "noFallthroughCasesInSwitch": true,
-    "outDir": "lib",
-    "typeRoots": [
-      "./node_modules/@types",
-      "./@types",
-      "../node_modules/@types"
-    ],
-  },
-  "exclude": [
-    "vitest.config.ts",
-    "node_modules",
-    "lib",
-    "esm",
-    "dist",
-    "examples",
-    "docs"
-  ]
+    "rootDir": "./src",
+    "baseUrl": "./",
+    "paths": {
+      "*": ["src/*", "node_modules/*"]
+    }
+  }
 }

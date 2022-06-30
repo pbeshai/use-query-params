@@ -10,7 +10,10 @@
     "src"
   ],
   "scripts": {
-    "build": "package-bundler --copyPackageJson --rewritePackageJson",
+    "build": "npm-run-all build:code build:adapters copy:adapters",
+    "build:code": "package-bundler --copyPackageJson --rewritePackageJson --tsconfigPath ./tsconfig.build.json",
+    "build:adapters": "npx lerna run build --scope \"*-adapter-*\"",
+    "copy:adapters": "scripts/copy-adapters.js",
     "build-website": "npm run test && npm run build && cd examples/website-example && npm run build && npm run copy-build",
     "clean": "rimraf dist",
     "dev": "cross-env NODE_ENV=development tsc -m esNext --outDir esm -w",
@@ -45,7 +48,7 @@
     "@types/history": "^4.7.8",
     "@types/react": "^17.0.4",
     "@types/react-router": "^5.1.13",
-    "@types/react-router-dom": "^5.1.7",
+    "@types/react-router-dom": "^5.3.3",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "cross-env": "^7.0.3",
@@ -59,9 +62,8 @@
     "prettier": "^2.2.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "react-router": "^5.2.0",
-    "react-router-dom": "^5.2.0",
-    "react-test-renderer": "^17.0.2"
+    "react-router": "^5.3.3",
+    "react-router-dom": "^5.3.3"
   },
   "peerDependencies": {
     "react": ">=16.8.0",

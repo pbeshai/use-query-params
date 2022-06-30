@@ -26,7 +26,7 @@ export function makeMockAdapter(
     },
   };
 
-  const Adapter = ({ children }) => children(adapter);
+  const Adapter = ({ children }: any) => children(adapter);
   Adapter.adapter = adapter;
 
   return Adapter;
@@ -34,7 +34,7 @@ export function makeMockAdapter(
 
 // helper to get the query params from the updated location
 export function calledPushQuery(adapter: QueryParamAdapter, index: number = 0) {
-  return parseQueryString(adapter.push.mock.calls[index][0].search);
+  return parseQueryString((adapter.push as any).mock.calls[index][0].search);
 }
 
 export function makeMockLocation(

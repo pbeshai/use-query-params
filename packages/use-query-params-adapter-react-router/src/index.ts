@@ -1,6 +1,9 @@
 // @ts-ignore
 import { useNavigate, useLocation } from 'react-router';
-import { QueryParamAdapter, QueryParamAdapterComponent } from '../../types';
+import {
+  QueryParamAdapter,
+  QueryParamAdapterComponent,
+} from 'use-query-params';
 
 /**
  * Query Param Adapter for react-router v6

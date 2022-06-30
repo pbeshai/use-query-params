@@ -1,22 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import App from './App';
-import {
-  QueryParamProvider,
-  ExtendedStringifyOptions,
-  transformSearchStringJsonSafe,
-} from 'use-query-params';
-
-const queryStringifyOptions: ExtendedStringifyOptions = {
-  transformSearchString: transformSearchStringJsonSafe,
-};
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter5Adapter } from 'use-query-params/dist/adapters/react-router-5';
+import { parse, stringify } from 'query-string';
 
 ReactDOM.render(
   <Router>
     <QueryParamProvider
-      ReactRouterRoute={Route}
-      stringifyOptions={queryStringifyOptions}
+      Adapter={ReactRouter5Adapter}
+      options={{
+        enableBatching: true,
+        parseParams: parse,
+        stringifyParams: stringify,
+      }}
     >
       <App />
     </QueryParamProvider>

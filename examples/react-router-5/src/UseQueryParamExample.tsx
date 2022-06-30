@@ -23,7 +23,7 @@ const UseQueryParamExample = () => {
   const [anyp, setAnyP] = useQueryParam('anyp');
   const [arr, setArr] = useQueryParam(
     'arr',
-    withDefault(ArrayParam, [] as (string | null)[])
+    React.useMemo(() => withDefault(ArrayParam, [] as (string | null)[]), [])
   );
 
   // verify we aren't creating new arrays each time
