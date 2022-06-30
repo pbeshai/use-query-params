@@ -1,5 +1,5 @@
 import { cleanup, render } from '@testing-library/react';
-import { createMemoryHistory } from 'history';
+import { createMemoryHistory } from 'history-4';
 import * as React from 'react';
 import {
   Router,
