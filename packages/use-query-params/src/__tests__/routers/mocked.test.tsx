@@ -117,8 +117,5 @@ function renderTest(
 
 afterEach(cleanup);
 describe('routers/mocked', () => {
-  it('works', () => {
-    expect(true).toBe(true);
-  });
   testSpec(renderTest);
 });
