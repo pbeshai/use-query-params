@@ -2,23 +2,18 @@ import { cleanup, render } from '@testing-library/react';
 import { createMemoryHistory } from 'history-5';
 import * as React from 'react';
 import {
-  Router,
-  Route,
-  Switch,
-  useNavigate,
   useLocation,
-  Link,
+  useNavigate,
+  unstable_HistoryRouter,
 } from 'react-router-dom-6';
-import { NumberParam, withDefault } from 'serialize-query-params';
-import { describe, test } from 'vitest';
-import { testSpec } from './shared';
+import { describe } from 'vitest';
 import {
   QueryParamAdapter,
   QueryParamAdapterComponent,
   QueryParamProvider,
-  useQueryParam,
 } from '../../index';
 import { QueryParamOptions } from '../../options';
+import { testSpec } from './shared';
 
 // inline this for convenience around build process...
 export const ReactRouterAdapter: QueryParamAdapterComponent = ({
@@ -42,29 +37,8 @@ export const ReactRouterAdapter: QueryParamAdapterComponent = ({
   return children(adapter);
 };
 
-// copied from https://github.com/remix-run/react-router/blob/main/packages/react-router/lib/components.tsx#L32
-// TODO: drop this if we rework tests to not require inspecting history object
-export function TestMemoryRouter({
-  children,
-  history,
-}: any): React.ReactElement {
-  let [state, setState] = React.useState({
-    action: history.action,
-    location: history.location,
-  });
-
-  React.useLayoutEffect(() => history.listen(setState), [history]);
-
-  return (
-    <Router
-      location={state.location}
-      navigationType={state.action}
-      navigator={history}
-    >
-      {children}
-    </Router>
-  );
-}
+// use this router so we can pass our own history to inspect
+const HistoryRouter = unstable_HistoryRouter;
 
 function renderWithRouter(
   ui: React.ReactNode,
@@ -73,19 +47,19 @@ function renderWithRouter(
 ) {
   const history = createMemoryHistory({ initialEntries: [initialRoute] });
   const results = render(
-    <TestMemoryRouter history={history}>
+    <HistoryRouter history={history}>
       <QueryParamProvider Adapter={ReactRouterAdapter} options={options}>
         {ui}
       </QueryParamProvider>
-    </TestMemoryRouter>
+    </HistoryRouter>
   );
   const rerender = (ui: React.ReactNode, newOptions = options) =>
     results.rerender(
-      <TestMemoryRouter history={history}>
+      <HistoryRouter history={history}>
         <QueryParamProvider Adapter={ReactRouterAdapter} options={newOptions}>
           {ui}
         </QueryParamProvider>
-      </TestMemoryRouter>
+      </HistoryRouter>
     );
   return {
     ...results,
