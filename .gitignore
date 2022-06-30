@@ -88,3 +88,4 @@ esm/
 dist/
 .DS_Store
 examples/**/package-lock.json
+packages/use-query-params/adapters

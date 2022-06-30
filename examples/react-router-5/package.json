@@ -8,15 +8,15 @@
     "@types/node": "^11.11.2",
     "@types/react": "^16.8.7",
     "@types/react-dom": "^16.8.2",
-    "@types/react-router-dom": "^5.3.3",
     "@types/react-router": "^5.1.13",
+    "@types/react-router-dom": "^5.3.3",
     "query-string": "^6.12.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-router": "^5.3.3",
     "react-router-dom": "^5.3.3",
-    "react-scripts": "2.1.8",
-    "typescript": "^3.3.3333",
+    "react-scripts": "^5.0.1",
+    "typescript": "^4.2.4",
     "use-query-params": "*"
   },
   "scripts": {
@@ -24,7 +24,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "preinstall": "npm link ../../packages/use-query-params/node_modules/react && npm link ../../packages/use-query-params/node_modules/react-router && npm link ../../packages/use-query-params/node_modules/react-router-dom"
+    "linkdeps": "npm link ../../packages/use-query-params/node_modules/react && npm link ../../packages/use-query-params/node_modules/react-router && npm link ../../packages/use-query-params/node_modules/react-router-dom"
   },
   "eslintConfig": {
     "extends": "react-app"

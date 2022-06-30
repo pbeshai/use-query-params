@@ -10,7 +10,7 @@
     "src"
   ],
   "scripts": {
-    "build": "package-bundler --copyPackageJson --rewritePackageJson --tsconfigPath ./tsconfig.build.json",
+    "build": "package-bundler --copyPackageJson --rewritePackageJson --tsconfigPath ./tsconfig.build.json --sourcemap false",
     "clean": "rimraf dist",
     "prepublishOnly": "npm run test && npm run clean && npm run build",
     "lint": "eslint --ext js,ts,tsx src",
