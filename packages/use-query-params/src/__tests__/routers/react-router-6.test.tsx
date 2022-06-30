@@ -70,8 +70,5 @@ function renderWithRouter(
 
 afterEach(cleanup);
 describe('routers/react-router-6', () => {
-  it('works', () => {
-    expect(true).toBe(true);
-  });
   testSpec(renderWithRouter);
 });
