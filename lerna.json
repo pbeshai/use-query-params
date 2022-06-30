@@ -1,9 +1,11 @@
 {
   "lerna": "latest",
   "packages": [
-    "packages/*",
-    "examples/*"
+    "examples/*",
+    "packages/*"
   ],
-  "npmClient": "npm",
-  "version": "independent"
+  "npmClient": "yarn",
+  "useWorkspaces": true,
+  "version": "independent",
+  "registry": "https://registry.npmjs.org/"
 }

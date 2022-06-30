@@ -1,8 +1,14 @@
 import { cleanup, render } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 import * as React from 'react';
-import { Router, Switch, useHistory, useLocation } from 'react-router';
-import { Link, Route } from 'react-router-dom';
+import {
+  Router,
+  Route,
+  Switch,
+  useHistory,
+  useLocation,
+  Link,
+} from 'react-router-dom-5';
 import { NumberParam, withDefault } from 'serialize-query-params';
 import { describe, test } from 'vitest';
 import { testSpec } from './shared';
