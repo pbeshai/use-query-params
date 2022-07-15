@@ -11,6 +11,7 @@ export {
   decodeString,
   decodeEnum,
   decodeArrayEnum,
+  decodeDelimitedArrayEnum,
   encodeJson,
   decodeJson,
   encodeArray,
@@ -42,6 +43,7 @@ export {
   DelimitedNumericArrayParam,
   createEnumParam,
   createEnumArrayParam,
+  createEnumDelimitedArrayParam,
 } from './params';
 
 export type {

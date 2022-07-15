@@ -19,24 +19,35 @@ export const createEnumParam = <T extends string>(
   enumValues: T[]
 ): QueryParamConfig<T | null | undefined, T | null | undefined> => ({
   encode: Serialize.encodeString,
-  decode: input => Serialize.decodeEnum(input, enumValues),
-})
+  decode: (input) => Serialize.decodeEnum(input, enumValues),
+});
 
 /**
  * Array enum
  */
-export const createEnumArrayParam = <T extends string[]>(
-  enumValues: T,
+export const createEnumArrayParam = <T extends string>(
+  enumValues: T[]
+): QueryParamConfig<T[] | null | undefined, T[] | null | undefined> => ({
+  encode: (text) =>
+    Serialize.encodeArray(text == null || Array.isArray(text) ? text : [text]),
+  decode: (input) => Serialize.decodeArrayEnum(input, enumValues),
+});
+
+/**
+ * Array delimited enum
+ */
+export const createEnumDelimitedArrayParam = <T extends string>(
+  enumValues: T[],
   entrySeparator = '_'
-): QueryParamConfig<T | null | undefined, T | null | undefined> => ({
-  encode: text => {
-    if (text === undefined || text === null || Array.isArray(text))
-      return Serialize.encodeDelimitedArray(text)
-    return Serialize.encodeDelimitedArray([text])
-  },
-  decode: input =>
-    Serialize.decodeArrayEnum(input, enumValues, entrySeparator),
-})
+): QueryParamConfig<T[] | null | undefined, T[] | null | undefined> => ({
+  encode: (text) =>
+    Serialize.encodeDelimitedArray(
+      text == null || Array.isArray(text) ? text : [text],
+      entrySeparator
+    ),
+  decode: (input) =>
+    Serialize.decodeDelimitedArrayEnum(input, enumValues, entrySeparator),
+});
 
 /**
  * Numbers (integers or floats)
