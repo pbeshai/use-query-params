@@ -1,20 +1,6 @@
-import {
-  stringify,
-  StringifyOptions,
-  parse as parseQueryString,
-  parseUrl,
-} from 'query-string';
 import { EncodedQuery } from './types';
-
-/**
- * options passed to query-string stringify plus an
- * addition of transformSearchString: a function that takes
- * the result of stringify and runs a transformation on it.
- * (e.g. replacing all instances of character x with y)
- */
-export type ExtendedStringifyOptions = StringifyOptions & {
-  transformSearchString?: (searchString: string) => string;
-};
+import { objectToSearchString } from './objectToSearchString';
+import { searchStringToObject } from '.';
 
 /**
  * An example of a transformSearchString function that undoes encoding of
@@ -23,6 +9,7 @@ export type ExtendedStringifyOptions = StringifyOptions & {
 const JSON_SAFE_CHARS = `{}[],":`
   .split('')
   .map((d) => [d, encodeURIComponent(d)]);
+
 export function transformSearchStringJsonSafe(searchString: string): string {
   let str = searchString;
   for (let [char, code] of JSON_SAFE_CHARS) {
@@ -38,16 +25,18 @@ export function transformSearchStringJsonSafe(searchString: string): string {
 export function updateLocation(
   encodedQuery: EncodedQuery,
   location: Location,
-  stringifyOptions?: ExtendedStringifyOptions
+  objectToSearchStringFn = objectToSearchString
 ): Location {
-  let encodedSearchString = stringify(encodedQuery, stringifyOptions);
-  if (stringifyOptions && stringifyOptions.transformSearchString) {
-    encodedSearchString = stringifyOptions.transformSearchString(
-      encodedSearchString
-    );
-  }
+  let encodedSearchString = objectToSearchStringFn(encodedQuery);
+
   const search = encodedSearchString.length ? `?${encodedSearchString}` : '';
-  const href = parseUrl(location.href || '').url + search;
+  let href: string;
+  if (location.href) {
+    const url = new URL(location.href);
+    href = `${url.origin}${url.pathname}${search}`;
+  } else {
+    href = search;
+  }
 
   const newLocation: Location & {
     key: string;
@@ -70,16 +59,17 @@ export function updateLocation(
 export function updateInLocation(
   encodedQueryReplacements: EncodedQuery,
   location: Location,
-  stringifyOptions?: ExtendedStringifyOptions
+  objectToSearchStringFn = objectToSearchString,
+  searchStringToObjectFn = searchStringToObject
 ): Location {
   // explicitly avoid parsing numbers to ensure the
   // return type has the same shape as EncodeQuery
-  const currQuery = parseQueryString(location.search, { parseNumbers: false }) as EncodedQuery;
+  const currQuery = searchStringToObjectFn(location.search);
 
   const newQuery = {
     ...currQuery,
     ...encodedQueryReplacements,
   };
 
-  return updateLocation(newQuery, location, stringifyOptions);
+  return updateLocation(newQuery, location, objectToSearchStringFn);
 }

@@ -1,6 +1,7 @@
-import { stringify, ParsedQuery } from 'query-string';
+import { stringify } from 'query-string';
+import { EncodedQuery } from '..';
 
-export function makeMockLocation(query: ParsedQuery): Location {
+export function makeMockLocation(query: EncodedQuery): Location {
   const queryStr = stringify(query);
   const search = queryStr.length ? `?${queryStr}` : '';
   return {
