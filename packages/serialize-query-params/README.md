@@ -79,6 +79,20 @@ import { createEnumParam } from 'serialize-query-params';
 const SortOrderEnumParam = createEnumParam(['asc', 'desc'])
 ```
 
+**Array Enum Param**
+
+You can define array enum param using `createEnumArrayParam`. It will restricts decoded output to a list of allowed values: 
+
+```js
+import { createEnumArrayParam } from 'serialize-query-params';
+
+// feel free to use Enum instead of union types
+type Color = 'red' | 'green' | 'blue'
+
+// values other than 'red', 'green' or 'blue' will be decoded as undefined
+const ColorArrayEnumParam = createEnumArrayParam<Color[]>(['red', 'green', 'blue'])
+```
+
 **Setting a default value**
 
 If you'd like to have a default value, you can wrap your param with `withDefault()`:

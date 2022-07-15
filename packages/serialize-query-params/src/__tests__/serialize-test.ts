@@ -8,6 +8,7 @@ import {
   encodeString,
   decodeString,
   decodeEnum,
+  decodeArrayEnum,
   encodeJson,
   decodeJson,
   encodeArray,
@@ -164,6 +165,35 @@ describe('serialize', () => {
       expect(decodeEnum(['foo', 'bar'], enumValues)).toBe('foo');
     });
   })
+
+  describe('decodeArrayEnum', () => {
+    type Color = 'red' | 'green' | 'blue';
+    const enumValues: Color[] = ['red', 'green', 'blue'];
+
+    it('produces the correct value', () => {
+      expect(decodeArrayEnum('red', enumValues)).toEqual(['red']);
+      expect(decodeArrayEnum('red_green_blue', enumValues)).toEqual([
+        'red',
+        'green',
+        'blue',
+      ]);
+      expect(decodeArrayEnum('red,green', enumValues, ',')).toEqual([
+        'red',
+        'green',
+      ]);
+      expect(decodeArrayEnum('red_purple', enumValues)).toBeUndefined();
+      expect(decodeArrayEnum('pink_purple', enumValues)).toBeUndefined();
+      expect(decodeArrayEnum('', enumValues)).toBeUndefined();
+      expect(decodeArrayEnum(undefined, enumValues)).toBeUndefined();
+      expect(decodeArrayEnum(null, enumValues)).toBeNull();
+    });
+
+    it('handles array of values', () => {
+      expect(decodeArrayEnum(['red', 'green'], enumValues)).toEqual(['red']);
+      expect(decodeArrayEnum(['purple'], enumValues)).toBeUndefined();
+      expect(decodeArrayEnum([], enumValues)).toBeNull();
+    });
+  });
 
   describe('encodeJson', () => {
     it('produces the correct value', () => {

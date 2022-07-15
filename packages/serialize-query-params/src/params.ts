@@ -23,6 +23,22 @@ export const createEnumParam = <T extends string>(
 })
 
 /**
+ * Array enum
+ */
+export const createEnumArrayParam = <T extends string[]>(
+  enumValues: T,
+  entrySeparator = '_'
+): QueryParamConfig<T | null | undefined, T | null | undefined> => ({
+  encode: text => {
+    if (text === undefined || text === null || Array.isArray(text))
+      return Serialize.encodeDelimitedArray(text)
+    return Serialize.encodeDelimitedArray([text])
+  },
+  decode: input =>
+    Serialize.decodeArrayEnum(input, enumValues, entrySeparator),
+})
+
+/**
  * Numbers (integers or floats)
  */
 export const NumberParam: QueryParamConfig<

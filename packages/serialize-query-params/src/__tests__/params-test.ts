@@ -12,6 +12,7 @@ import {
   DelimitedArrayParam,
   DelimitedNumericArrayParam,
   createEnumParam,
+  createEnumArrayParam,
 } from '../index';
 
 describe('params', () => {
@@ -116,6 +117,26 @@ describe('params', () => {
       expect(TestEnumParam.encode('foo')).toBe('foo');
       expect(TestEnumParam.decode('bar')).toBe('bar');
       expect(TestEnumParam.decode('baz')).toBeUndefined();
+    });
+    it('createEnumArrayParam', () => {
+      type Color = 'red' | 'green' | 'blue';
+      const TestArrayEnumParam = createEnumArrayParam<Color[]>([
+        'red',
+        'green',
+        'blue',
+      ]);
+
+      expect(TestArrayEnumParam.encode(['red'])).toBe('red');
+      expect(TestArrayEnumParam.encode(['red', 'green', 'blue'])).toBe(
+        'red_green_blue'
+      );
+      expect(TestArrayEnumParam.decode('red_green_blue')).toEqual([
+        'red',
+        'green',
+        'blue',
+      ]);
+      expect(TestArrayEnumParam.decode('red_purple')).toBeUndefined();
+      expect(TestArrayEnumParam.decode('purple')).toBeUndefined();
     });
   });
 });

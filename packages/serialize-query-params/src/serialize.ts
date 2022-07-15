@@ -272,6 +272,27 @@ export function decodeEnum<T extends string>(
 }
 
 /**
+ * Decodes an enum value from arrays while safely handling null and undefined values.
+ *
+ * @template T
+ * @param {String} input the encoded string
+ * @param {T} enumValues allowed enum values
+ * @param entrySeparator The array as a string with elements joined by the
+ * entry separator
+ * @return {T} the string value from enumValues
+ */
+export function decodeArrayEnum<T extends string[]>(
+  input: string | (string | null)[] | null | undefined,
+  enumValues: T,
+  entrySeparator = '_'
+): T | null | undefined {
+  const str = decodeDelimitedArray(input, entrySeparator)
+  if (str == null) return str
+  if (Array.isArray(str) && str.length === 0) return undefined
+  return str.every((s) => s && enumValues.includes(s)) ? str as T : undefined
+}
+
+/**
  * Encodes anything as a JSON string.
  *
  * @param {Any} any The thing to be encoded
