@@ -12,8 +12,8 @@ ReactDOM.render(
       adapter={ReactRouter5Adapter}
       options={{
         enableBatching: true,
-        parseParams: parse,
-        stringifyParams: stringify,
+        searchStringToObject: parse,
+        objectToSearchString: stringify,
       }}
     >
       <App />

@@ -8,6 +8,7 @@ import {
   EncodedQuery,
   NumberParam,
   StringParam,
+  objectToSearchString,
 } from 'serialize-query-params';
 import {
   QueryParamAdapter,
@@ -15,12 +16,11 @@ import {
   QueryParams,
   SetQuery,
 } from '../index';
-import { stringifyParams } from '../stringifyParams';
 import { calledPushQuery, makeMockAdapter } from './helpers';
 
 // helper to setup tests
 function setupWrapper(query: EncodedQuery) {
-  const Adapter = makeMockAdapter({ search: stringifyParams(query) });
+  const Adapter = makeMockAdapter({ search: objectToSearchString(query) });
   const adapter = (Adapter as any).adapter as QueryParamAdapter;
   const wrapper = ({ children }: any) => (
     <QueryParamProvider adapter={Adapter}>{children}</QueryParamProvider>

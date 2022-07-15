@@ -220,7 +220,7 @@ export function testSpec(renderWithRouter: any) {
           <TestComponent />,
           '?store=0x1a8',
           {
-            parseParams: (searchString: string) => {
+            searchStringToObject: (searchString: string) => {
               const parsed = qs.parse(searchString);
               const { store } = parsed;
               let f, g, h;
@@ -236,7 +236,7 @@ export function testSpec(renderWithRouter: any) {
                 h,
               };
             },
-            stringifyParams: (encodedParams: any) => {
+            objectToSearchString: (encodedParams: any) => {
               const { f, g, h } = encodedParams;
               const store = `0x${f}${g}${h}`;
 
@@ -313,8 +313,8 @@ export function testSpec(renderWithRouter: any) {
         </div>,
         '?f=1&g=a&h=8',
         {
-          parseParams: qs.parse,
-          stringifyParams: qs.stringify,
+          searchStringToObject: qs.parse,
+          objectToSearchString: qs.stringify,
           params: {
             f: NumberParam,
             g: StringParam,

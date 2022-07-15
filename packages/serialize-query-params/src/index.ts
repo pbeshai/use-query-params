@@ -61,3 +61,6 @@ export type { ExtendedStringifyOptions } from './updateLocation';
 
 export { encodeQueryParams } from './encodeQueryParams';
 export { decodeQueryParams } from './decodeQueryParams';
+
+export { searchStringToObject } from './searchStringToObject';
+export { objectToSearchString } from './objectToSearchString';

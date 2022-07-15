@@ -11,6 +11,7 @@ import {
   JsonParam,
   BooleanParam,
   withDefault,
+  objectToSearchString,
 } from 'serialize-query-params';
 import { describe, it, vi } from 'vitest';
 
@@ -21,11 +22,10 @@ import {
   QueryParamOptions,
 } from '../index';
 import { calledPushQuery, makeMockAdapter } from './helpers';
-import { stringifyParams } from '../stringifyParams';
 
 // helper to setup tests
 function setupWrapper(query: EncodedQuery, options?: QueryParamOptions) {
-  const Adapter = makeMockAdapter({ search: stringifyParams(query) });
+  const Adapter = makeMockAdapter({ search: objectToSearchString(query) });
   const adapter = (Adapter as any).adapter as QueryParamAdapter;
   const wrapper = ({ children }: any) => (
     <QueryParamProvider adapter={Adapter} options={options}>
@@ -177,7 +177,7 @@ describe('useQueryParams', () => {
   it('allows the config to change over time', () => {
     const { wrapper, adapter } = setupWrapper(
       { foo: '123', bar: 'xxx' },
-      { parseParams: qs.parse, stringifyParams: qs.stringify }
+      { searchStringToObject: qs.parse, objectToSearchString: qs.stringify }
     );
     const { result, rerender } = renderHook(
       ({ config }) => useQueryParams(config),
