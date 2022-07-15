@@ -9,7 +9,7 @@ import { parse, stringify } from 'query-string';
 ReactDOM.render(
   <Router>
     <QueryParamProvider
-      Adapter={ReactRouter5Adapter}
+      adapter={ReactRouter5Adapter}
       options={{
         enableBatching: true,
         parseParams: parse,

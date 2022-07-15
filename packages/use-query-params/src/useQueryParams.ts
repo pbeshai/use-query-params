@@ -101,8 +101,7 @@ export function useQueryParams(
   const decodedValues = stableGetLatest(
     parsedParams,
     paramConfigMap,
-    decodedParamCache,
-    mergedOptions
+    decodedParamCache
   );
 
   // clear out unused values in cache

@@ -1,4 +1,4 @@
-import { describe, it, vi, test } from 'vitest';
+import { describe, it } from 'vitest';
 import { updateLocation, updateInLocation } from '../index';
 import { makeMockLocation } from './helpers';
 import { parse } from 'query-string';
@@ -24,8 +24,8 @@ describe('updateLocation', () => {
       pgb: null,
       emp: '',
     });
-    expect(newLocation.key).toBeDefined();
-    expect(newLocation.key).not.toBe((location as any).key);
+    expect((newLocation as any).key).toBeDefined();
+    expect((newLocation as any).key).not.toBe((location as any).key);
     // include updated search string
     expect(newLocation.href).toBe(
       'http://localhost:3000/' + newLocation.search
@@ -88,8 +88,8 @@ describe('updateInLocation', () => {
       bar: '',
       pgb: null,
     });
-    expect(newLocation.key).toBeDefined();
-    expect(newLocation.key).not.toBe((location as any).key);
+    expect((newLocation as any).key).toBeDefined();
+    expect((newLocation as any).key).not.toBe((location as any).key);
 
     // check multiple params
     expect(

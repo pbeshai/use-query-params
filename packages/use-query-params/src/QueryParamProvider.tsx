@@ -46,7 +46,7 @@ interface QueryParamProviderProps {
   /** Main app goes here */
   children: React.ReactNode;
   /** required for the root provider but not for nested ones */
-  Adapter?: QueryParamAdapterComponent;
+  adapter?: QueryParamAdapterComponent;
   options?: QueryParamOptions;
 }
 
@@ -86,9 +86,10 @@ function QueryParamProviderInner({
  */
 export function QueryParamProvider({
   children,
-  Adapter,
+  adapter,
   options,
 }: QueryParamProviderProps) {
+  const Adapter = adapter;
   return Adapter ? (
     <Adapter>
       {(adapter) => (

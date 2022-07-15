@@ -53,8 +53,7 @@ export function getUpdatedSearchString({
     const latestValues = getLatestDecodedValues(
       parsedParams,
       paramConfigMap,
-      decodedParamCache,
-      options
+      decodedParamCache
     );
 
     changesToUse = (changes as Function)(latestValues);

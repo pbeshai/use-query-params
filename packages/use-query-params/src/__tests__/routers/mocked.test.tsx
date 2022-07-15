@@ -95,7 +95,7 @@ function renderTest(
   const history = createTestHistory(initialRoute);
   const results = render(
     <TestRouter history={history}>
-      <QueryParamProvider Adapter={TestAdapter} options={options}>
+      <QueryParamProvider adapter={TestAdapter} options={options}>
         {ui}
       </QueryParamProvider>
     </TestRouter>
@@ -103,7 +103,7 @@ function renderTest(
   const rerender = (ui: React.ReactNode, newOptions = options) =>
     results.rerender(
       <TestRouter history={history}>
-        <QueryParamProvider Adapter={TestAdapter} options={newOptions}>
+        <QueryParamProvider adapter={TestAdapter} options={newOptions}>
           {ui}
         </QueryParamProvider>
       </TestRouter>
