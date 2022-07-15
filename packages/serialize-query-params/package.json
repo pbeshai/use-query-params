@@ -41,9 +41,6 @@
   "devDependencies": {
     "@types/node": "15.0.1"
   },
-  "peerDependencies": {
-    "query-string": ">=5.1.1"
-  },
   "tsd": {
     "directory": "src"
   }

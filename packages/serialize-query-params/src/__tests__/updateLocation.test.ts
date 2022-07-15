@@ -1,7 +1,11 @@
 import { describe, it } from 'vitest';
-import { updateLocation, updateInLocation } from '../index';
+import {
+  updateLocation,
+  updateInLocation,
+  transformSearchStringJsonSafe,
+} from '../index';
 import { makeMockLocation } from './helpers';
-import { parse } from 'query-string';
+import { parse, stringify } from 'query-string';
 
 describe('updateLocation', () => {
   it('creates the correct search string', () => {
@@ -17,7 +21,8 @@ describe('updateLocation', () => {
         und: undefined,
         emp: '',
       },
-      location
+      location,
+      stringify
     );
     expect(parse(newLocation.search)).toEqual({
       foo: 'xxx',
@@ -33,7 +38,7 @@ describe('updateLocation', () => {
 
     // check multiple params
     expect(
-      parse(updateLocation({ foo: 'a', baz: 'b' }, location).search)
+      parse(updateLocation({ foo: 'a', baz: 'b' }, location, stringify).search)
     ).toEqual({ foo: 'a', baz: 'b' });
   });
 
@@ -50,7 +55,7 @@ describe('updateLocation', () => {
     );
   });
 
-  it('handles stringify options', () => {
+  it('handles custom stringify options', () => {
     const location = makeMockLocation({
       foo: 'one two',
       bar: '[({1,2:3:4,5})]',
@@ -58,18 +63,16 @@ describe('updateLocation', () => {
     const newLocation = updateLocation(
       { foo: 'o t h', bar: '[({1,2:3:6,5})]' },
       location,
-      {
-        encode: false,
-      }
+      (params) => stringify(params, { encode: false })
     );
     expect(newLocation.search).toBe('?bar=[({1,2:3:6,5})]&foo=o t h');
 
     const newLocation2 = updateLocation(
       { foo: 'o t h', bar: '[({1,2:6:4,5})]' },
       location,
-      {
-        encode: false,
-        transformSearchString: (str) => str.replace(/ /g, '%20'),
+      (params) => {
+        const str = stringify(params, { encode: false });
+        return transformSearchStringJsonSafe(str).replace(/ /g, '%20');
       }
     );
     expect(newLocation2.search).toBe('?bar=[({1,2:6:4,5})]&foo=o%20t%20h');
@@ -81,7 +84,9 @@ describe('updateInLocation', () => {
     const location = makeMockLocation({ foo: 'abc', bar: '555', baz: '222' });
     const newLocation = updateInLocation(
       { foo: 'xxx', pgb: null, baz: undefined, bar: '' },
-      location
+      location,
+      stringify,
+      parse
     );
     expect(parse(newLocation.search)).toEqual({
       foo: 'xxx',
@@ -114,15 +119,21 @@ describe('updateInLocation', () => {
       foo: 'one two',
       bar: '[({1,2:3:4,5})]',
     });
-    const newLocation = updateInLocation({ foo: 'o t h' }, location, {
-      encode: false,
-    });
+    const newLocation = updateInLocation({ foo: 'o t h' }, location, (params) =>
+      stringify(params, {
+        encode: false,
+      })
+    );
     expect(newLocation.search).toBe('?bar=[({1,2:3:4,5})]&foo=o t h');
 
-    const newLocation2 = updateInLocation({ foo: 'o t h' }, location, {
-      encode: false,
-      transformSearchString: (str) => str.replace(/ /g, '%20'),
-    });
+    const newLocation2 = updateInLocation(
+      { foo: 'o t h' },
+      location,
+      (params) => {
+        const str = stringify(params, { encode: false });
+        return str.replace(/ /g, '%20');
+      }
+    );
     expect(newLocation2.search).toBe('?bar=[({1,2:3:4,5})]&foo=o%20t%20h');
   });
 });
