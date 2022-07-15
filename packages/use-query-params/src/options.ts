@@ -1,11 +1,14 @@
-import { EncodedQuery, QueryParamConfigMap } from 'serialize-query-params';
-import { parseParams } from './parseParams';
-import { stringifyParams } from './stringifyParams';
+import {
+  EncodedQuery,
+  QueryParamConfigMap,
+  searchStringToObject,
+  objectToSearchString,
+} from 'serialize-query-params';
 import { UrlUpdateType } from './types';
 
 export const defaultOptions: QueryParamOptionsWithRequired = {
-  parseParams: parseParams,
-  stringifyParams: stringifyParams,
+  searchStringToObject: searchStringToObject,
+  objectToSearchString: objectToSearchString,
   updateType: 'pushIn',
   includeKnownParams: undefined,
   includeAllParams: false,
@@ -14,8 +17,8 @@ export const defaultOptions: QueryParamOptionsWithRequired = {
 };
 
 export interface QueryParamOptions {
-  parseParams?: (searchString: string) => EncodedQuery;
-  stringifyParams?: (encodedParams: EncodedQuery) => string;
+  searchStringToObject?: (searchString: string) => EncodedQuery;
+  objectToSearchString?: (encodedParams: EncodedQuery) => string;
   updateType?: UrlUpdateType;
   includeKnownParams?: boolean;
   includeAllParams?: boolean;
@@ -31,7 +34,7 @@ export interface QueryParamOptions {
   enableBatching?: boolean;
 }
 
-type RequiredOptions = 'parseParams' | 'stringifyParams';
+type RequiredOptions = 'searchStringToObject' | 'objectToSearchString';
 export type QueryParamOptionsWithRequired = Required<
   Pick<QueryParamOptions, RequiredOptions>
 > &

@@ -11,7 +11,7 @@ import {
   processInheritedParams,
 } from './inheritedParams';
 import { makeStableGetLatestDecodedValues } from './latestValues';
-import { memoParseParams } from './memoParseParams';
+import { memoSearchStringToObject } from './memoSearchStringToObject';
 import { mergeOptions, QueryParamOptions } from './options';
 import { useQueryParamContext } from './QueryParamProvider';
 import {
@@ -81,8 +81,8 @@ export function useQueryParams(
   );
 
   // what is the current stringified value?
-  const parsedParams = memoParseParams(
-    mergedOptions.parseParams,
+  const parsedParams = memoSearchStringToObject(
+    mergedOptions.searchStringToObject,
     adapter.location.search,
     serializeUrlNameMap(paramConfigMap) // note we serialize for memo purposes
   );

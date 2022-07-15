@@ -3,10 +3,9 @@
  */
 import * as React from 'react';
 import { renderToString } from 'react-dom/server';
-import { StringParam } from 'serialize-query-params';
+import { StringParam, objectToSearchString } from 'serialize-query-params';
 import { test } from 'vitest';
 import QueryParamProvider from '../QueryParamProvider';
-import { stringifyParams } from '../stringifyParams';
 import { useQueryParam } from '../useQueryParam';
 import { makeMockAdapter } from './helpers';
 
@@ -18,7 +17,7 @@ test('SSR initial query param', () => {
   };
 
   const query = { foo: 'bar' };
-  const Adapter = makeMockAdapter({ search: stringifyParams(query) });
+  const Adapter = makeMockAdapter({ search: objectToSearchString(query) });
 
   const result = renderToString(
     <QueryParamProvider adapter={Adapter}>

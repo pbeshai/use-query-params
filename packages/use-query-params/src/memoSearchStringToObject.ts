@@ -4,11 +4,13 @@ import { deserializeUrlNameMap } from './urlName';
 
 let cachedSearchString: string | undefined;
 let cachedUrlNameMapString: string | undefined;
-let cachedParseParamsFn: ((searchString: string) => EncodedQuery) | undefined;
+let cachedSearchStringToObjectFn:
+  | ((searchString: string) => EncodedQuery)
+  | undefined;
 let cachedParsedQuery: EncodedQuery = {};
 
-export const memoParseParams = (
-  parseParams: (searchString: string) => EncodedQuery,
+export const memoSearchStringToObject = (
+  searchStringToObject: (searchString: string) => EncodedQuery,
   searchString?: string | undefined,
   /** optionally provide a mapping string to handle renames via `urlName`
    * mapping are separated by \n and mappings are urlName\0paramName
@@ -17,14 +19,14 @@ export const memoParseParams = (
 ) => {
   if (
     cachedSearchString === searchString &&
-    cachedParseParamsFn === parseParams &&
+    cachedSearchStringToObjectFn === searchStringToObject &&
     cachedUrlNameMapString === urlNameMapStr
   ) {
     return cachedParsedQuery;
   }
   cachedSearchString = searchString;
-  cachedParseParamsFn = parseParams;
-  const newParsedQuery = parseParams(searchString ?? '');
+  cachedSearchStringToObjectFn = searchStringToObject;
+  const newParsedQuery = searchStringToObject(searchString ?? '');
   cachedUrlNameMapString = urlNameMapStr;
 
   const urlNameMap = deserializeUrlNameMap(urlNameMapStr);

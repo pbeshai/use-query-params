@@ -6,7 +6,7 @@ import {
 import { decodedParamCache } from './decodedParamCache';
 import { expandWithInheritedParams } from './inheritedParams';
 import { getLatestDecodedValues } from './latestValues';
-import { memoParseParams } from './memoParseParams';
+import { memoSearchStringToObject } from './memoSearchStringToObject';
 import { QueryParamOptionsWithRequired } from './options';
 import { removeDefaults } from './removeDefaults';
 import { PartialLocation, QueryParamAdapter, UrlUpdateType } from './types';
@@ -30,11 +30,14 @@ export function getUpdatedSearchString({
   options: QueryParamOptionsWithRequired;
   updateType?: UrlUpdateType;
 }): string {
-  const { parseParams, stringifyParams } = options;
+  const { searchStringToObject, objectToSearchString } = options;
   if (updateType == null) updateType = options.updateType;
 
   let encodedChanges;
-  const parsedParams = memoParseParams(parseParams, currentSearchString);
+  const parsedParams = memoSearchStringToObject(
+    searchStringToObject,
+    currentSearchString
+  );
 
   // see if we have unconfigured params in the changes that we can
   // inherit to expand our config map instead of just using strings
@@ -74,9 +77,12 @@ export function getUpdatedSearchString({
 
   let newSearchString: string;
   if (updateType === 'push' || updateType === 'replace') {
-    newSearchString = stringifyParams(encodedChanges);
+    newSearchString = objectToSearchString(encodedChanges);
   } else {
-    newSearchString = stringifyParams({ ...parsedParams, ...encodedChanges });
+    newSearchString = objectToSearchString({
+      ...parsedParams,
+      ...encodedChanges,
+    });
   }
 
   if (newSearchString?.length && newSearchString[0] !== '?') {
