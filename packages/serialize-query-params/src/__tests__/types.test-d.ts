@@ -6,6 +6,7 @@ import {
   ArrayParam,
   withDefault,
   createEnumParam,
+  createEnumArrayParam,
 } from '..';
 
 // test basic decoded values
@@ -32,7 +33,7 @@ expectType<{ str: string | null; num: number }>(decodedValueMap2);
 // test enum param with default
 const MyEnumParam = createEnumParam(['foo', 'bar']);
 const queryParamConfig3 = {
-  enum: withDefault(MyEnumParam, 'foo'),
+  enum: withDefault(MyEnumParam, 'foo' as const),
 };
 
 const decodedValueMap3: DecodedValueMap<typeof queryParamConfig3> = {
@@ -49,3 +50,16 @@ const decodedValueMap4: DecodedValueMap<typeof queryParamConfig4> = {
   arr: queryParamConfig4.arr.decode(['x', 'b']),
 };
 expectType<{ arr: string[] | (string | null)[] }>(decodedValueMap4);
+
+// test enum param with default array type
+const queryParamConfig5 = {
+  arr: withDefault(createEnumArrayParam(['foo', 'bar']), ['foo'] as (
+    | 'foo'
+    | 'bar'
+  )[]),
+};
+
+const decodedValueMap5: DecodedValueMap<typeof queryParamConfig5> = {
+  arr: queryParamConfig5.arr.decode(['x', 'b']),
+};
+expectType<{ arr: ('foo' | 'bar')[] }>(decodedValueMap5);
