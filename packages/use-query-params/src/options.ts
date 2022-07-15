@@ -7,8 +7,6 @@ export const defaultOptions: QueryParamOptionsWithRequired = {
   parseParams: parseParams,
   stringifyParams: stringifyParams,
   updateType: 'pushIn',
-  keepNull: false,
-  keepEmptyString: false,
   includeKnownParams: undefined,
   includeAllParams: false,
   removeDefaultsFromUrl: false,
@@ -19,14 +17,17 @@ export interface QueryParamOptions {
   parseParams?: (searchString: string) => EncodedQuery;
   stringifyParams?: (encodedParams: EncodedQuery) => string;
   updateType?: UrlUpdateType;
-  keepNull?: boolean;
-  keepEmptyString?: boolean;
   includeKnownParams?: boolean;
   includeAllParams?: boolean;
   params?: QueryParamConfigMap;
 
   /** when a value equals its default, do not encode it in the URL when updating */
   removeDefaultsFromUrl?: boolean;
+
+  /**
+   * @experimental this is an experimental option to combine multiple `set` calls
+   * into a single URL update.
+   */
   enableBatching?: boolean;
 }
 

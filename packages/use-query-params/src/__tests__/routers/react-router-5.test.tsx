@@ -51,7 +51,7 @@ function renderWithRouter(
   const history = createMemoryHistory({ initialEntries: [initialRoute] });
   const results = render(
     <Router history={history}>
-      <QueryParamProvider Adapter={ReactRouter5Adapter} options={options}>
+      <QueryParamProvider adapter={ReactRouter5Adapter} options={options}>
         {ui}
       </QueryParamProvider>
     </Router>
@@ -59,7 +59,7 @@ function renderWithRouter(
   const rerender = (ui: React.ReactNode, newOptions = options) =>
     results.rerender(
       <Router history={history}>
-        <QueryParamProvider Adapter={ReactRouter5Adapter} options={newOptions}>
+        <QueryParamProvider adapter={ReactRouter5Adapter} options={newOptions}>
           {ui}
         </QueryParamProvider>
       </Router>

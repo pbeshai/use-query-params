@@ -21,7 +21,7 @@ test('SSR initial query param', () => {
   const Adapter = makeMockAdapter({ search: stringifyParams(query) });
 
   const result = renderToString(
-    <QueryParamProvider Adapter={Adapter}>
+    <QueryParamProvider adapter={Adapter}>
       <Component />
     </QueryParamProvider>
   );

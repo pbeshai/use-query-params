@@ -198,60 +198,6 @@ export function testSpec(renderWithRouter: any) {
         expect(pushSpy).toHaveBeenCalledTimes(1);
       });
 
-      it('keepNull', () => {
-        const { queryByText, rerender } = renderWithRouter(
-          <QueryParamExample options={{ keepNull: true }} />,
-          '?x',
-          {
-            parseParams: qs.parse,
-            stringifyParams: qs.stringify,
-          }
-        );
-
-        expect(queryByText(/x is 0 null/)).toBeTruthy();
-
-        rerender(<QueryParamExample options={{ keepNull: false }} />);
-        expect(queryByText(/x is 0 undefined/)).toBeTruthy();
-
-        rerender(<QueryParamExample />);
-        expect(queryByText(/x is 0 undefined/)).toBeTruthy();
-
-        rerender(<QueryParamExample />, { keepNull: true });
-        expect(queryByText(/x is 0 null/)).toBeTruthy();
-      });
-
-      it('keepEmptyString', () => {
-        const { queryByText, rerender } = renderWithRouter(
-          <QueryParamExample
-            options={{ keepEmptyString: true }}
-            paramType={StringParam}
-          />,
-          '?x=',
-          {
-            parseParams: qs.parse,
-            stringifyParams: qs.stringify,
-          }
-        );
-
-        expect(queryByText(/x is ""/)).toBeTruthy();
-
-        rerender(
-          <QueryParamExample
-            paramType={StringParam}
-            options={{ keepEmptyString: false }}
-          />
-        );
-        expect(queryByText(/x is 0 undefined/)).toBeTruthy();
-
-        rerender(<QueryParamExample paramType={StringParam} />);
-        expect(queryByText(/x is 0 undefined/)).toBeTruthy();
-
-        rerender(<QueryParamExample paramType={StringParam} />, {
-          keepEmptyString: true,
-        });
-        expect(queryByText(/x is ""/)).toBeTruthy();
-      });
-
       it('parse/stringify with hash', () => {
         const TestComponent = () => {
           const [query, setQuery] = useQueryParams({
@@ -310,7 +256,7 @@ export function testSpec(renderWithRouter: any) {
         const { queryByText, getByText, history, rerender } = renderWithRouter(
           <QueryParamExample
             options={{ removeDefaultsFromUrl: true }}
-            paramType={{ ...NumberParam, default: 3 }}
+            paramType={withDefault(NumberParam, 3)}
           />,
           '?x=3'
         );
@@ -325,7 +271,7 @@ export function testSpec(renderWithRouter: any) {
         rerender(
           <QueryParamExample
             options={{ removeDefaultsFromUrl: true }}
-            paramType={{ ...NumberParam, default: 5 }}
+            paramType={withDefault(NumberParam, 5)}
           />
         );
 

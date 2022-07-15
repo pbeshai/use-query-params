@@ -23,7 +23,7 @@ describe('QueryParamProvider', () => {
     };
 
     render(
-      <QueryParamProvider Adapter={Adapter}>
+      <QueryParamProvider adapter={Adapter}>
         <TestComponent />
       </QueryParamProvider>
     );

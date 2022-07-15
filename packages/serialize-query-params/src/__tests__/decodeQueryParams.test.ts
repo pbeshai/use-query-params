@@ -1,4 +1,4 @@
-import { describe, it, vi, test } from 'vitest';
+import { describe, it } from 'vitest';
 import { decodeQueryParams } from '../index';
 
 import {

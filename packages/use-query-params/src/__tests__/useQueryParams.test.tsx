@@ -10,6 +10,7 @@ import {
   DateParam,
   JsonParam,
   BooleanParam,
+  withDefault,
 } from 'serialize-query-params';
 import { describe, it, vi } from 'vitest';
 
@@ -27,7 +28,7 @@ function setupWrapper(query: EncodedQuery, options?: QueryParamOptions) {
   const Adapter = makeMockAdapter({ search: stringifyParams(query) });
   const adapter = (Adapter as any).adapter as QueryParamAdapter;
   const wrapper = ({ children }: any) => (
-    <QueryParamProvider Adapter={Adapter} options={options}>
+    <QueryParamProvider adapter={Adapter} options={options}>
       {children}
     </QueryParamProvider>
   );
@@ -233,10 +234,9 @@ describe('useQueryParams', () => {
     const [, setter] = result.current;
 
     setter({ foo: 999 }, 'replaceIn');
-    setter({ bar: 'yyy' }, 'replaceIn');
     rerender();
     const [decodedQuery] = result.current;
-    expect(decodedQuery).toEqual({ foo: 999, bar: 'yyy' });
+    expect(decodedQuery).toEqual({ foo: 999, bar: 'xxx' });
   });
 
   it('sets distinct params with different hooks in the same render', () => {
@@ -412,9 +412,31 @@ describe('useQueryParams', () => {
   });
 
   describe('default values', () => {
+    it('replaces undefined with default value withDefault', () => {
+      const { wrapper } = setupWrapper({});
+      const { result, rerender } = renderHook(
+        () => useQueryParams({ foo: withDefault(StringParam, 'boop') }),
+        {
+          wrapper,
+        }
+      );
+      const [decodedQuery, setter] = result.current;
+
+      expect(decodedQuery).toEqual({ foo: 'boop' });
+      setter({ foo: undefined });
+      rerender();
+      const [decodedQuery2, setter2] = result.current;
+      expect(decodedQuery2).toEqual({ foo: 'boop' });
+      setter2({ foo: 'beep' });
+      rerender();
+      const [decodedQuery3] = result.current;
+      expect(decodedQuery3).toEqual({ foo: 'beep' });
+    });
+
     it('replaces undefined with default value', () => {
       const { wrapper } = setupWrapper({});
       const { result, rerender } = renderHook(
+        // note it is still recommended to use withDefault() which gives better type inference
         () => useQueryParams({ foo: { ...StringParam, default: 'boop' } }),
         {
           wrapper,
@@ -433,35 +455,11 @@ describe('useQueryParams', () => {
       expect(decodedQuery3).toEqual({ foo: 'beep' });
     });
 
-    it('replaces undefined with default value but keeps null', () => {
-      const { wrapper } = setupWrapper({});
-      const { result, rerender } = renderHook(
-        () =>
-          useQueryParams(
-            { foo: { ...StringParam, default: 'boop' } },
-            {
-              keepNull: true,
-              parseParams: qs.parse,
-              stringifyParams: qs.stringify,
-            }
-          ),
-        {
-          wrapper,
-        }
-      );
-      const [decodedQuery, setter] = result.current;
-
-      expect(decodedQuery).toEqual({ foo: 'boop' });
-      setter({ foo: null });
-      rerender();
-      const [decodedQuery2] = result.current;
-      expect(decodedQuery2).toEqual({ foo: null });
-    });
-
     it('supports a changing default value', () => {
       const { wrapper } = setupWrapper({});
       const { result, rerender } = renderHook(
         ({ defaultValue }: { defaultValue: string }) =>
+          // note it is still recommended to use withDefault() which gives better type inference
           useQueryParams({ foo: { ...StringParam, default: defaultValue } }),
         {
           wrapper,
@@ -481,7 +479,7 @@ describe('useQueryParams', () => {
 
   describe('should call custom paramConfig.decode properly', () => {
     it('when custom paramConfig decode undefined as non-undefined value, should not call decode function when irrelevant update happens', () => {
-      const { wrapper } = setupWrapper({ bar: '1' }, { keepNull: true });
+      const { wrapper } = setupWrapper({ bar: '1' });
       const customQueryParam = {
         encode: (str: string | undefined | null) => str,
         decode: (str: string | (string | null)[] | undefined | null) => {

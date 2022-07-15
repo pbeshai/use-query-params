@@ -23,7 +23,7 @@ function setupWrapper(query: EncodedQuery) {
   const Adapter = makeMockAdapter({ search: stringifyParams(query) });
   const adapter = (Adapter as any).adapter as QueryParamAdapter;
   const wrapper = ({ children }: any) => (
-    <QueryParamProvider Adapter={Adapter}>{children}</QueryParamProvider>
+    <QueryParamProvider adapter={Adapter}>{children}</QueryParamProvider>
   );
 
   return { wrapper, adapter };

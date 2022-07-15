@@ -1,4 +1,4 @@
-import { describe, it, vi, test } from 'vitest';
+import { describe, it } from 'vitest';
 import {
   encodeDate,
   decodeDate,
@@ -68,9 +68,9 @@ describe('serialize', () => {
 
     it('handles array of values', () => {
       const result = decodeDate(['2019-03-01', '2019-05-01']);
-      expect(result.getFullYear()).toBe(2019);
-      expect(result.getMonth()).toBe(2);
-      expect(result.getDate()).toBe(1);
+      expect(result!.getFullYear()).toBe(2019);
+      expect(result!.getMonth()).toBe(2);
+      expect(result!.getDate()).toBe(1);
     });
   });
 

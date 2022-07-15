@@ -18,7 +18,7 @@ function renderWithRouter(ui: React.ReactNode, initialRoute: string) {
   return {
     ...render(
       <Router history={history}>
-        <QueryParamProvider Adapter={ReactRouter5Adapter}>
+        <QueryParamProvider adapter={ReactRouter5Adapter}>
           {ui}
         </QueryParamProvider>
       </Router>

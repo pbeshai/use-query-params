@@ -4,7 +4,6 @@ import {
   QueryParamConfigMap,
 } from 'serialize-query-params';
 import { DecodedParamCache } from './decodedParamCache';
-import { QueryParamOptions } from './options';
 import shallowEqual from './shallowEqual';
 
 /**
@@ -14,8 +13,7 @@ import shallowEqual from './shallowEqual';
 export function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
   parsedParams: EncodedQuery,
   paramConfigMap: QPCMap,
-  decodedParamCache: DecodedParamCache,
-  options: QueryParamOptions = {}
+  decodedParamCache: DecodedParamCache
 ) {
   const decodedValues: Partial<DecodedValueMap<QPCMap>> = {};
 
@@ -58,12 +56,8 @@ export function getLatestDecodedValues<QPCMap extends QueryParamConfigMap>(
       }
     }
 
-    if (decodedValue === null && !options.keepNull) {
-      decodedValue = undefined;
-    } else if (decodedValue === '' && !options.keepEmptyString) {
-      decodedValue = undefined;
-    }
-
+    // in case the decode function didn't interpret `default` for some reason,
+    // we can interpret it here as a backup
     if (decodedValue === undefined && paramConfig.default !== undefined) {
       decodedValue = paramConfig.default;
     }
@@ -84,14 +78,12 @@ export function makeStableGetLatestDecodedValues() {
   function stableGetLatest<QPCMap extends QueryParamConfigMap>(
     parsedParams: EncodedQuery,
     paramConfigMap: QPCMap,
-    decodedParamCache: DecodedParamCache,
-    options: QueryParamOptions
+    decodedParamCache: DecodedParamCache
   ) {
     const decodedValues = getLatestDecodedValues(
       parsedParams,
       paramConfigMap,
-      decodedParamCache,
-      options
+      decodedParamCache
     );
     if (
       prevDecodedValues != null &&
