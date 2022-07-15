@@ -14,6 +14,7 @@ import {
   DelimitedNumericArrayParam,
   createEnumParam,
   createEnumArrayParam,
+  createEnumDelimitedArrayParam,
 } from '../index';
 
 describe('params', () => {
@@ -135,8 +136,20 @@ describe('params', () => {
       expect(TestEnumParam.decode('baz')).toBeUndefined();
     });
     it('createEnumArrayParam', () => {
-      type Color = 'red' | 'green' | 'blue';
-      const TestArrayEnumParam = createEnumArrayParam<Color[]>([
+      const TestArrayEnumParam = createEnumArrayParam(['red', 'green', 'blue']);
+
+      expect(TestArrayEnumParam.encode(['red'])).toEqual(['red']);
+      expect(TestArrayEnumParam.encode(['red', 'green', 'blue'])).toEqual([
+        'red',
+        'green',
+        'blue',
+      ]);
+
+      expect(TestArrayEnumParam.decode(['red', 'purple'])).toBeUndefined();
+      expect(TestArrayEnumParam.decode('purple')).toBeUndefined();
+    });
+    it('createEnumDelimitedArrayParam', () => {
+      const TestArrayEnumParam = createEnumDelimitedArrayParam([
         'red',
         'green',
         'blue',

@@ -10,6 +10,7 @@ import {
   decodeString,
   decodeEnum,
   decodeArrayEnum,
+  decodeDelimitedArrayEnum,
   encodeJson,
   decodeJson,
   encodeArray,
@@ -173,26 +174,56 @@ describe('serialize', () => {
 
     it('produces the correct value', () => {
       expect(decodeArrayEnum('red', enumValues)).toEqual(['red']);
-      expect(decodeArrayEnum('red_green_blue', enumValues)).toEqual([
+      expect(decodeArrayEnum(['red', 'green', 'blue'], enumValues)).toEqual([
         'red',
         'green',
         'blue',
       ]);
-      expect(decodeArrayEnum('red,green', enumValues, ',')).toEqual([
+      expect(decodeArrayEnum(['red', 'green'], enumValues)).toEqual([
         'red',
         'green',
       ]);
-      expect(decodeArrayEnum('red_purple', enumValues)).toBeUndefined();
-      expect(decodeArrayEnum('pink_purple', enumValues)).toBeUndefined();
+      expect(decodeArrayEnum(['red', 'purple'], enumValues)).toBeUndefined();
+      expect(decodeArrayEnum(['pink', 'purple'], enumValues)).toBeUndefined();
+      expect(decodeArrayEnum([], enumValues)).toBeUndefined();
       expect(decodeArrayEnum('', enumValues)).toBeUndefined();
       expect(decodeArrayEnum(undefined, enumValues)).toBeUndefined();
       expect(decodeArrayEnum(null, enumValues)).toBeNull();
     });
+  });
+
+  describe('decodeDelimitedArrayEnum', () => {
+    type Color = 'red' | 'green' | 'blue';
+    const enumValues: Color[] = ['red', 'green', 'blue'];
+
+    it('produces the correct value', () => {
+      expect(decodeDelimitedArrayEnum('red', enumValues)).toEqual(['red']);
+      expect(decodeDelimitedArrayEnum('red_green_blue', enumValues)).toEqual([
+        'red',
+        'green',
+        'blue',
+      ]);
+      expect(decodeDelimitedArrayEnum('red,green', enumValues, ',')).toEqual([
+        'red',
+        'green',
+      ]);
+      expect(
+        decodeDelimitedArrayEnum('red_purple', enumValues)
+      ).toBeUndefined();
+      expect(
+        decodeDelimitedArrayEnum('pink_purple', enumValues)
+      ).toBeUndefined();
+      expect(decodeDelimitedArrayEnum('', enumValues)).toBeUndefined();
+      expect(decodeDelimitedArrayEnum(undefined, enumValues)).toBeUndefined();
+      expect(decodeDelimitedArrayEnum(null, enumValues)).toBeNull();
+    });
 
     it('handles array of values', () => {
-      expect(decodeArrayEnum(['red', 'green'], enumValues)).toEqual(['red']);
-      expect(decodeArrayEnum(['purple'], enumValues)).toBeUndefined();
-      expect(decodeArrayEnum([], enumValues)).toBeNull();
+      expect(decodeDelimitedArrayEnum(['red', 'green'], enumValues)).toEqual([
+        'red',
+      ]);
+      expect(decodeDelimitedArrayEnum(['purple'], enumValues)).toBeUndefined();
+      expect(decodeDelimitedArrayEnum([], enumValues)).toBeUndefined();
     });
   });
 

@@ -266,9 +266,9 @@ export function decodeEnum<T extends string>(
   input: string | (string | null)[] | null | undefined,
   enumValues: T[]
 ): T | null | undefined {
-  const str = decodeString(input)
-  if (str == null) return str
-  return enumValues.includes(str as any) ? str as T : undefined
+  const str = decodeString(input);
+  if (str == null) return str;
+  return enumValues.includes(str as any) ? (str as T) : undefined;
 }
 
 /**
@@ -276,20 +276,39 @@ export function decodeEnum<T extends string>(
  *
  * @template T
  * @param {String} input the encoded string
- * @param {T} enumValues allowed enum values
+ * @param {T[]} enumValues allowed enum values
+ * @return {T[]} the string value from enumValues
+ */
+export function decodeArrayEnum<T extends string>(
+  input: string | (string | null)[] | null | undefined,
+  enumValues: T[]
+): T[] | null | undefined {
+  const arr = decodeArray(input);
+  if (arr == null) return arr;
+  if (!arr.length) return undefined;
+  return arr.every((str) => str != null && enumValues.includes(str as T))
+    ? (arr as T[])
+    : undefined;
+}
+
+/**
+ * Decodes an enum value from arrays while safely handling null and undefined values.
+ *
+ * @template T
+ * @param {String} input the encoded string
+ * @param {T[]} enumValues allowed enum values
  * @param entrySeparator The array as a string with elements joined by the
  * entry separator
- * @return {T} the string value from enumValues
+ * @return {T[]} the string value from enumValues
  */
-export function decodeArrayEnum<T extends string[]>(
+export function decodeDelimitedArrayEnum<T extends string>(
   input: string | (string | null)[] | null | undefined,
-  enumValues: T,
+  enumValues: T[],
   entrySeparator = '_'
-): T | null | undefined {
-  const str = decodeDelimitedArray(input, entrySeparator)
-  if (str == null) return str
-  if (Array.isArray(str) && str.length === 0) return undefined
-  return str.every((s) => s && enumValues.includes(s)) ? str as T : undefined
+): T[] | null | undefined {
+  if (input != null && Array.isArray(input) && !input.length) return undefined;
+  const arr = decodeDelimitedArray(input, entrySeparator);
+  return decodeArrayEnum(arr, enumValues);
 }
 
 /**
