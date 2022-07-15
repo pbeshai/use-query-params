@@ -57,7 +57,6 @@ export {
   updateInLocation,
   transformSearchStringJsonSafe,
 } from './updateLocation';
-export type { ExtendedStringifyOptions } from './updateLocation';
 
 export { encodeQueryParams } from './encodeQueryParams';
 export { decodeQueryParams } from './decodeQueryParams';
