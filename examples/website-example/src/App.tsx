@@ -1,8 +1,6 @@
-import * as React from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 import UseQueryParamExample from './UseQueryParamExample';
 import UseQueryParamsExample from './UseQueryParamsExample';
-import './App.css';
 
 const App = (props: any) => {
   const [example, setExample] = React.useState(0);

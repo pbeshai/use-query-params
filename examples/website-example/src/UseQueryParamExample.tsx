@@ -1,14 +1,12 @@
+import { nanoid } from 'nanoid';
 import * as React from 'react';
-import {
-  useQueryParam,
-  StringParam,
-  NumberParam,
-  ArrayParam,
-  NumericArrayParam,
-} from 'use-query-params';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { nanoid } from 'nanoid';
+import {
+  NumericArrayParam,
+  StringParam,
+  useQueryParam,
+} from 'use-query-params';
 
 const UseQueryParamExample = () => {
   const [foo, setFoo] = useQueryParam('foo', StringParam);

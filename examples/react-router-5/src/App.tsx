@@ -9,7 +9,6 @@ import ReadmeExample2 from './ReadmeExample2';
 import ReadmeExample3 from './ReadmeExample3';
 import ReadmeExample4 from './ReadmeExample4';
 
-import './App.css';
 import ReadmeExample3Mapped from './ReadmeExample3Mapped';
 import Issue46 from './Issue46';
 
@@ -18,8 +17,7 @@ const App = (props: any) => {
 
   return (
     <div className="App">
-      <h1>Demos</h1>
-      <div>
+      <nav>
         <button onClick={() => setExample(0)}>useQueryParam Example</button>
         <button onClick={() => setExample(1)}>useQueryParams Example</button>
         <button onClick={() => setExample(2)}>withQueryParams Example</button>
@@ -37,7 +35,7 @@ const App = (props: any) => {
             Push New URL
           </Link>
         </div>
-      </div>
+      </nav>
       <div>
         {example === 0 && <UseQueryParamExample />}
         {example === 1 && <UseQueryParamsExample />}

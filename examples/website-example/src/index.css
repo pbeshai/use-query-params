@@ -54,3 +54,27 @@ td {
 }
 
 .text-center { text-align: center; }
+
+
+
+.App {
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.nav {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.ext-nav {
+  margin-bottom: 1.5em;
+}
+
+.example-block {
+  margin-bottom: 3rem;
+}
+
+.set-btn {
+  font-family: monospace;
+}
