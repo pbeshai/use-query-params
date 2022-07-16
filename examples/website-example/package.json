@@ -2,40 +2,58 @@
   "name": "website-example",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://pbeshai.github.com/use-query-params",
   "dependencies": {
-    "@types/jest": "^26.0.22",
-    "@types/nanoid": "^2.1.0",
-    "@types/node": "^14.14.37",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
-    "@types/react-router-dom": "^5.3.3",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.11.45",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
     "@types/react-syntax-highlighter": "^13.5.0",
-    "nanoid": "^3.1.22",
-    "query-string": "^7.0.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-router-dom": "^5.3.3",
-    "react-scripts": "4.0.3",
+    "@types/nanoid": "^2.1.0",
     "react-syntax-highlighter": "^15.4.3",
-    "typescript": "^4.2.3",
-    "use-query-params": "*"
+    "nanoid": "^3.1.22",
+    "query-string": "^7.1.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router": "^6.3.0",
+    "react-router-dom": "^6.3.0",
+    "react-scripts": "5.0.1",
+    "serialize-query-params": "file:.yalc/serialize-query-params",
+    "typescript": "^4.7.4",
+    "use-query-params": "file:.yalc/use-query-params",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "copy-build": "rsync -vaHE --delete ./build/ ../../docs/",
-    "linkdeps": "npm link ../../packages/use-query-params/node_modules/react && npm link ../../packages/use-query-params/node_modules/react-router && npm link ../../packages/use-query-params/node_modules/react-router-dom"
+    "copy-build": "rsync -vaHE --delete ./build/ ../../docs/"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "resolutions": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "6.3.0",
+    "react-router": "6.3.0"
+  }
 }

@@ -4,7 +4,6 @@ import {
   StringParam,
   NumberParam,
   ArrayParam,
-  QueryParamConfig,
   withDefault,
 } from 'use-query-params';
 

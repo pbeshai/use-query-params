@@ -5,7 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  padding: 16px;
+  padding: 24px;
 }
 
 code {
@@ -13,10 +13,45 @@ code {
     monospace;
 }
 
-div {
-  margin-bottom: 16px;
+nav {
+  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #eee;
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+  margin: -24px -24px 0;
+}
+
+nav a {
+  color: blue;
+  text-decoration: none;
+  padding: 2px 4px;
+  display: inline-block;
+}
+
+a.active {
+  color: rgb(179, 32, 93);
+  background-color: rgb(242, 228, 234);
+}
+
+nav a:hover {
+  text-decoration: underline;
 }
 
 button {
-  margin-right: 8px;
+  margin: 0 0.5rem;
+  font-size: 16px;
+  padding: 0.5em 1.0em;
+  background: #eee;
 }
+
+table {
+  margin: 1rem;
+}
+
+td {
+  padding: 0 1rem;
+}
+

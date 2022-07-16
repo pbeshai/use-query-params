@@ -1,7 +1,6 @@
 {
   "lerna": "latest",
   "packages": [
-    "examples/*",
     "packages/*"
   ],
   "npmClient": "yarn",

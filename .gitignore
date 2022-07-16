@@ -88,4 +88,7 @@ esm/
 dist/
 .DS_Store
 examples/**/package-lock.json
+examples/**/yarn.lock
 packages/use-query-params/adapters
+.yalc
+yalc.lock
