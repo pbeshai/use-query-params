@@ -39,16 +39,25 @@ export function useQueryParamContext() {
 
 /**
  * Props for the Provider component, used to hook the active routing
- * system into our controls.
+ * system into our controls. Note only the root provider requires
+ * `adapter`. We try to encourage that via intellisense by writing
+ * the types this way (you must provide at least one of adapter or options,
+ * default intellisense suggests adapter required.)
  */
-
-interface QueryParamProviderProps {
+type QueryParamProviderProps = {
   /** Main app goes here */
   children: React.ReactNode;
-  /** required for the root provider but not for nested ones */
-  adapter?: QueryParamAdapterComponent;
-  options?: QueryParamOptions;
-}
+} & (
+  | {
+      adapter?: never;
+      options: QueryParamOptions;
+    }
+  | {
+      /** required for the root provider but not for nested ones */
+      adapter: QueryParamAdapterComponent;
+      options?: QueryParamOptions;
+    }
+);
 
 function QueryParamProviderInner({
   children,
