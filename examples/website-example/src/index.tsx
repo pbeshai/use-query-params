@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { QueryParamProvider } from 'use-query-params';
-import { ReactRouterAdapter } from 'use-query-params/adapters/react-router';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 // optionally use the query-string parse / stringify functions to
 // handle more advanced cases than URLSearchParams supports.
@@ -16,7 +16,7 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <QueryParamProvider
-        adapter={ReactRouterAdapter}
+        adapter={ReactRouter6Adapter}
         options={{
           searchStringToObject: parse,
           objectToSearchString: stringify,

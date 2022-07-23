@@ -19,21 +19,22 @@ nav {
   flex-wrap: wrap;
   gap: 12px;
   background: #eee;
-  padding: 16px;
+  padding: 0 16px;
   border-bottom: 1px solid #ddd;
   margin: -24px -24px 0;
 }
 
 nav a {
-  color: blue;
+  color: black;
+  font-weight: 600;
   text-decoration: none;
-  padding: 2px 4px;
+  padding: 12px 12px;
   display: inline-block;
 }
 
 a.active {
   color: rgb(179, 32, 93);
-  background-color: rgb(242, 228, 234);
+  background-color: white;
 }
 
 nav a:hover {
