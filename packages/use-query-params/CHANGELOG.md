@@ -34,3 +34,50 @@
 
 - Stops reading from refs in render to prepare for future versions of React where this is not allowed.
 - Simplifies the way locations are updated by only passing in the search string as the new location.
+
+### Migrating from v1
+
+There are two things you need to adjust to update from v1:
+
+1. Decide if you want to keep query-string as your parser/stringifier or if you want to simplify to using the built-in URLSearchParams solution in v2. The simplest path for migration is to keep your query-string dependency and specify that use-query-params should use it for `searchStringToObject` and `objectToSearchString`. 
+2. Switch to using an adapter to link your routing library with use-query-params.
+
+Here's an example of the changes to complete both for React Router 5:
+
+```diff
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { QueryParamProvider } from 'use-query-params';
++ import { ReactRouter5Adapter } from 'use-query-params/adapters/react-router-5';
++ import { parse, stringify } from 'query-string';
+- import { BrowserRouter as Router, Route } from 'react-router-dom';
++ import { BrowserRouter as Router } from 'react-router-dom';
+
+import App from './App';
+
+ReactDOM.render(
+  <Router>
+-    <QueryParamProvider ReactRouterRoute={Route}>
++    <QueryParamProvider
++      adapter={ReactRouter5Adapter}
++      options={{
++        searchStringToObject: parse,
++        objectToSearchString: stringify,
++      }}
++    >
+      <App />
+    </QueryParamProvider>
+  </Router>,
+  document.getElementById('root')
+);
+```
+
+Note the `options` above are optional, but will retain the behavior you're used to from v1, which used query-string internally.
+
+If you're using react-router-6, you'd import that adapter instead:
+
+```js
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+```
+
+
