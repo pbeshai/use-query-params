@@ -1,47 +1,16 @@
 import { cleanup, render } from '@testing-library/react';
-import { createMemoryHistory } from 'history-4';
+import { createMemoryHistory } from 'history';
 import * as React from 'react';
-import {
-  Router,
-  Route,
-  Switch,
-  useHistory,
-  useLocation,
-  Link,
-} from 'react-router-dom-5';
+import { Router, Route, Switch, Link } from 'react-router-dom';
 import { NumberParam, withDefault } from 'serialize-query-params';
 import { describe, test } from 'vitest';
-import { testSpec } from './shared';
 import {
-  QueryParamAdapter,
-  QueryParamAdapterComponent,
   QueryParamProvider,
+  QueryParamOptions,
   useQueryParam,
-} from '../../index';
-import { QueryParamOptions } from '../../options';
-
-// inline this for convenience around build process...
-/**
- * Query Param Adapter for react-router v5
- */
-const ReactRouter5Adapter: QueryParamAdapterComponent = ({ children }) => {
-  const location = useLocation();
-  const history = useHistory();
-
-  const adapter: QueryParamAdapter = {
-    replace(location) {
-      history.replace(location.search, location.state);
-    },
-    push(location) {
-      history.push(location.search, location.state);
-    },
-    get location() {
-      return location;
-    },
-  };
-
-  return children(adapter);
-};
+} from 'use-query-params/src';
+import { testSpec } from 'use-query-params/src/__tests__/routers/shared';
+import { ReactRouter5Adapter } from '..';
 
 function renderWithRouter(
   ui: React.ReactNode,

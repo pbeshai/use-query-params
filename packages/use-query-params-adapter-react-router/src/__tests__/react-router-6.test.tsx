@@ -1,41 +1,11 @@
 import { cleanup, render } from '@testing-library/react';
-import { createMemoryHistory } from 'history-5';
+import { createMemoryHistory } from 'history';
 import * as React from 'react';
-import {
-  useLocation,
-  useNavigate,
-  unstable_HistoryRouter,
-} from 'react-router-dom-6';
-import { describe } from 'vitest';
-import {
-  QueryParamAdapter,
-  QueryParamAdapterComponent,
-  QueryParamProvider,
-} from '../../index';
-import { QueryParamOptions } from '../../options';
-import { testSpec } from './shared';
-
-// inline this for convenience around build process...
-export const ReactRouterAdapter: QueryParamAdapterComponent = ({
-  children,
-}) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const adapter: QueryParamAdapter = {
-    replace(location) {
-      navigate(location, { replace: true, state: location.state });
-    },
-    push(location) {
-      navigate(location, { replace: false, state: location.state });
-    },
-    get location() {
-      return location;
-    },
-  };
-
-  return children(adapter);
-};
+import { unstable_HistoryRouter } from 'react-router-dom';
+import { describe, afterEach } from 'vitest';
+import { QueryParamProvider, QueryParamOptions } from 'use-query-params/src';
+import { testSpec } from 'use-query-params/src/__tests__/routers/shared';
+import { ReactRouterAdapter } from '..';
 
 // use this router so we can pass our own history to inspect
 const HistoryRouter = unstable_HistoryRouter;
