@@ -29,28 +29,66 @@ When creating apps with easily shareable URLs, you often want to encode state as
 Using npm:
 
 ```
-$ npm install --save use-query-params query-string
+$ npm install --save use-query-params
 ```
-
-Note: There is a peer dependency on [query-string](https://github.com/sindresorhus/query-string). For IE11 support, use v5.1.1, otherwise use v6.
-
-Link your routing system (e.g., [React Router example](../../examples/react-router/src/index.tsx), [Reach Router example](../../examples/reach-router/src/index.tsx)):
+Link your routing system via an adapter (e.g., [React Router 6 example](../../examples/react-router-6/src/index.tsx), [Reach Router 5 example](../../examples/reach-router-5/src/index.tsx)):
 
 ```js
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import ReactDOM from 'react-dom/client';
 import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import App from './App';
 
-ReactDOM.render(
-  <Router>
-    <QueryParamProvider ReactRouterRoute={Route}>
-      <App />
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
+root.render(
+  <BrowserRouter>
+    <QueryParamProvider adapter={ReactRouter6Adapter}>
+      <Routes>
+        <Route path="/" element={<App />}>
+      </Routes>
     </QueryParamProvider>
   </Router>,
   document.getElementById('root')
 );
+```
+
+By default, use-query-params uses [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) to handle interpreting the location string, which means it does not decode `null` and has limited handling of other more advanced URL parameter configurations. If you want access to those features, add a third-party library like [query-string](https://github.com/sindresorhus/query-string) and tell use-query-params to use it:
+
+```js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+// optionally use the query-string parse / stringify functions to
+// handle more advanced cases than URLSearchParams supports.
+import { parse, stringify } from 'query-string';
+import App from './App';
+
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
+root.render(
+  <BrowserRouter>
+    <QueryParamProvider 
+      adapter={ReactRouter6Adapter}
+      options={{
+        searchStringToObject: parse,
+        objectToSearchString: stringify,
+      }}
+    >
+      <Routes>
+        <Route path="/" element={<App />}>
+      </Routes>
+    </QueryParamProvider>
+  </Router>,
+  document.getElementById('root')
+);
+      
 ```
 
 
@@ -94,12 +132,15 @@ import {
   withDefault,
 } from 'use-query-params';
 
+// create a custom parameter with a default value
+const MyFiltersParam = withDefault(ArrayParam, [])
+
 const UseQueryParamsExample = () => {
   // something like: ?x=123&q=foo&filters=a&filters=b&filters=c in the URL
   const [query, setQuery] = useQueryParams({
     x: NumberParam,
     q: StringParam,
-    filters: withDefault(ArrayParam, []),
+    filters: MyFiltersParam,
   });
   const { x: num, q: searchQuery, filters } = query;
 
@@ -161,10 +202,13 @@ const WithQueryParamsExample = ({ query, setQuery }: any) => {
   );
 };
 
+// create a custom parameter with a default value
+const MyFiltersParam = withDefault(ArrayParam, [])
+
 export default withQueryParams({
   x: NumberParam,
   q: StringParam,
-  filters: withDefault(ArrayParam, []),
+  filters: MyFiltersParam,
 }, WithQueryParamsExample);
 ```
 
@@ -180,11 +224,14 @@ import {
   withDefault,
 } from 'use-query-params';
 
+// create a custom parameter with a default value
+const MyFiltersParam = withDefault(ArrayParam, [])
+
 const RenderPropsExample = () => {
   const queryConfig = {
     x: NumberParam,
     q: StringParam,
-    filters: withDefault(ArrayParam, []),
+    filters: MyFiltersParam,
   };
   return (
     <div>
@@ -229,10 +276,9 @@ export default RenderPropsExample;
 
 A few basic [examples](../../examples) have been put together to demonstrate how `useQueryParams` works with different routing systems.
 
-- [React Router Example](../../examples/react-router)
-- [Reach Router Example](../../examples/reach-router)
+- [React Router 6 Example](../../examples/react-router-6)
+- [React Router 5 Example](../../examples/react-router-5)
 
-The React Router and Reach Router examples contain simple tests showing how to use the library with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro).
 
 ### API
 
