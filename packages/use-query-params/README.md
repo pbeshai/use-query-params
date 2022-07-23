@@ -167,7 +167,8 @@ const UseQueryParamsExample = () => {
 export default UseQueryParamsExample;
 ```
 
-Or with the higher-order component (HOC) `withQueryParams`:
+<details>
+<summary>Or with the higher-order component (HOC) <b>withQueryParams</b>:</summary>
 
 ```js
 import * as React from 'react';
@@ -211,8 +212,10 @@ export default withQueryParams({
   filters: MyFiltersParam,
 }, WithQueryParamsExample);
 ```
+</details>
 
-Or with render props via `<QueryParams>`:
+<details>
+<summary>Or with render props via <b>&lt;QueryParams&gt;</b>:</summary>
 
 ```js
 import * as React from 'react';
@@ -270,6 +273,7 @@ const RenderPropsExample = () => {
 
 export default RenderPropsExample;
 ```
+</details>
 
 
 ### Examples
