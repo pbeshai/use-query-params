@@ -2,7 +2,7 @@
   <h1>useQueryParams</h1>
   <p>A <a href="https://reactjs.org/docs/hooks-intro.html">React Hook</a>, HOC, and Render Props solution for managing state in URL query parameters with easy serialization.
   </p>
-  <p>Works with <a href="https://reacttraining.com/react-router/">React Router</a> and <a href="https://reach.tech/router">Reach Router</a> out of the box. TypeScript supported.</p>
+  <p>Works with <a href="https://reacttraining.com/react-router/">React Router</a> out of the box. TypeScript supported.</p>
 
 
   <p>
@@ -31,7 +31,7 @@ Using npm:
 ```
 $ npm install --save use-query-params
 ```
-Link your routing system via an adapter (e.g., [React Router 6 example](../../examples/react-router-6/src/index.tsx), [Reach Router 5 example](../../examples/reach-router-5/src/index.tsx)):
+Link your routing system via an adapter (e.g., [React Router 6 example](../../examples/react-router-6/src/index.tsx), [React Router 5 example](../../examples/reach-router-5/src/index.tsx)):
 
 ```js
 import React from 'react';
@@ -577,27 +577,6 @@ the URL and have the rest of your app know about it.
 See the tests or these examples for how to use it:
 
 - [React Router Example](../../examples/react-router)
-- [Reach Router Example](../../examples/reach-router)
-
-
-**Example (Reach Router)**
-
-```js
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { globalHistory, Router } from '@reach/router';
-import { QueryParamProvider } from 'use-query-params';
-import App from './App';
-
-ReactDOM.render(
-  <QueryParamProvider reachHistory={globalHistory}>
-    <Router>
-      <App default />
-    </Router>
-  </QueryParamProvider>,
-  document.getElementById('root')
-);
-```
 
 <br/>
 
