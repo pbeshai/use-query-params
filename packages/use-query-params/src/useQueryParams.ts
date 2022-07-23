@@ -7,8 +7,8 @@ import {
 } from 'serialize-query-params';
 import { decodedParamCache } from './decodedParamCache';
 import {
-  expandWithInheritedParams,
-  processInheritedParams,
+  extendParamConfigForKeys,
+  convertInheritedParamStringsToParams,
 } from './inheritedParams';
 import { makeStableGetLatestDecodedValues } from './latestValues';
 import { memoSearchStringToObject } from './memoSearchStringToObject';
@@ -75,7 +75,7 @@ export function useQueryParams(
   }, [contextOptions, options]);
 
   // interpret params that were configured up the chain
-  let paramConfigMap = processInheritedParams(
+  let paramConfigMap = convertInheritedParamStringsToParams(
     paramConfigMapWithInherit,
     mergedOptions
   );
@@ -89,7 +89,7 @@ export function useQueryParams(
 
   // do we want to include all params from the URL even if not configured?
   if (mergedOptions.includeAllParams) {
-    paramConfigMap = expandWithInheritedParams(
+    paramConfigMap = extendParamConfigForKeys(
       paramConfigMap,
       Object.keys(parsedParams),
       mergedOptions.params,

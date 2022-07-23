@@ -9,6 +9,9 @@ let cachedSearchStringToObjectFn:
   | undefined;
 let cachedParsedQuery: EncodedQuery = {};
 
+/**
+ * cached conversion of ?foo=1&bar=2 to { foo: '1', bar: '2' }
+ */
 export const memoSearchStringToObject = (
   searchStringToObject: (searchString: string) => EncodedQuery,
   searchString?: string | undefined,
@@ -17,6 +20,7 @@ export const memoSearchStringToObject = (
    */
   urlNameMapStr?: string | undefined
 ) => {
+  // if we have a cached version, just return it
   if (
     cachedSearchString === searchString &&
     cachedSearchStringToObjectFn === searchStringToObject &&
@@ -24,6 +28,7 @@ export const memoSearchStringToObject = (
   ) {
     return cachedParsedQuery;
   }
+
   cachedSearchString = searchString;
   cachedSearchStringToObjectFn = searchStringToObject;
   const newParsedQuery = searchStringToObject(searchString ?? '');

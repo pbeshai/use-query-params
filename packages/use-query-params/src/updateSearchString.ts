@@ -4,7 +4,7 @@ import {
   QueryParamConfigMap,
 } from 'serialize-query-params';
 import { decodedParamCache } from './decodedParamCache';
-import { expandWithInheritedParams } from './inheritedParams';
+import { extendParamConfigForKeys } from './inheritedParams';
 import { getLatestDecodedValues } from './latestValues';
 import { memoSearchStringToObject } from './memoSearchStringToObject';
 import { QueryParamOptionsWithRequired } from './options';
@@ -17,6 +17,11 @@ type ChangesType<DecodedValueMapType> =
   | Partial<DecodedValueMapType>
   | ((latestValues: DecodedValueMapType) => Partial<DecodedValueMapType>);
 
+/**
+ * Given a ?foo=1&bar=2 and { bar: 3, baz: true } produce ?foo=1&bar=3&baz=1
+ * or similar, depending on updateType. The result will be prefixed with "?"
+ * or just be the empty string.
+ */
 export function getUpdatedSearchString({
   changes,
   updateType,
@@ -25,10 +30,10 @@ export function getUpdatedSearchString({
   options,
 }: {
   changes: ChangesType<DecodedValueMap<any>>;
+  updateType?: UrlUpdateType;
   currentSearchString: string;
   paramConfigMap: QueryParamConfigMap;
   options: QueryParamOptionsWithRequired;
-  updateType?: UrlUpdateType;
 }): string {
   const { searchStringToObject, objectToSearchString } = options;
   if (updateType == null) updateType = options.updateType;
@@ -41,7 +46,7 @@ export function getUpdatedSearchString({
 
   // see if we have unconfigured params in the changes that we can
   // inherit to expand our config map instead of just using strings
-  const paramConfigMap = expandWithInheritedParams(
+  const paramConfigMap = extendParamConfigForKeys(
     baseParamConfigMap,
     Object.keys(changes),
     options.params
@@ -92,6 +97,10 @@ export function getUpdatedSearchString({
   return newSearchString ?? '';
 }
 
+/**
+ * uses an adapter to update a location object and optionally
+ * navigate based on the updateType
+ */
 export function updateSearchString({
   searchString,
   adapter,
@@ -129,6 +138,10 @@ const timeoutTask = (task: Function) => setTimeout(() => task(), 0);
 // alternative could be native `queueMicrotask`
 
 const updateQueue: UpdateArgs[] = [];
+
+/**
+ * support batching by enqueuing updates (if immediate is not true)
+ */
 export function enqueueUpdate(
   args: UpdateArgs,
   { immediate }: { immediate?: boolean } = {}

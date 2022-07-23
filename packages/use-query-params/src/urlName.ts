@@ -1,5 +1,8 @@
 import { EncodedValueMap, QueryParamConfigMap } from 'serialize-query-params';
 
+/**
+ * Create an alias mapping using the optional `urlName` property on params
+ */
 export function serializeUrlNameMap(
   paramConfigMap: QueryParamConfigMap
 ): string | undefined {
@@ -16,6 +19,9 @@ export function serializeUrlNameMap(
   return urlNameMapParts ? urlNameMapParts.join('\n') : undefined;
 }
 
+/**
+ * Converts the stringified alias/urlName map back into an object
+ */
 export function deserializeUrlNameMap(
   urlNameMapStr: string | undefined
 ): Record<string, string> | undefined {
@@ -27,8 +33,8 @@ export function deserializeUrlNameMap(
 }
 
 /**
- * Note: This function is destructive - it mutates encodedValues.
- * Replaces keys with their urlNames
+ * converts { searchString: 'foo'} to { q: 'foo'} if the searchString
+ * is configured to have "q" as its urlName.
  */
 export function applyUrlNames(
   encodedValues: Partial<EncodedValueMap<any>>,

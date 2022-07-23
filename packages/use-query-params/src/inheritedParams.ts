@@ -6,7 +6,12 @@ import {
 import { QueryParamOptions } from './options';
 import { QueryParamConfigMapWithInherit } from './types';
 
-export function processInheritedParams(
+/**
+ * Convert inherit strings from a query param config to actual
+ * parameters based on predefined ('inherited') mappings.
+ * Defaults to StringParam.
+ */
+export function convertInheritedParamStringsToParams(
   paramConfigMapWithInherit: QueryParamConfigMapWithInherit,
   options: QueryParamOptions
 ): QueryParamConfigMap {
@@ -29,33 +34,43 @@ export function processInheritedParams(
 
   for (const key of paramKeys) {
     const param = paramConfigMapWithInherit[key];
+    // does it have an existing parameter definition? use it
     if (param != null && typeof param === 'object') {
       paramConfigMap[key] = param;
       continue;
     }
 
+    // otherwise, we have to inherit or use the default
     hasInherit = true;
 
     // default is StringParam
     paramConfigMap[key] = options.params?.[key] ?? StringParam;
   }
 
+  // if we didn't inherit anything, just return the input
   if (!hasInherit) return paramConfigMapWithInherit as QueryParamConfigMap;
 
   return paramConfigMap;
 }
 
-export function expandWithInheritedParams(
+/**
+ * Extends a config to include params for all specified keys,
+ * defaulting to StringParam if not found in the inheritedParams
+ * map.
+ */
+export function extendParamConfigForKeys(
   baseParamConfigMap: QueryParamConfigMap,
   paramKeys: string[],
-  inheritedParams: QueryParamOptions['params'] | undefined,
+  inheritedParams?: QueryParamOptions['params'] | undefined,
   defaultParam?: QueryParamConfig<any> | undefined
 ) {
+  // if we aren't inheriting anything or there are no params, return the input
   if (!inheritedParams || !paramKeys.length) return baseParamConfigMap;
 
   let paramConfigMap = { ...baseParamConfigMap };
   let hasInherit = false;
   for (const paramKey of paramKeys) {
+    // if it is missing a parameter, fill it in
     if (!Object.prototype.hasOwnProperty.call(paramConfigMap, paramKey)) {
       paramConfigMap[paramKey] = inheritedParams[paramKey] ?? defaultParam;
       hasInherit = true;
