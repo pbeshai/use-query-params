@@ -562,21 +562,19 @@ describe('useQueryParams', () => {
     });
 
     it('works with useQueryParams(["x", "z"])', () => {
+      const paramConfig = {
+        x: NumberParam,
+        z: BooleanParam,
+        a: StringParam,
+      };
       const { wrapper } = setupWrapper(
         { x: '99', y: '123', z: '1' },
         {
-          params: {
-            x: NumberParam,
-            z: BooleanParam,
-          },
+          params: paramConfig,
         }
       );
       const { result, rerender } = renderHook(
-        () =>
-          useQueryParams<{ x: typeof NumberParam; z: typeof BooleanParam }>([
-            'x',
-            'z',
-          ]),
+        () => useQueryParams<Pick<typeof paramConfig, 'x' | 'z'>>(['x', 'z']),
         {
           wrapper,
         }
