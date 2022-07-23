@@ -72,12 +72,32 @@ ReactDOM.render(
 );
 ```
 
-Note the `options` above are optional, but will retain the behavior you're used to from v1, which used query-string internally.
-
 If you're using react-router-6, you'd import that adapter instead:
 
 ```js
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 ```
 
+Note the `options` above are optional, but will retain the behavior you're used to from v1, which used query-string internally. If you want to switch to using URLSearchParams and not use query-string, you would do:
+
+```diff
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { QueryParamProvider } from 'use-query-params';
++ import { ReactRouter5Adapter } from 'use-query-params/adapters/react-router-5';
+- import { BrowserRouter as Router, Route } from 'react-router-dom';
++ import { BrowserRouter as Router } from 'react-router-dom';
+
+import App from './App';
+
+ReactDOM.render(
+  <Router>
+-    <QueryParamProvider ReactRouterRoute={Route}>
++    <QueryParamProvider adapter={ReactRouter5Adapter}>
+      <App />
+    </QueryParamProvider>
+  </Router>,
+  document.getElementById('root')
+);
+```
 
