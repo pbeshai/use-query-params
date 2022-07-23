@@ -129,7 +129,7 @@ const timeoutTask = (task: Function) => setTimeout(() => task(), 0);
 // alternative could be native `queueMicrotask`
 
 const updateQueue: UpdateArgs[] = [];
-export function queueUpdate(
+export function enqueueUpdate(
   args: UpdateArgs,
   { immediate }: { immediate?: boolean } = {}
 ) {

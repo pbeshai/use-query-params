@@ -19,7 +19,7 @@ import {
   SetQuery,
   UrlUpdateType,
 } from './types';
-import { queueUpdate } from './updateSearchString';
+import { enqueueUpdate } from './updateSearchString';
 import { serializeUrlNameMap } from './urlName';
 
 // for multiple param config
@@ -97,7 +97,7 @@ export function useQueryParams(
     );
   }
 
-  // run decode on each key, collect
+  // run decode on each key
   const decodedValues = stableGetLatest(
     parsedParams,
     paramConfigMap,
@@ -121,22 +121,20 @@ export function useQueryParams(
     adapter,
     paramConfigMap,
     options: mergedOptions,
-  } as const;
+  };
   const callbackDependenciesRef =
     useRef<typeof callbackDependencies>(callbackDependencies);
   if (callbackDependenciesRef.current == null) {
     callbackDependenciesRef.current = callbackDependencies;
   }
   useEffect(() => {
-    callbackDependenciesRef.current = {
-      adapter,
-      paramConfigMap,
-      options: mergedOptions,
-    };
+    callbackDependenciesRef.current.adapter = adapter;
+    callbackDependenciesRef.current.paramConfigMap = paramConfigMap;
+    callbackDependenciesRef.current.options = mergedOptions;
   }, [adapter, paramConfigMap, mergedOptions]);
 
   // create callback with stable identity
-  const setQuery = useMemo(() => {
+  const [setQuery] = useState(() => {
     const setQuery = (
       changes: ChangesType<DecodedValueMap<any>>,
       updateType?: UrlUpdateType
@@ -146,7 +144,7 @@ export function useQueryParams(
         callbackDependenciesRef.current!;
       if (updateType == null) updateType = options.updateType;
 
-      queueUpdate(
+      enqueueUpdate(
         {
           changes,
           updateType,
@@ -160,7 +158,7 @@ export function useQueryParams(
     };
 
     return setQuery;
-  }, []);
+  });
 
   return [decodedValues, setQuery];
 }
