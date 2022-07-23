@@ -1,6 +1,6 @@
 import { cleanup, render } from '@testing-library/react';
 import * as React from 'react';
-import { describe, it } from 'vitest';
+import { describe } from 'vitest';
 import {
   PartialLocation,
   QueryParamAdapter,
