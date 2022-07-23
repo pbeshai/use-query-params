@@ -16,7 +16,7 @@
     "build:adapters": "npx lerna run build --scope \"*-adapter-*\"",
     "copy:adapters": "scripts/copy-adapters.js",
     "build-website": "npm run test && npm run build && cd examples/website-example && npm run build && npm run copy-build",
-    "clean": "rimraf dist",
+    "clean": "rimraf dist adapters",
     "dev": "cross-env NODE_ENV=development tsc -m esNext --outDir esm -w",
     "prepublishOnly": "npm run test && npm run clean && npm run build",
     "lint": "eslint --ext js,ts,tsx src",

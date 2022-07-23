@@ -48,9 +48,10 @@
   },
   "scripts": {
     "audit": "lerna-audit",
+    "clean": "lerna run clean",
     "build": "lerna run build --scope \"*-query-params\"",
     "build:uqp": "lerna run build --scope \"use-query-params\"",
-    "build:adapter": "lerna run build --scope \"use-query-params-adapter-react-router\"",
+    "build:adapter": "lerna run build --scope \"use-query-params-adapter-react-router-6\"",
     "build:sqp": "lerna run build --scope \"serialize-query-params\"",
     "clean:uqp": "lerna run clean --scope \"use-query-params\"",
     "test": "vitest",

@@ -8,7 +8,7 @@ import {
 /**
  * Query Param Adapter for react-router v6
  */
-export const ReactRouterAdapter: QueryParamAdapterComponent = ({
+export const ReactRouter6Adapter: QueryParamAdapterComponent = ({
   children,
 }) => {
   const navigate = useNavigate();
