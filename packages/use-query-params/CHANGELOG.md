@@ -1,0 +1,36 @@
+# Changelog
+
+## use-query-params v2.0.0
+
+**Breaking**
+
+- Drop dependency for query-string. New default uses URLSearchParams which doesn’t support `null`. You can continue using [query-string](https://github.com/sindresorhus/query-string) by specifying the `searchStringToObject` and `objectToSearchString` options as parse and stringify respectively.
+- Modify **QueryParamProvider** to take adapter prop, no longer taking react router or reach props
+
+**New Features**
+
+- Deep imports for React-Router 5 and 6 adapters
+- Supports registering params in the **QueryParamProvider** to have them available to any downstream hooks.
+    - Supports nesting **QueryParamProviders** to extend the registered params list
+- Additional function signatures have been added, but greater care must be taken to get proper types out of the response.
+    - `useQueryParam(’myparam’)` ← param type is inherited from the params registered in the **QueryParamProvider**
+    - `useQueryParam(’myparam’, StringParam, options)`
+    - `useQueryParams()` ← gets all params from the **QueryParamProvider**
+    - `useQueryParams([’myparam1’, ‘myparam2’])` ← gets just myparam1 and myparam2 from those registered in the **QueryParamProvider**.
+    - `useQueryParams({ myparam: StringParam }, options)`
+    - `useQueryParams({ myparam: ‘inherit’ }, options)` ←inherit myparam param name from **QueryParamProvider**
+
+- New `options` prop to **QueryParamProvider** and argument to **useQueryParam(s)**
+    - (experimental) batching via `enableBatching` option (i.e., multiple consecutive calls to setQueryParams in a row only result in a single update to the URL). This seems to work but would require updating the way all the tests are written to verify for sure, so marking as experimental for now.
+    - `removeDefaultsFromUrl` (default: false). This happens on updates only, not on initial load. Requires the use of the `default` attribute on a parameter to function (note serialize-query-params v2 withDefault now populates this). 
+    - `includeKnownParams` -  in addition to those specified, also include all preconfigured parameters from the **QueryParamProvider**
+    - `includeAllParams` (default: false) - in addition to those specified, include all other parameters found in the current URL
+    - `updateType` (default “pushIn”) - the default update type when set is called.
+    - `searchStringToObject, objectToSearchString` (default uses URLSearchParams) - equivalent of `parse` and `stringify` from query-string.
+- Parameters now can include `urlName` to automatically convert to a different name in the URL (e.g. { encode, decode, urlName })
+- Caches decoded values across multiple hook calls from different components
+
+**Fixes**
+
+- Stops reading from refs in render to prepare for future versions of React where this is not allowed.
+- Simplifies the way locations are updated by only passing in the search string as the new location.
