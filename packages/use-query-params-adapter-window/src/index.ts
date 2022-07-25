@@ -4,10 +4,10 @@ import { PartialLocation, QueryParamAdapterComponent } from 'use-query-params';
 function makeAdapter() {
   const adapter = {
     replace(location: PartialLocation) {
-      window.history.replaceState(location.state, '', location.search);
+      window.history.replaceState(location.state, '', location.search || '?');
     },
     push(location: PartialLocation) {
-      window.history.pushState(location.state, '', location.search);
+      window.history.pushState(location.state, '', location.search || '?');
     },
     get location() {
       return window.location;

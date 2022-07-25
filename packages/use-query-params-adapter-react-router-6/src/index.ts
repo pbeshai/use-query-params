@@ -16,10 +16,16 @@ export const ReactRouter6Adapter: QueryParamAdapterComponent = ({
 
   const adapter: QueryParamAdapter = {
     replace(location) {
-      navigate(location, { replace: true, state: location.state });
+      navigate(location.search || '?', {
+        replace: true,
+        state: location.state,
+      });
     },
     push(location) {
-      navigate(location, { replace: false, state: location.state });
+      navigate(location.search || '?', {
+        replace: false,
+        state: location.state,
+      });
     },
     get location() {
       return location;

@@ -6,13 +6,13 @@ import { PartialLocation, QueryParamAdapterComponent } from 'use-query-params';
 function makeAdapter() {
   const adapter = {
     replace(location: PartialLocation) {
-      globalHistory.navigate(location.search, {
+      globalHistory.navigate(location.search || '?', {
         replace: true,
         state: location.state,
       });
     },
     push(location: PartialLocation) {
-      globalHistory.navigate(location.search, {
+      globalHistory.navigate(location.search || '?', {
         replace: false,
         state: location.state,
       });

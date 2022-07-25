@@ -24,6 +24,8 @@
 When creating apps with easily shareable URLs, you often want to encode state as query parameters, but all query parameters must be encoded as strings. `useQueryParams` allows you to easily encode and decode data of any type as query parameters with smart memoization to prevent creating unnecessary duplicate objects. It uses [serialize-query-params](../serialize-query-params/).
 
 
+**Migrating from v1?** See [./CHANGELOG.md#migrating-from-v1]
+
 ### Installation
 
 Using npm:
