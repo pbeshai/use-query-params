@@ -18,10 +18,11 @@
     "build-website": "npm run test && npm run build && cd examples/website-example && npm run build && npm run copy-build",
     "clean": "rimraf dist adapters",
     "dev": "cross-env NODE_ENV=development tsc -m esNext --outDir esm -w",
-    "prepublishOnly": "npm run test && npm run clean && npm run build",
+    "prepublishOnly": "npm-run-all test:run clean build",
     "lint": "eslint --ext js,ts,tsx src",
     "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "test": "vitest",
+    "test:run": "vitest --run",
     "test-watch": "vitest watch",
     "test-coverage": "vitest run --coverage"
   },
@@ -88,5 +89,5 @@
       "git add"
     ]
   },
-  "gitHead": "4ea61b1b9e6750b760a966a41f4e0a0cef85c956"
+  "gitHead": "4589090c353d8131dc11a8ea7d55ae4d859ba624"
 }
