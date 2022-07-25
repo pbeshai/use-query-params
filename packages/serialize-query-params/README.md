@@ -23,18 +23,20 @@ Used in React with [use-query-params](../use-query-params).
 Using npm:
 
 ```
-$ npm install --save serialize-query-params query-string
+$ npm install --save serialize-query-params
 ```
 
-Note: There is a peer dependency on [query-string](https://github.com/sindresorhus/query-string). For IE11 support, use v5.1.1, otherwise use v6.
+By default, serialize-query-params uses [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) to handle interpreting the location string, which means it does not decode `null` and has limited handling of other more advanced URL parameter configurations. If you want access to those features, add a third-party library like [query-string](https://github.com/sindresorhus/query-string) and provide its functions to updateLocation and updateInLocation as needed.
 
 ### API
 
 - [Param Types](#param-types)
 - [decodeQueryParams](#decodequeryparams)
 - [encodeQueryParams](#encodequeryparams)
-- [updateLocation](#usequeryparam)
-- [updateLocationIn](#usequeryparams-1)
+- [searchStringToObject](#searchstringtoobject)
+- [objectToSearchString](#objecttosearchstring)
+- [updateLocation](#updatelocation)
+- [updateInLocation](#updateinlocation)
 - [Type Definitions](./src/types.ts)
 - [Serialization Utility Functions](./src/serialize.ts)
 
@@ -81,7 +83,7 @@ const SortOrderEnumParam = createEnumParam(['asc', 'desc'])
 
 **Array Enum Param**
 
-You can define array enum param using `createEnumArrayParam`. It will restricts decoded output to a list of allowed values: 
+You can define array enum param using `createEnumArrayParam` or `createEnumDelimitedArrayParam`. It will restricts decoded output to a list of allowed values. 
 
 ```js
 import { createEnumArrayParam } from 'serialize-query-params';
@@ -92,6 +94,7 @@ type Color = 'red' | 'green' | 'blue'
 // values other than 'red', 'green' or 'blue' will be decoded as undefined
 const ColorArrayEnumParam = createEnumArrayParam<Color[]>(['red', 'green', 'blue'])
 ```
+
 
 **Setting a default value**
 
@@ -199,17 +202,63 @@ const link = `/?${stringify(encodedQuery)}`;
 
 
 
+#### searchStringToObject
+
+```js
+function searchStringToObject(searchString: string): EncodedQuery 
+```
+Default implementation of searchStringToObject powered by URLSearchParams
+This converts a search string like `?foo=123&bar=x` to { foo: '123', bar: 'x' }
+This is only a very basic version, you may prefer the advanced versions offered
+by third party libraries like query-string ("parse") or qs.
+
+**Example**
+
+```js
+import { searchStringToObject } from 'serialize-query-params';
+
+const obj = searchStringToObject('?foo=a&bar=x&foo=z');
+// -> { foo: ['a', 'z'], bar: 'x'}
+```
+
+<br/>
+
+
+#### objectToSearchString
+
+```js
+function objectToSearchString(encodedParams: EncodedQuery): string 
+```
+
+Default implementation of objectToSearchString powered by URLSearchParams.
+Does not support null values. Does not prefix with "?"
+This converts an object { foo: '123', bar: 'x' } to a search string `?foo=123&bar=x`
+This is only a very basic version, you may prefer the advanced versions offered
+by third party libraries like query-string ("stringify") or qs.
+
+**Example**
+
+```js
+import { objectToSearchString } from 'serialize-query-params';
+
+const obj = objectToSearchString({ foo: ['a', 'z'], bar: 'x' });
+// '?foo=a&foo=z&bar=x'
+```
+
+<br/>
+
 #### updateLocation
 
 ```js
-export function updateLocation(
+function updateLocation(
   encodedQuery: EncodedQuery,
-  location: Location
+  location: Location,
+  objectToSearchStringFn = objectToSearchString
 ): Location {
 ```
 
-Updates a location object to have a new query string (the `search` field) based 
-on the encoded query parameters passed in via `encodedQuery`. Parameters not
+Creates a new location-like object with the new query string (the `search` field) 
+based on the encoded query parameters passed in via `encodedQuery`. Parameters not
 specified in `encodedQuery` will be dropped from the URL.
 
 **Example**
@@ -230,14 +279,16 @@ const newLocation = updateLocation({ foo: '555' }, location);
 #### updateInLocation
 
 ```js
-export function updateInLocation(
+function updateInLocation(
   encodedQueryReplacements: EncodedQuery,
-  location: Location
+  location: Location,
+  objectToSearchStringFn = objectToSearchString,
+  searchStringToObjectFn = searchStringToObject
 ): Location {
 ```
 
-Updates a location object to have a new query string (the `search` field) based 
-on the encoded query parameters passed in via `encodedQueryReplacements`. Only
+Creates a new location-like object with the new query string (the `search` field) 
+based on the encoded query parameters passed in via `encodedQueryReplacements`. Only
 parameters specified in `encodedQueryReplacements` are affected by this update,
 all other parameters are retained.
 

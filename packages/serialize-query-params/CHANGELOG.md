@@ -4,7 +4,7 @@
 
 **Breaking**
 
-- Drop dependency for [query-string](https://github.com/sindresorhus/query-string). You now must pass your stringify/parse functions directly to updateLocation and updateInLocation.
+- Drop dependency for [query-string](https://github.com/sindresorhus/query-string). You now must pass your stringify/parse functions directly to `updateLocation` and `updateInLocation`.
 
 **New Features**
 
