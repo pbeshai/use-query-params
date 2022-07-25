@@ -31,6 +31,7 @@ Using npm:
 ```
 $ npm install --save use-query-params
 ```
+
 Link your routing system via an adapter (e.g., [React Router 6 example](../../examples/react-router-6/src/index.tsx), [React Router 5 example](../../examples/reach-router-5/src/index.tsx)):
 
 ```js
@@ -313,11 +314,23 @@ See [all param definitions from serialize-query-params here](../serialize-query-
 
 Note that all null and empty values are typically treated as follows:
 
+Note that with the default searchStringToObject implementation that uses URLSearchParams, null and empty values are treated as follows:
+
 | value | encoding |
 | --- | --- |
-| `null` | `?qp` |
 | `""` | `?qp=` |
+| `null` | `?` (removed from URL) |
 | `undefined` | `?` (removed from URL) |
+
+If you need a more discerning interpretation, you can use [query-string](https://github.com/sindresorhus/query-string)'s parse and stringify to get:
+
+| value | encoding |
+| --- | --- |
+| `""` | `?qp=` |
+| `null` | `?qp` |
+| `undefined` | `?` (removed from URL) |
+
+
 
 Examples in this table assume query parameter named `qp`.
 
@@ -371,19 +384,18 @@ const CommaArrayParam = {
 #### useQueryParam
 
 ```js
-useQueryParam<T>(name: string, paramConfig: QueryParamConfig<T>, rawQuery?: ParsedQuery):
+useQueryParam<T>(name: string, paramConfig?: QueryParamConfig<T>, options?: QueryParamOptions):
   [T | undefined, (newValue: T, updateType?: UrlUpdateType) => void]
 ```
 
 Given a query param name and query parameter configuration `{ encode, decode }`
-return the decoded value and a setter for updating it.
+return the decoded value and a setter for updating it. If you do not provide a paramConfig, it inherits it from what was defined in the QueryParamProvider, falling back to StringParam if nothing is found.
 
 The setter takes two arguments `(newValue, updateType)` where updateType
 is one of `'pushIn' | 'push' | 'replaceIn' | 'replace'`, defaulting to
 `'pushIn'`.
 
-You may optionally pass in a rawQuery object, otherwise the query is derived
-from the location in the context.
+You can override options from the QueryParamProvider with the third argument. See [QueryParamOptions](#queryparamoptions) for details.
 
 **Example**
 
@@ -407,8 +419,21 @@ setFoo((latestFoo) => latestFoo + 150)
 #### useQueryParams
 
 ```js
-useQueryParams<QPCMap extends QueryParamConfigMap>(paramConfigMap: QPCMap):
-  [DecodedValueMap<QPCMap>, SetQuery<QPCMap>]
+// option 1: pass only a config with possibly some options
+useQueryParams<QPCMap extends QueryParamConfigMapWithInherit>(
+  paramConfigMap: QPCMap,
+  options?: QueryParamOptions
+): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>];
+
+// option 2: pass an array of param names, relying on predefined params for types
+useQueryParams<QPCMap extends QueryParamConfigMapWithInherit>(
+  names: string[],
+  options?: QueryParamOptions
+): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>];
+
+// option 3: pass no args, get all params back that were predefined in a proivder
+useQueryParams<QPCMap extends QueryParamConfigMapWithInherit>(
+): [DecodedValueMap<QPCMap>, SetQuery<QPCMap>];
 ```
 
 Given a query parameter configuration (mapping query param name to `{ encode, decode }`),
@@ -417,6 +442,9 @@ return an object with the decoded values and a setter for updating them.
 The setter takes two arguments `(newQuery, updateType)` where updateType
 is one of `'pushIn' | 'push' | 'replaceIn' | 'replace'`, defaulting to
 `'pushIn'`.
+
+You can override options from the QueryParamProvider with the options argument. See [QueryParamOptions](#queryparamoptions) for details.
+
 
 **Example**
 
@@ -547,30 +575,34 @@ const link = `/?${stringify(encodedQuery)}`;
 #### QueryParamProvider
 
 ```js
-// Use one of these:
-<QueryParamProvider ReactRouterRoute={Route}><App /></QueryParamProvider>
+// choose an adapter, depending on your router
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import { ReactRouter5Adapter } from 'use-query-params/adapters/react-router-5';
+<QueryParamProvider adapter={ReactRouter6Adapter}><App /></QueryParamProvider>
 
-<QueryParamProvider reachHistory={globalHistory}><App /></QueryParamProvider>
-
-<QueryParamProvider history={myCustomHistory}><App /></QueryParamProvider>
-
-// optionally specify options to query-string stringify
-const stringifyOptions = { encode: false }
-<QueryParamProvider ReactRouterRoute={Route} stringifyOptions={stringifyOptions}>
+// optionally specify options
+import { parse, stringify } from 'query-string';
+const options = {
+  searchStringToObject: parse,
+  objectToSearchString: stringify,
+}
+<QueryParamProvider adapter={ReactRouter6Adapter} options={options}>
   <App />
 </QueryParamProvider>
 
-// also accepts a transformSearchString function (searchString: string) => string
-import {
-  ExtendedStringifyOptions,
-  transformSearchStringJsonSafe,
-} from 'use-query-params';
-
-const stringifyOptions: ExtendedStringifyOptions = {
-  transformSearchString: transformSearchStringJsonSafe,
-};
-<QueryParamProvider ReactRouterRoute={Route} stringifyOptions={stringifyOptions}>
-  <App />
+// optionally nest parameters in options to get automatically on useQueryParams calls
+<QueryParamProvider adapter={ReactRouter6Adapter} options={{
+  params: { foo: NumberParam }
+}}>
+  <App> {/* useQueryParams calls have access to foo here */}
+    ...
+    <Page1>
+      <QueryParamProvider options={{ params: { bar: BooleanParam }}}>
+        ... {/* useQueryParams calls have access to foo and bar here */}
+      </QueryParamProvider>
+    </Page1>
+    ...
+  </App>
 </QueryParamProvider>
 ```
 
@@ -578,9 +610,24 @@ The **QueryParamProvider** component links your routing library's history to
 the **useQueryParams** hook. It is needed for the hook to be able to update
 the URL and have the rest of your app know about it.
 
-See the tests or these examples for how to use it:
+You can specify global options at the provider level.
 
-- [React Router Example](../../examples/react-router)
+##### QueryParamOptions
+
+| option | default | description |
+| --- | --- | --- |
+| updateType | "pushIn" | How the URL gets updated by default, one of: replace, replaceIn, push, pushIn. |
+| searchStringToObject | from serialize-query-params | How to convert the search string e.g. `?foo=123&bar=x` into an object. Default uses URLSearchParams, but you could also use `parse` from query-string for example. `(searchString: string) => Record<string, string | (string | null)[] | null | undefined>` |
+| objectToSearchString | from serialize-query-params | How to convert an object (e.g. `{ foo: 'x' }` -> `foo=x` into a search string – no "?" included). Default uses URLSearchParams, but you could also use `stringify` from query-string for example. `(query: Record<string, string | (string | null)[] | null | undefined>) => string` |
+| params | undefined | Define parameters at the provider level to be automatically available to hook calls. Type is QueryParamConfigMap, e.g. `{ params: { foo: NumberParam, bar: BooleanParam }}`
+| includeKnownParams | undefined | When true, include all parameters that were configured via the `params` option on a QueryParamProvider. Default behavior depends on the arguments passed to useQueryParams (if not specifying any params, it is true, otherwise false). |
+| includeAllParams | false | Include all parameters found in the URL even if not configured in any param config. |
+| removeDefaultsFromUrl | false | When true, removes parameters from the URL when set is called if their value is the same as their default (based on the `default` attribute of the Param object, typically populated by `withDefault()`) |
+| *enableBatching* | false | **experimental** - turns on batching (i.e., multiple consecutive calls to setQueryParams in a row only result in a single update to the URL). Currently marked as experimental since we need to update all the tests to verify no issues occur, feedback welcome. |
+
+
+
+
 
 <br/>
 
