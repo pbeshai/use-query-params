@@ -14,7 +14,7 @@
     "build": "package-bundler --copyPackageJson --rewritePackageJson --tsconfigPath ./tsconfig.build.json",
     "clean": "rimraf dist",
     "dev": "NODE_ENV=development tsc -w",
-    "prepublishOnly": "npm run test-all && npm run clean && npm run build",
+    "prepublishOnly": "npm-run-all test-all clean build",
     "test": "vitest run",
     "test-watch": "vitest watch",
     "test-coverage": "vitest run --coverage",
@@ -44,5 +44,5 @@
   "tsd": {
     "directory": "src"
   },
-  "gitHead": "4ea61b1b9e6750b760a966a41f4e0a0cef85c956"
+  "gitHead": "4589090c353d8131dc11a8ea7d55ae4d859ba624"
 }
