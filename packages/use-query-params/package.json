@@ -62,8 +62,8 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-5": "npm:react-router@^5.3.3",
-    "react-router-dom-5": "npm:react-router-dom@^5.3.3",
     "react-router-6": "npm:react-router@^6.3.0",
+    "react-router-dom-5": "npm:react-router-dom@^5.3.3",
     "react-router-dom-6": "npm:react-router-dom@^6.3.0"
   },
   "peerDependencies": {
@@ -71,7 +71,7 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "serialize-query-params": "^2.0.0"
+    "serialize-query-params": "^2.0.0-rc.0"
   },
   "husky": {
     "hooks": {
@@ -87,5 +87,6 @@
       "eslint --fix",
       "git add"
     ]
-  }
+  },
+  "gitHead": "4ea61b1b9e6750b760a966a41f4e0a0cef85c956"
 }

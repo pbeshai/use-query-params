@@ -41,7 +41,7 @@
     "react-router": ">=5"
   },
   "dependencies": {
-    "use-query-params": "*"
+    "use-query-params": "file:../use-query-params"
   },
   "husky": {
     "hooks": {

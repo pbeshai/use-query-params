@@ -39,7 +39,7 @@
     "@reach/router": "^1.2.1"
   },
   "dependencies": {
-    "use-query-params": "*"
+    "use-query-params": "file:../use-query-params"
   },
   "husky": {
     "hooks": {
