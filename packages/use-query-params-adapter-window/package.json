@@ -37,7 +37,7 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "use-query-params": "*"
+    "use-query-params": "file:../use-query-params"
   },
   "husky": {
     "hooks": {
