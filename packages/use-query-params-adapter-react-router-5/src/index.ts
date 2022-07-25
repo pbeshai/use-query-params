@@ -16,10 +16,10 @@ export const ReactRouter5Adapter: QueryParamAdapterComponent = ({
 
   const adapter: QueryParamAdapter = {
     replace(location) {
-      history.replace(location.search, location.state);
+      history.replace(location.search || '?', location.state);
     },
     push(location) {
-      history.push(location.search, location.state);
+      history.push(location.search || '?', location.state);
     },
     get location() {
       return location;
