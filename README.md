@@ -2,7 +2,7 @@
   <h1>useQueryParams</h1>
   <p>A <a href="https://reactjs.org/docs/hooks-intro.html">React Hook</a>, HOC, and Render Props solution for managing state in URL query parameters with easy serialization.
   </p>
-  <p>Works with <a href="https://reacttraining.com/react-router/">React Router</a> and <a href="https://reach.tech/router">Reach Router</a> out of the box. TypeScript supported.</p>
+  <p>Works with <a href="https://reacttraining.com/react-router/">React Router 5 and 6</a> out of the box. TypeScript supported.</p>
 
 
   <p>
