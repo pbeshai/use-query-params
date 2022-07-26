@@ -121,7 +121,9 @@ export function updateSearchString({
   };
 
   if (navigate) {
-    if (updateType?.startsWith('replace')) {
+    // be defensive about checking updateType since it is somewhat easy to
+    // accidentally pass a second argument to the setter.
+    if (typeof updateType === 'string' && updateType.startsWith('replace')) {
       adapter.replace(newLocation);
     } else {
       adapter.push(newLocation);
