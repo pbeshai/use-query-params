@@ -35,6 +35,10 @@
 - Stops reading from refs in render to prepare for future versions of React where this is not allowed.
 - Simplifies the way locations are updated by only passing in the search string as the new location.
 
+- **v2.0.0-rc.1** Fix CJS imports of adapters (#224)
+- **v2.0.0-rc.1** Be more defensive about reading updateType
+
+
 ### Migrating from v1
 
 There are two things you need to adjust to update from v1:
