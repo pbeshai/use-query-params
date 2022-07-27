@@ -41,4 +41,17 @@ for (const adapterDir of adapterDirs) {
       );
     }
   }
+
+  // create a package.json for import
+  // see #224 https://github.com/pbeshai/use-query-params/issues/224
+  const packageJson = {
+    main: 'index.cjs.js',
+    module: 'index.js',
+    name: `use-query-params/adapters/${adapterName}`,
+    types: 'index.d.ts',
+  };
+  fs.writeFileSync(
+    path.resolve(adapterOutDir, 'package.json'),
+    JSON.stringify(packageJson, null, 2)
+  );
 }
