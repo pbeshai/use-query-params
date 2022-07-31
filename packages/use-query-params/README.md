@@ -34,7 +34,7 @@ Using npm:
 $ npm install --save use-query-params
 ```
 
-Link your routing system via an adapter (e.g., [React Router 6 example](../../examples/react-router-6/src/index.tsx), [React Router 5 example](../../examples/reach-router-5/src/index.tsx)):
+Link your routing system via an adapter (e.g., [React Router 6 example](../../examples/react-router-6/src/index.tsx), [React Router 5 example](../../examples/react-router-5/src/index.tsx)):
 
 ```js
 import React from 'react';
