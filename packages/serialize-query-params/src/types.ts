@@ -39,7 +39,7 @@ export interface QueryParamConfig<D, D2 = D> {
    * does and it would be annoying for there to be two slightly different
    * types.
    */
-  urlName?: D2;
+  urlName?: string;
 }
 
 /**
