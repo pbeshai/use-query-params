@@ -1,5 +1,10 @@
 # Changelog
 
+## serialize-query-params v2.0.1
+
+**Fixes**
+- type for urlName is now string (#227)
+
 ## serialize-query-params v2.0.0
 
 **Breaking**
