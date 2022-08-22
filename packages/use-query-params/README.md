@@ -54,7 +54,7 @@ root.render(
         <Route path="/" element={<App />}>
       </Routes>
     </QueryParamProvider>
-  </Router>,
+  </BrowserRouter>,
   document.getElementById('root')
 );
 ```
