@@ -14,6 +14,7 @@ export const defaultOptions: QueryParamOptionsWithRequired = {
   includeAllParams: false,
   removeDefaultsFromUrl: false,
   enableBatching: false,
+  skipUpdateWhenNoChange: true,
 };
 
 export interface QueryParamOptions {
@@ -22,6 +23,8 @@ export interface QueryParamOptions {
   updateType?: UrlUpdateType;
   includeKnownParams?: boolean;
   includeAllParams?: boolean;
+  /** whether sets that result in no change to the location search string should be ignored (default: true) */
+  skipUpdateWhenNoChange?: boolean;
   params?: QueryParamConfigMap;
 
   /** when a value equals its default, do not encode it in the URL when updating */

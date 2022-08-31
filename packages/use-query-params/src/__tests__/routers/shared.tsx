@@ -448,5 +448,36 @@ export function testSpec(renderWithRouter: any) {
       );
       expect(numRenders).toBe(2);
     });
+
+    it('doesnt update when the search string is the same', async () => {
+      let numRenders = 0;
+      const TestComponent = () => {
+        const [foo, setFoo] = useQueryParam('foo');
+
+        numRenders += 1;
+        return (
+          <div>
+            {JSON.stringify({ foo })}
+            <button
+              onClick={() => {
+                setFoo('foo1');
+              }}
+            >
+              Change
+            </button>
+          </div>
+        );
+      };
+      const { queryByText, getByText } = renderWithRouter(
+        <TestComponent />,
+        '?foo=foo1',
+        { enableBatching: true }
+      );
+
+      expect(queryByText(/{"foo":"foo1"}/)).toBeTruthy();
+      getByText(/Change/).click();
+      await waitFor(() => expect(queryByText(/{"foo":"foo1"}/)).toBeTruthy());
+      expect(numRenders).toBe(1);
+    });
   });
 }
