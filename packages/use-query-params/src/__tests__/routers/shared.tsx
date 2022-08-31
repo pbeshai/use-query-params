@@ -470,8 +470,7 @@ export function testSpec(renderWithRouter: any) {
       };
       const { queryByText, getByText } = renderWithRouter(
         <TestComponent />,
-        '?foo=foo1',
-        { enableBatching: true }
+        '?foo=foo1'
       );
 
       expect(queryByText(/{"foo":"foo1"}/)).toBeTruthy();
