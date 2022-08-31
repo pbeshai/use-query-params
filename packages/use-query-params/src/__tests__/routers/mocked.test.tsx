@@ -66,9 +66,8 @@ const TestRouter = ({
  */
 const TestAdapter: QueryParamAdapterComponent = ({ children }) => {
   const history = React.useContext(TestRouterContext);
-  const [location, setLocation] = React.useState<PartialLocation>(
-    history.location
-  );
+  // need a use state here to force a re-render
+  const [, setLocation] = React.useState<PartialLocation>(history.location);
   React.useLayoutEffect(() => {
     history.onChange = setLocation;
   }, [history]);
@@ -80,8 +79,10 @@ const TestAdapter: QueryParamAdapterComponent = ({ children }) => {
     push(newLocation) {
       history.push(newLocation);
     },
+
+    // note this always reads the latest in history to fix #233
     get location() {
-      return location;
+      return history.location;
     },
   };
   return children(adapter);
