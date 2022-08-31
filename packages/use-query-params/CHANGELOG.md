@@ -1,5 +1,9 @@
 # Changelog
 
+## use-query-params v2.0.1 (August 31, 2022)
+- fixes #233 - consecutive calls to setters (e.g. setFoo('a'); setBar('b')) properly accumulate. Previously only the last would make it through.
+
+
 ## use-query-params v2.0.0
 
 **Breaking**
