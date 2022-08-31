@@ -155,6 +155,7 @@ export function enqueueUpdate(
     scheduleTask(() => {
       const updates = updateQueue.slice();
       updateQueue.length = 0;
+      const initialSearchString = updates[0].currentSearchString;
 
       let searchString: string | undefined;
       for (let i = 0; i < updates.length; ++i) {
@@ -163,6 +164,14 @@ export function enqueueUpdate(
             ? updates[i]
             : { ...updates[i], currentSearchString: searchString! };
         searchString = getUpdatedSearchString(modifiedUpdate);
+      }
+
+      // do not update unnecessarily #234
+      if (
+        args.options.skipUpdateWhenNoChange &&
+        searchString === initialSearchString
+      ) {
+        return;
       }
 
       updateSearchString({
