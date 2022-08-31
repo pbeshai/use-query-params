@@ -1,6 +1,6 @@
 {
   "name": "use-query-params",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "React Hook for managing state in URL query parameters with easy serialization.",
   "main": "./dist/index.cjs.js",
   "typings": "./dist/index.d.ts",

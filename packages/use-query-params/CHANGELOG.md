@@ -1,5 +1,8 @@
 # Changelog
 
+## use-query-params v2.1.0 (August 31, 2022)
+- feat: #234 skip unnecessary updates by default. new option `skipUpdateWhenNoChange` defaults to true (set to false for previous behavior)
+
 ## use-query-params v2.0.1 (August 31, 2022)
 - fixes #233 - consecutive calls to setters (e.g. setFoo('a'); setBar('b')) properly accumulate. Previously only the last would make it through.
 
