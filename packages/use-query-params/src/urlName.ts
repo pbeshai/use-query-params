@@ -42,8 +42,8 @@ export function applyUrlNames(
 ) {
   let newEncodedValues: Partial<EncodedValueMap<any>> = {};
   for (const paramName in encodedValues) {
-    if (paramConfigMap[paramName]?.urlName) {
-      newEncodedValues[paramConfigMap[paramName].urlName] =
+    if (paramConfigMap[paramName]?.urlName != null) {
+      newEncodedValues[paramConfigMap[paramName].urlName!] =
         encodedValues[paramName];
     } else {
       newEncodedValues[paramName] = encodedValues[paramName];

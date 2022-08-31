@@ -327,6 +327,44 @@ export function testSpec(renderWithRouter: any) {
       expect(queryByText(/{"f":2,"g":"b","h":7}/)).toBeTruthy();
     });
 
+    it('multiple updates in same callback work (no batching) with useQueryParam', async () => {
+      const TestComponent = () => {
+        const [foo, setFoo] = useQueryParam('foo');
+        const [bar, setBar] = useQueryParam('bar');
+        const [baz, setBaz] = useQueryParam('baz');
+
+        return (
+          <div>
+            {JSON.stringify({ foo, bar, baz })}
+            <button
+              onClick={() => {
+                setFoo('foo2');
+                setBar('bar2');
+                setBaz('baz2');
+              }}
+            >
+              Change
+            </button>
+          </div>
+        );
+      };
+      const { queryByText, getByText } = renderWithRouter(
+        <TestComponent />,
+        '?foo=foo1&bar=bar1&baz=baz1',
+        { enableBatching: false }
+      );
+
+      expect(
+        queryByText(/{"foo":"foo1","bar":"bar1","baz":"baz1"}/)
+      ).toBeTruthy();
+      getByText(/Change/).click();
+      await waitFor(() =>
+        expect(
+          queryByText(/{"foo":"foo2","bar":"bar2","baz":"baz2"}/)
+        ).toBeTruthy()
+      );
+    });
+
     it('multiple updates in same callback work (batching) with useQueryParam', async () => {
       let numRenders = 0;
       const TestComponent = () => {
@@ -409,48 +447,6 @@ export function testSpec(renderWithRouter: any) {
         ).toBeTruthy()
       );
       expect(numRenders).toBe(2);
-    });
-
-    it('disabling batching works', async () => {
-      let numRenders = 0;
-      const TestComponent = () => {
-        const [foo, setFoo] = useQueryParam('foo');
-        const [bar, setBar] = useQueryParam('bar');
-        const [baz, setBaz] = useQueryParam('baz');
-
-        numRenders += 1;
-
-        return (
-          <div>
-            {JSON.stringify({ foo, bar, baz })}
-            <button
-              onClick={() => {
-                setFoo('foo2');
-                setBar('bar2');
-                setBaz('baz2'); // the above get clobbered if batching is off
-              }}
-            >
-              Change
-            </button>
-          </div>
-        );
-      };
-      const { queryByText, getByText } = renderWithRouter(
-        <TestComponent />,
-        '?foo=foo1&bar=bar1&baz=baz1',
-        { enableBatching: false }
-      );
-
-      expect(numRenders).toBe(1);
-      expect(
-        queryByText(/{"foo":"foo1","bar":"bar1","baz":"baz1"}/)
-      ).toBeTruthy();
-      getByText(/Change/).click();
-      await waitFor(() =>
-        expect(
-          queryByText(/{"foo":"foo1","bar":"bar1","baz":"baz2"}/)
-        ).toBeTruthy()
-      );
     });
   });
 }
