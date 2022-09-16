@@ -1,6 +1,5 @@
 import { useContext } from 'react';
-import { useNavigate, useLocation } from 'react-router';
-import { UNSAFE_NavigationContext } from 'react-router-dom';
+import { UNSAFE_NavigationContext, useNavigate, useLocation } from 'react-router-dom';
 import {
   QueryParamAdapter,
   QueryParamAdapterComponent,
