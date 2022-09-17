@@ -1,5 +1,5 @@
 // @ts-ignore
-import { useHistory, useLocation } from 'react-router';
+import { useHistory, useLocation } from 'react-router-dom';
 import {
   QueryParamAdapter,
   QueryParamAdapterComponent,
