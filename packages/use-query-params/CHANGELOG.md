@@ -1,5 +1,8 @@
 # Changelog
 
+## use-query-params v2.1.1 (September 16, 2022)
+- fix: #241 import from react-router-dom in adapters to prevent error about wrong context. (thank you @lisandro52)
+
 ## use-query-params v2.1.0 (August 31, 2022)
 - feat: #234 skip unnecessary updates by default. new option `skipUpdateWhenNoChange` defaults to true (set to false for previous behavior)
 
