@@ -1,5 +1,10 @@
 # Changelog
 
+## serialize-query-params v2.0.2
+
+**Fixes**
+- `updateLocation` returns an empty string for `href` when the original `location.href` is not defined. This allows `updateLocation` to be recursively recalled without crashing when creating a `new URL()`  (#244)
+
 ## serialize-query-params v2.0.1
 
 **Fixes**

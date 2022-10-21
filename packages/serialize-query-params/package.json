@@ -1,6 +1,6 @@
 {
   "name": "serialize-query-params",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A library for simplifying encoding and decoding URL query parameters.",
   "main": "./dist/index.cjs.js",
   "types": "./dist/index.d.ts",

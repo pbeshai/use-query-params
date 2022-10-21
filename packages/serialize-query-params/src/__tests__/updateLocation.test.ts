@@ -77,6 +77,26 @@ describe('updateLocation', () => {
     );
     expect(newLocation2.search).toBe('?bar=[({1,2:6:4,5})]&foo=o%20t%20h');
   });
+  it('call it twice, should not throw exception', () => {
+    const location = makeMockLocation({
+        foo: 'one two',
+        bar: '[({1,2:3:4,5})]',
+    }, false);
+    const newLocationAsReturned = updateLocation(
+        { foo: 'o t h', bar: '[({1,2:3:6,5})]' },
+        location,
+        (params) => stringify(params, { encode: false })
+    );
+    const newLocation2 = updateLocation(
+    { foo: 'o t h', bar: '[({1,2:6:4,5})]' },
+      newLocationAsReturned,
+        (params) => {
+            const str = stringify(params, { encode: false });
+            return transformSearchStringJsonSafe(str).replace(/ /g, '%20');
+        }
+    );
+    expect(newLocation2.search).toBe('?bar=[({1,2:6:4,5})]&foo=o%20t%20h');
+  });
 });
 
 describe('updateInLocation', () => {
