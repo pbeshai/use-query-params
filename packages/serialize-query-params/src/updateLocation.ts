@@ -10,7 +10,7 @@ const JSON_SAFE_CHARS = `{}[],":`
   .split('')
   .map((d) => [d, encodeURIComponent(d)]);
 
-const getHrefFromLocation = (location: Location, search: string) => {
+function getHrefFromLocation(location: Location, search: string): string {
   // https://developer.mozilla.org/en-US/docs/Web/API/URL/URL
   let href: string = search;
 
@@ -26,7 +26,7 @@ const getHrefFromLocation = (location: Location, search: string) => {
   }
 
   return href;
-};
+}
 
 export function transformSearchStringJsonSafe(searchString: string): string {
   let str = searchString;
