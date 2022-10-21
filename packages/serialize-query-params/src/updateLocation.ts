@@ -10,6 +10,24 @@ const JSON_SAFE_CHARS = `{}[],":`
   .split('')
   .map((d) => [d, encodeURIComponent(d)]);
 
+function getHrefFromLocation(location: Location, search: string): string {
+  // https://developer.mozilla.org/en-US/docs/Web/API/URL/URL
+  let href: string = search;
+
+  if (location.href) {
+      // TODO - implement base option if location.href is relative
+      //  see https://developer.mozilla.org/en-US/docs/Web/API/URL/URL#syntax
+    try {
+      const url = new URL(location.href);
+      href = `${url.origin}${url.pathname}${search}`;
+    } catch (e) {
+      href = '';
+    }
+  }
+
+  return href;
+}
+
 export function transformSearchStringJsonSafe(searchString: string): string {
   let str = searchString;
   for (let [char, code] of JSON_SAFE_CHARS) {
@@ -30,13 +48,6 @@ export function updateLocation(
   let encodedSearchString = objectToSearchStringFn(encodedQuery);
 
   const search = encodedSearchString.length ? `?${encodedSearchString}` : '';
-  let href: string;
-  if (location.href) {
-    const url = new URL(location.href);
-    href = `${url.origin}${url.pathname}${search}`;
-  } else {
-    href = search;
-  }
 
   const newLocation: Location & {
     key: string;
@@ -44,7 +55,7 @@ export function updateLocation(
   } = {
     ...location,
     key: `${Date.now()}`, // needed for some routers (e.g. react-router)
-    href,
+    href: getHrefFromLocation(location, search),
     search,
     query: encodedQuery, // needed for some routers (e.g. found)
   };
