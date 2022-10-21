@@ -12,13 +12,17 @@ const JSON_SAFE_CHARS = `{}[],":`
 
 const getHrefFromLocation = (location: Location, search: string) => {
   // https://developer.mozilla.org/en-US/docs/Web/API/URL/URL
-  let href: string = '';
+  let href: string = search;
 
   if (location.href) {
       // TODO - implement base option if location.href is relative
       //  see https://developer.mozilla.org/en-US/docs/Web/API/URL/URL#syntax
+    try {
       const url = new URL(location.href);
       href = `${url.origin}${url.pathname}${search}`;
+    } catch (e) {
+      href = '';
+    }
   }
 
   return href;
