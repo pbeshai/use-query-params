@@ -1,5 +1,8 @@
 # Changelog
 
+## use-query-params v2.1.2 (October 24, 2022)
+- fix: #244 `updateLocation` returns an empty string for `href` when the original `location.href` is not defined. This allows `updateLocation` to be recursively recalled without crashing when creating a `new URL()`  (thank you @jmcpeak) 
+
 ## use-query-params v2.1.1 (September 16, 2022)
 - fix: #241 import from react-router-dom in adapters to prevent error about wrong context. (thank you @lisandro52)
 
