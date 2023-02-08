@@ -1,5 +1,10 @@
 import { useContext } from 'react';
-import { UNSAFE_NavigationContext, useNavigate, useLocation } from 'react-router-dom';
+import {
+  UNSAFE_NavigationContext,
+  useNavigate,
+  useLocation,
+  UNSAFE_DataRouterContext,
+} from 'react-router-dom';
 import {
   QueryParamAdapter,
   QueryParamAdapterComponent,
@@ -18,6 +23,7 @@ export const ReactRouter6Adapter: QueryParamAdapterComponent = ({
   // see: https://github.com/remix-run/react-router/blob/f3d87dcc91fbd6fd646064b88b4be52c15114603/packages/react-router-dom/index.tsx#L113-L131
   const { navigator } = useContext(UNSAFE_NavigationContext);
   const navigate = useNavigate();
+  const router = useContext(UNSAFE_DataRouterContext)?.router;
   const location = useLocation();
 
   const adapter: QueryParamAdapter = {
@@ -35,7 +41,9 @@ export const ReactRouter6Adapter: QueryParamAdapterComponent = ({
     },
     get location() {
       // be a bit defensive here in case of an unexpected breaking change in React Router
-      return (navigator as any)?.location ?? location;
+      return (
+        router?.state?.location ?? (navigator as any)?.location ?? location
+      );
     },
   };
 

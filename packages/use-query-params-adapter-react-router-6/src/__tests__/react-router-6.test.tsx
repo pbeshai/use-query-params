@@ -1,36 +1,85 @@
 import { cleanup, render } from '@testing-library/react';
-import { createMemoryHistory } from 'history';
 import * as React from 'react';
-import { unstable_HistoryRouter } from 'react-router-dom';
-import { describe, afterEach } from 'vitest';
-import { QueryParamProvider, QueryParamOptions } from 'use-query-params/src';
+import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { QueryParamOptions, QueryParamProvider } from 'use-query-params/src';
 import { testSpec } from 'use-query-params/src/__tests__/routers/shared';
+import { afterEach, describe, vi } from 'vitest';
 import { ReactRouter6Adapter } from '..';
-
-// use this router so we can pass our own history to inspect
-const HistoryRouter = unstable_HistoryRouter;
 
 function renderWithRouter(
   ui: React.ReactNode,
   initialRoute: string,
   options?: QueryParamOptions
 ) {
-  const history = createMemoryHistory({ initialEntries: [initialRoute] });
-  const results = render(
-    <HistoryRouter history={history}>
-      <QueryParamProvider adapter={ReactRouter6Adapter} options={options}>
-        {ui}
-      </QueryParamProvider>
-    </HistoryRouter>
+  // note this set up is a bit weird due to historical reasons where
+  // we originally relied on a history object for a router to
+  // determine push/replace. this is less the focus of newer react
+  // router versions, but this adapter approach works.
+  let entries: any[] = [initialRoute];
+  const router = createMemoryRouter(
+    [
+      {
+        path: '/:page?',
+        element: (
+          <QueryParamProvider adapter={ReactRouter6Adapter} options={options}>
+            {ui}
+          </QueryParamProvider>
+        ),
+      },
+    ],
+    { initialEntries: entries }
   );
-  const rerender = (ui: React.ReactNode, newOptions = options) =>
-    results.rerender(
-      <HistoryRouter history={history}>
-        <QueryParamProvider adapter={ReactRouter6Adapter} options={newOptions}>
-          {ui}
-        </QueryParamProvider>
-      </HistoryRouter>
+  let history = {
+    router,
+    get location() {
+      return this.router.state.location;
+    },
+    replace: vi.fn(),
+    push: vi.fn(),
+  };
+
+  // keep track of updates to help tests inspect push/replace/rerender
+  router.subscribe(function (state) {
+    entries.push(state.location);
+    if (state.historyAction === 'REPLACE') {
+      history.replace(state.location);
+    } else if (state.historyAction === 'PUSH') {
+      history.push(state.location);
+    }
+  });
+
+  const results = render(<RouterProvider router={router} />);
+  const rerender = (ui: React.ReactNode, newOptions = options) => {
+    const newRouter = createMemoryRouter(
+      [
+        {
+          path: '/:page?',
+          element: (
+            <QueryParamProvider
+              adapter={ReactRouter6Adapter}
+              options={newOptions}
+            >
+              {ui}
+            </QueryParamProvider>
+          ),
+        },
+      ],
+      { initialEntries: entries }
     );
+    history.router = newRouter;
+
+    // keep track of updates to help tests inspect push/replace/rerender
+    newRouter.subscribe(function (state) {
+      entries.push(state.location);
+      if (state.historyAction === 'REPLACE') {
+        history.replace(state.location);
+      } else if (state.historyAction === 'PUSH') {
+        history.push(state.location);
+      }
+    });
+
+    return results.rerender(<RouterProvider router={newRouter} />);
+  };
   return {
     ...results,
     rerender,
