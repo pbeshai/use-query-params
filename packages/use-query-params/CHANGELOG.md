@@ -1,5 +1,8 @@
 # Changelog
 
+## use-query-params v2.2.0 (February 8, 2023)
+- fix: #233 attempt to read location from data router in react-router 6.6+. making this a minor revision since it imports something that may not be there in older versions of react-router 6.
+
 ## use-query-params v2.1.2 (October 24, 2022)
 - fix: #244 `updateLocation` returns an empty string for `href` when the original `location.href` is not defined. This allows `updateLocation` to be recursively recalled without crashing when creating a `new URL()`  (thank you @jmcpeak) 
 
