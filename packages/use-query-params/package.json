@@ -68,8 +68,18 @@
     "react-router-dom-6": "npm:react-router-dom@^6.8.1"
   },
   "peerDependencies": {
+    "@reach/router": "^1.2.1",
     "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
+    "react-dom": ">=16.8.0",
+    "react-router-dom": ">=5"
+  },
+  "peerDependenciesMeta": {
+    "@reach/router": {
+      "optional": true
+    },
+    "react-router-dom": {
+      "optional": true
+    }
   },
   "dependencies": {
     "serialize-query-params": "^2.0.2"
