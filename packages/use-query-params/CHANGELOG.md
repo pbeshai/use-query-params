@@ -1,5 +1,9 @@
 # Changelog
 
+## use-query-params v2.2.1 (March 24, 2023)
+- fix: #256 adds peer dependencies and metas to allow adapters to work on pnpm setups
+
+
 ## use-query-params v2.2.0 (February 8, 2023)
 - fix: #233 attempt to read location from data router in react-router 6.6+. making this a minor revision since it imports something that may not be there in older versions of react-router 6.
 
