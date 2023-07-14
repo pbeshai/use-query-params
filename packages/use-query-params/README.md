@@ -386,8 +386,14 @@ const CommaArrayParam = {
 #### useQueryParam
 
 ```js
-useQueryParam<T>(name: string, paramConfig?: QueryParamConfig<T>, options?: QueryParamOptions):
-  [T | undefined, (newValue: T, updateType?: UrlUpdateType) => void]
+useQueryParam<TypeToEncode, TypeFromDecode = TypeToEncode>(
+  name: string,
+  paramConfig?: QueryParamConfig<TypeToEncode, TypeFromDecode>,
+  options?: QueryParamOptions
+): [
+  TypeFromDecode, 
+  (newValue: NewValueType<TypeToEncode>, updateType?: UrlUpdateType) => void
+]
 ```
 
 Given a query param name and query parameter configuration `{ encode, decode }`
@@ -551,8 +557,8 @@ is one of `'pushIn' | 'push' | 'replaceIn' | 'replace'`, defaulting to
 ```js
 encodeQueryParams<QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap,
-  query: Partial<DecodedValueMap<QPCMap>>
-): EncodedQueryWithNulls
+  query: Partial<ToBeEncodedValueMap<QPCMap>>
+): Partial<EncodedValueMap<QPCMap>>
 ```
 
 Convert the values in query to strings via the encode functions configured

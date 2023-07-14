@@ -1,10 +1,12 @@
+import {EncodedValue} from "types";
+
 /**
  * Interprets an encoded string and returns either the string or null/undefined if not available.
  * Ignores array inputs (takes just first element in array)
  * @param input encoded string
  */
 function getEncodedValue(
-  input: string | (string | null)[] | null | undefined,
+  input: EncodedValue,
   allowEmptyString?: boolean
 ): string | null | undefined {
   if (input == null) {
@@ -35,7 +37,7 @@ function getEncodedValue(
  * @param input encoded string
  */
 function getEncodedValueArray(
-  input: string | (string | null)[] | null | undefined
+  input: EncodedValue
 ): (string | null)[] | null | undefined {
   if (input == null) {
     return input;
@@ -78,7 +80,7 @@ export function encodeDate(
  * @return {Date} parsed date
  */
 export function decodeDate(
-  input: string | (string | null)[] | null | undefined
+  input: EncodedValue
 ): Date | null | undefined {
   const dateString = getEncodedValue(input);
   if (dateString == null) return dateString;
@@ -130,7 +132,7 @@ export function encodeDateTime(
  * @return {Date} parsed date
  */
 export function decodeDateTime(
-  input: string | (string | null)[] | null | undefined
+  input: EncodedValue
 ): Date | null | undefined {
   const dateString = getEncodedValue(input);
   if (dateString == null) return dateString;
@@ -170,7 +172,7 @@ export function encodeBoolean(
  * @return {Boolean} the boolean value
  */
 export function decodeBoolean(
-  input: string | (string | null)[] | null | undefined
+  input: EncodedValue
 ): boolean | null | undefined {
   const boolStr = getEncodedValue(input);
   if (boolStr == null) return boolStr;
@@ -210,7 +212,7 @@ export function encodeNumber(
  * @return {Number} the number value
  */
 export function decodeNumber(
-  input: string | (string | null)[] | null | undefined
+  input: EncodedValue
 ): number | null | undefined {
   const numStr = getEncodedValue(input);
   if (numStr == null) return numStr;
@@ -227,7 +229,7 @@ export function decodeNumber(
  * @return {String} the encoded string
  */
 export function encodeString(
-  str: string | (string | null)[] | null | undefined
+  str: EncodedValue
 ): string | null | undefined {
   if (str == null) {
     return str;
@@ -245,7 +247,7 @@ export function encodeString(
  * @return {String} the string value
  */
 export function decodeString(
-  input: string | (string | null)[] | null | undefined
+  input: EncodedValue
 ): string | null | undefined {
   const str = getEncodedValue(input, true);
   if (str == null) return str;
@@ -263,7 +265,7 @@ export function decodeString(
  * @return {String} the string value from enumValues
  */
 export function decodeEnum<T extends string>(
-  input: string | (string | null)[] | null | undefined,
+  input: EncodedValue,
   enumValues: T[]
 ): T | null | undefined {
   const str = decodeString(input);
@@ -280,7 +282,7 @@ export function decodeEnum<T extends string>(
  * @return {T[]} the string value from enumValues
  */
 export function decodeArrayEnum<T extends string>(
-  input: string | (string | null)[] | null | undefined,
+  input: EncodedValue,
   enumValues: T[]
 ): T[] | null | undefined {
   const arr = decodeArray(input);
@@ -302,7 +304,7 @@ export function decodeArrayEnum<T extends string>(
  * @return {T[]} the string value from enumValues
  */
 export function decodeDelimitedArrayEnum<T extends string>(
-  input: string | (string | null)[] | null | undefined,
+  input: EncodedValue,
   enumValues: T[],
   entrySeparator = '_'
 ): T[] | null | undefined {
@@ -336,7 +338,7 @@ export function encodeJson(
  * @return {Any} The javascript representation
  */
 export function decodeJson(
-  input: string | (string | null)[] | null | undefined
+  input: EncodedValue
 ): any | null | undefined {
   const jsonStr = getEncodedValue(input);
   if (jsonStr == null) return jsonStr;
@@ -376,7 +378,7 @@ export function encodeArray(
  * @return {Array} The javascript representation
  */
 export function decodeArray(
-  input: string | (string | null)[] | null | undefined
+  input: EncodedValue
 ): (string | null)[] | null | undefined {
   const arr = getEncodedValueArray(input);
   if (arr == null) return arr;
@@ -409,7 +411,7 @@ export function encodeNumericArray(
  * @return {Array} The javascript representation
  */
 export function decodeNumericArray(
-  input: string | (string | null)[] | null | undefined
+  input: EncodedValue
 ): (number | null)[] | null | undefined {
   const arr = decodeArray(input);
   if (arr == null) return arr;
@@ -449,7 +451,7 @@ export function encodeDelimitedArray(
  * @return {Array} The javascript representation
  */
 export function decodeDelimitedArray(
-  input: string | (string | null)[] | null | undefined,
+  input: EncodedValue,
   entrySeparator = '_'
 ): (string | null)[] | null | undefined {
   const arrayStr = getEncodedValue(input, true);
@@ -481,7 +483,7 @@ export const encodeDelimitedNumericArray = encodeDelimitedArray as (
  * @return {Array} The javascript representation
  */
 export function decodeDelimitedNumericArray(
-  arrayStr: string | (string | null)[] | null | undefined,
+  arrayStr: EncodedValue,
   entrySeparator = '_'
 ): (number | null)[] | null | undefined {
   const decoded = decodeDelimitedArray(arrayStr, entrySeparator);
@@ -528,7 +530,7 @@ export function encodeObject(
  * @return {Object} The javascript object
  */
 export function decodeObject(
-  input: string | (string | null)[] | null | undefined,
+  input: EncodedValue,
   keyValSeparator = '-',
   entrySeparator = '_'
 ): { [key: string]: string } | null | undefined {
@@ -577,7 +579,7 @@ export const encodeNumericObject = encodeObject as (
  * @return {Object} The javascript object
  */
 export function decodeNumericObject(
-  input: string | (string | null)[] | null | undefined,
+  input: EncodedValue,
   keyValSeparator = '-',
   entrySeparator = '_'
 ): { [key: string]: number | null | undefined } | null | undefined {

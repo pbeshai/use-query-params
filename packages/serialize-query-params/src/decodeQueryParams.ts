@@ -5,12 +5,12 @@ import { DecodedValueMap, QueryParamConfigMap, EncodedValueMap } from './types';
  * in paramConfigMap
  *
  * @param paramConfigMap Map from query name to { encode, decode } config
- * @param query Query updates mapping param name to decoded value
+ * @param encodedQuery Query updates mapping param name to decoded value
  */
 export function decodeQueryParams<QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap,
   encodedQuery: Partial<EncodedValueMap<QPCMap>>
-): Partial<DecodedValueMap<QPCMap>> {
+): DecodedValueMap<QPCMap> {
   const decodedQuery: Partial<DecodedValueMap<QPCMap>> = {};
 
   // iterate over all keys in the config (#30)
@@ -39,9 +39,9 @@ export function decodeQueryParams<QPCMap extends QueryParamConfigMap>(
     } else {
       decodedQuery[paramName as keyof QPCMap] = paramConfigMap[
         paramName
-      ].decode(encodedValue as string | (string | null)[] | null);
+      ].decode(encodedValue);
     }
   }
 
-  return decodedQuery;
+  return decodedQuery as DecodedValueMap<QPCMap>;
 }

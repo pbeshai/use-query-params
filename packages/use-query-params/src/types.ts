@@ -2,6 +2,7 @@ import {
   QueryParamConfigMap,
   DecodedValueMap,
   QueryParamConfig,
+  ToBeEncodedValueMap,
 } from 'serialize-query-params';
 
 /**
@@ -19,10 +20,10 @@ export type UrlUpdateType = 'replace' | 'replaceIn' | 'push' | 'pushIn';
  */
 export type SetQuery<QPCMap extends QueryParamConfigMap> = (
   changes:
-    | Partial<DecodedValueMap<QPCMap>>
+    | Partial<ToBeEncodedValueMap<QPCMap>>
     | ((
         latestValues: DecodedValueMap<QPCMap>
-      ) => Partial<DecodedValueMap<QPCMap>>),
+      ) => Partial<ToBeEncodedValueMap<QPCMap>>),
   updateType?: UrlUpdateType
 ) => void;
 
