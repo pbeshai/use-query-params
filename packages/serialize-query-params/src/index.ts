@@ -52,6 +52,7 @@ export type {
   QueryParamConfigMap,
   DecodedValueMap,
   EncodedValueMap,
+  ToBeEncodedValueMap
 } from './types';
 
 export {

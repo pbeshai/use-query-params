@@ -138,7 +138,7 @@ const CommaArrayParam = {
 decodeQueryParams<QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap,
   encodedQuery: Partial<EncodedValueMap<QPCMap>>
-): Partial<DecodedValueMap<QPCMap>>
+): DecodedValueMap<QPCMap>
 ```
 
 Convert the values in query from strings to their natural types via the
@@ -170,7 +170,7 @@ const decodedQuery = decodeQueryParams(
 ```js
 encodeQueryParams<QPCMap extends QueryParamConfigMap>(
   paramConfigMap: QPCMap,
-  query: Partial<DecodedValueMap<QPCMap>>
+  query: Partial<ToBeEncodedValueMap<QPCMap>>
 ): Partial<EncodedValueMap<QPCMap>>
 ```
 

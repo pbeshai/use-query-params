@@ -1,8 +1,13 @@
 /**
+ * Encoded query parameter's value
+ */
+export type EncodedValue = string | (string | null)[] | null | undefined;
+
+/**
  * Encoded query parameters, possibly including null or undefined values
  */
 export interface EncodedQuery {
-  [key: string]: string | (string | null)[] | null | undefined;
+  [key: string]: EncodedValue;
 }
 
 /**
@@ -15,10 +20,10 @@ export interface EncodedQuery {
  */
 export interface QueryParamConfig<D, D2 = D> {
   /** Convert the query param value to a string */
-  encode: (value: D) => string | (string | null)[] | null | undefined;
+  encode: (value: D) => EncodedValue;
 
   /** Convert the query param string value to its native type */
-  decode: (value: string | (string | null)[] | null | undefined) => D2;
+  decode: (value: EncodedValue) => D2;
 
   /** Checks if two values are equal (otherwise typically shallowEqual will be used) */
   equals?: (valueA: D | D2, valueB: D | D2) => boolean;
@@ -60,5 +65,12 @@ export type DecodedValueMap<QPCMap extends QueryParamConfigMap> = {
  * Mapping from a query parameter name to it's encoded value type
  */
 export type EncodedValueMap<QPCMap extends QueryParamConfigMap> = {
-  [P in keyof QPCMap]: string | (string | null)[] | null | undefined;
+  [P in keyof QPCMap]: EncodedValue;
+};
+
+/**
+ * Mapping from a query parameter name to it's value to be encoded
+ */
+export type ToBeEncodedValueMap<QPCMap extends QueryParamConfigMap> = {
+  [P in keyof QPCMap]: Parameters<QPCMap[P]['encode']>[0];
 };
