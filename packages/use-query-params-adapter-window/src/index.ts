@@ -1,13 +1,19 @@
-import { useState } from 'react';
-import { PartialLocation, QueryParamAdapterComponent } from 'use-query-params';
+import { useEffect, useState } from 'react';
+import {
+  PartialLocation,
+  QueryParamAdapterComponent,
+  QueryParamAdapter,
+} from 'use-query-params';
 
-function makeAdapter() {
+function makeAdapter({ onChange }: { onChange(): void }): QueryParamAdapter {
   const adapter = {
     replace(location: PartialLocation) {
       window.history.replaceState(location.state, '', location.search || '?');
+      onChange();
     },
     push(location: PartialLocation) {
       window.history.pushState(location.state, '', location.search || '?');
+      onChange();
     },
     get location() {
       return window.location;
@@ -24,8 +30,17 @@ function makeAdapter() {
 export const WindowHistoryAdapter: QueryParamAdapterComponent = ({
   children,
 }) => {
+  const handleURLChange = () =>
+    setAdapter(makeAdapter({ onChange: handleURLChange }));
   // we use a lazy caching solution to prevent #46 from happening
-  const [adapter] = useState(makeAdapter);
+  const [adapter, setAdapter] = useState(() =>
+    makeAdapter({ onChange: handleURLChange })
+  );
+
+  useEffect(() => {
+    window.addEventListener('popstate', handleURLChange);
+    return () => window.removeEventListener('popstate', handleURLChange);
+  }, []);
 
   return children(adapter);
 };
