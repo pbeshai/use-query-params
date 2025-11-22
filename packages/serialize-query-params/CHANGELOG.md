@@ -1,5 +1,13 @@
 # Changelog
 
+## serialize-query-params v2.0.3
+
+**Fixes**
+- Fix types of encodeQueryParams and decodeQueryParams #272
+- fix: add encodeDateTime, decodeDateTime exports
+
+
+
 ## serialize-query-params v2.0.2
 
 **Fixes**
