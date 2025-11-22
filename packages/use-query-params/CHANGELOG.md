@@ -1,5 +1,10 @@
 # Changelog
 
+## use-query-params v2.2.2 (November 21, 2025)
+
+- fix(WindowAdapter): update adapter when window location is changed
+- latest serialize-query-params (2.0.3)
+
 ## use-query-params v2.2.1 (March 24, 2023)
 - fix: #256 adds peer dependencies and metas to allow adapters to work on pnpm setups
 

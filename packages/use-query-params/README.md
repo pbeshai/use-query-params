@@ -631,7 +631,7 @@ You can specify global options at the provider level.
 | includeKnownParams | undefined | When true, include all parameters that were configured via the `params` option on a QueryParamProvider. Default behavior depends on the arguments passed to useQueryParams (if not specifying any params, it is true, otherwise false). |
 | includeAllParams | false | Include all parameters found in the URL even if not configured in any param config. |
 | removeDefaultsFromUrl | false | When true, removes parameters from the URL when set is called if their value is the same as their default (based on the `default` attribute of the Param object, typically populated by `withDefault()`) |
-| *enableBatching* | false | **experimental** - turns on batching (i.e., multiple consecutive calls to setQueryParams in a row only result in a single update to the URL). Currently marked as experimental since we need to update all the tests to verify no issues occur, feedback welcome. |
+| *enableBatching* | false | - turns on batching (i.e., multiple consecutive calls to setQueryParams in a row only result in a single update to the URL). Likely will default to true in a future version. |
 
 
 
