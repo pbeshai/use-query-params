@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ToBeEncodedValueMap,
   DecodedValueMap,
   QueryParamConfig,
   QueryParamConfigMap,
@@ -23,9 +24,9 @@ import { enqueueUpdate } from './updateSearchString';
 import { serializeUrlNameMap } from './urlName';
 
 // for multiple param config
-type ChangesType<DecodedValueMapType> =
-  | Partial<DecodedValueMapType>
-  | ((latestValues: DecodedValueMapType) => Partial<DecodedValueMapType>);
+type ChangesType<QPCMap extends QueryParamConfigMap> =
+  | Partial<ToBeEncodedValueMap<QPCMap>>
+  | ((latestValues: DecodedValueMap<QPCMap>) => Partial<ToBeEncodedValueMap<QPCMap>>);
 
 type UseQueryParamsResult<QPCMap extends QueryParamConfigMap> = [
   DecodedValueMap<QPCMap>,
