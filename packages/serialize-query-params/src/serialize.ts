@@ -1,4 +1,4 @@
-import {EncodedValue} from "types";
+import {EncodedValue} from "./types";
 
 /**
  * Interprets an encoded string and returns either the string or null/undefined if not available.
