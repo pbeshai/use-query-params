@@ -1,5 +1,10 @@
 # Changelog
 
+## serialize-query-params v2.0.4
+
+**Fixes**
+- Fix type import for EncodedValue #304
+
 ## serialize-query-params v2.0.3
 
 **Fixes**
